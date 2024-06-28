@@ -15,7 +15,7 @@ export default function Home() {
       </div>
       <div className="rounded-lg shadow-lg bg-[#2640EB] mt-8 py-8 px-16 flex flex-col items-center justify-center">
         <h2 className="text-white text-2xl font-extrabold">Looking for us?</h2>
-        <div className="text-white text-xl">We're revamping. Check back soon!</div>
+        <div className="text-white text-xl">We&apos;re revamping. Check back soon!</div>
       </div>
     </main>
   );
