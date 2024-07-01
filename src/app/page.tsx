@@ -1,4 +1,7 @@
 'use client'
+import { useRef } from 'react';
+import { Provider } from 'react-redux';
+import { makeStore, AppStore } from '@/lib/store';
 import CandidateSignUpForm from '@/components/forms/CandidateSignUpForm';
 import clsx from 'clsx';
 import { PrivyProvider } from '@privy-io/react-auth';
