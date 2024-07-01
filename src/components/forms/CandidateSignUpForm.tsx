@@ -63,7 +63,7 @@ export default function CandidateSignUpForm() {
                                 height={50}
                                 priority
                             />
-                        <p>Follow</p>
+                        <p className="text-xl font-bold text-white">Follow</p>
                     </button>
                 </div>
             }
