@@ -1,74 +1,80 @@
-import { usePrivy } from "@privy-io/react-auth";
+"use client";
 import Image from "next/image";
+import { Checkbox } from "../ui/checkbox";
+import { useState } from "react";
+import { Button } from "../ui/button";
 
 export default function CandidateSignUpForm() {
-  const { ready, authenticated, login, user } = usePrivy();
+  const [acceptDC, setAcceptDC] = useState(false);
+
+  const handleAcceptDC = async () => {
+    // TODO - implement functionality to check if user has accepted DCs
+    // Need to research
+    setAcceptDC(!acceptDC);
+  };
 
   return (
     <div className='flex flex-col justify-center items-center gap-8'>
-      {!authenticated ? (
-        <div className='flex flex-col items-center gap-4'>
-          <p className='text-xl font-bold'>Connect your Farcaster</p>
-
-          <button
-            onClick={login}
-            className='flex items-center gap-4 bg-[#8A63D2] px-4 py-2 rounded-xl w-max'
-          >
-            <Image
-              className='relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert'
-              src='/fc-logo-transparent-white.png'
-              alt='Farcaster Logo'
-              width={40}
-              height={50}
-              priority
+      <div className='flex flex-col w-full gap-8 justify-start'>
+        <div>
+          <div className='items-top flex space-x-2 text-white'>
+            <Checkbox
+              id='acceptCast'
+              className='h-6 w-6 border border-white checked:bg-[#8A63D2]'
+              checked={acceptDC}
+              onClick={() => handleAcceptDC()}
             />
-            <p className='text-white font-bold text-xl'>Connect</p>
-          </button>
-        </div>
-      ) : (
-        /* Check if user has accepted DCs and ask for permission
-                   TODO - implement functionality to check this. Need to research
-                */
-        <>
-          <div>
-            <label className='flex gap-2 items-center'>
-              <input
-                type='checkbox'
-                className='appearance-none w-[2em] h-[2em] rounded-md border-black border-2'
-              />
-              <p className='text-xl font-bold'>Accept Direct Casts</p>
-            </label>
-          </div>
-          {/* Check if user follows interested.fyi and prompt if not */}
-          <div className='flex flex-col gap-2 items-center'>
-            <p className='text-lg font-bold'>
-              Follow{" "}
-              <a
-                className='text-blue-500'
-                href='https://warpcast.com/interestedfyi'
-                target='_blank'
+            <div className='grid gap-1.5 leading-none items-center'>
+              <label
+                htmlFor='acceptCast'
+                className='text-lg font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
               >
-                @interestedfyi
-              </a>{" "}
-              on Farcaster
-            </p>
-            <button className='flex items-center gap-4 bg-[#8A63D2] px-4 py-2 rounded-xl w-max'>
-              <Image
-                className='relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert'
-                src='/fc-logo-transparent-white.png'
-                alt='Farcaster Logo'
-                width={40}
-                height={50}
-                priority
-              />
-              <p className='text-xl font-bold text-white'>Follow</p>
-            </button>
+                Accept direct casts
+              </label>
+            </div>
           </div>
-          <button className='px-4 py-4 rounded-xl w-max bg-[#2640EB] text-white font-bold text-2xl'>
-            <p>Create Profile</p>
-          </button>
-        </>
-      )}
+        </div>
+        {/* Check if user follows interested.fyi and prompt if not */}
+        <div className='flex flex-col justify-start min-h-24 gap-4 text-white'>
+          {acceptDC ? (
+            <>
+              <p className='text-lg font-bold'>
+                Follow{" "}
+                <a
+                  className='text-[#E8FC6C]'
+                  href='https://warpcast.com/interestedfyi'
+                  target='_blank'
+                >
+                  @interestedfyi
+                </a>{" "}
+                on Farcaster
+              </p>
+              <Button
+                size='lg'
+                className='flex items-center gap-4 bg-[#8A63D2] hover:bg-[#986de8] rounded-xl w-max'
+              >
+                <Image
+                  className='relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert'
+                  src='/fc-logo-transparent-white.png'
+                  alt='Farcaster Logo'
+                  width={40}
+                  height={50}
+                  priority
+                />
+                <p className='text-xl font-bold text-white'>Follow</p>
+              </Button>
+            </>
+          ) : null}
+        </div>
+        {acceptDC ? (
+          <Button
+            className='rounded-xl bg-[#E8FC6C] text-[#2640EB] w-max font-[500] text-xl'
+            size='lg'
+          >
+            Create Profile
+          </Button>
+        ) : null}
+      </div>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import CandidateSignUpForm from "../forms/CandidateSignUpForm";
 import CompanySignUpForm from "../forms/CompanySignUpForm";
 import { Button } from "../ui/button";
 import { usePrivy } from "@privy-io/react-auth";
+import { Separator } from "../ui/separator";
 export function SignupForms() {
   const [formType, setFormType] = useState<"candidate" | "company" | null>(
     null
@@ -17,10 +18,15 @@ export function SignupForms() {
       return;
     }
     setFormType(value);
+
+    const formSection = document.getElementById("formSection");
+    if (formSection) {
+      formSection.scrollIntoView({ behavior: "smooth" });
+    }
   };
   return (
     <>
-      <div className='flex flex-col gap-4'>
+      <div className='flex flex-col gap-12'>
         <div className='flex justify-between gap-2 max-w-full w-96 relative z-50'>
           <Button
             onClick={() => handleClick("candidate")}
@@ -47,17 +53,23 @@ export function SignupForms() {
         >
           Refer
         </Button> */}
+        <section
+          id='formSection'
+          className='flex flex-col gap-12 relative z-50'
+        >
+          {formType !== null ? <Separator /> : null}
+          {formType === "candidate" && (
+            <div>
+              <CandidateSignUpForm />
+            </div>
+          )}
+          {formType === "company" && (
+            <div>
+              <CompanySignUpForm />
+            </div>
+          )}
+        </section>
       </div>
-      {formType === "candidate" && (
-        <div>
-          <CandidateSignUpForm />
-        </div>
-      )}
-      {formType === "company" && (
-        <div>
-          <CompanySignUpForm />
-        </div>
-      )}
     </>
   );
 }
