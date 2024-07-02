@@ -14,7 +14,7 @@ export default function CandidateSignUpForm() {
   };
 
   return (
-    <div className='flex flex-col justify-center items-center gap-8'>
+    <div className='flex flex-col justify-center items-center gap-8 bg-[#919CF480] p-8 rounded-xl'>
       <div className='flex flex-col w-full gap-8 justify-start'>
         <div>
           <div className='items-top flex space-x-2 text-white'>
@@ -51,7 +51,7 @@ export default function CandidateSignUpForm() {
               </p>
               <Button
                 size='lg'
-                className='flex items-center gap-4 bg-[#8A63D2] hover:bg-[#986de8] rounded-xl w-max'
+                className='flex items-center gap-4 shadow-md border bg-[#7c58c1] hover:bg-[#986de8] rounded-xl w-max'
               >
                 <Image
                   className='relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert'
@@ -68,7 +68,7 @@ export default function CandidateSignUpForm() {
         </div>
         {acceptDC ? (
           <Button
-            className='rounded-xl bg-[#E8FC6C] text-[#2640EB] w-max font-[500] text-xl'
+            className='rounded-xl shadow-md border bg-[#E8FC6C] text-[#2640EB] w-max font-[500] text-xl'
             size='lg'
           >
             Create Profile
