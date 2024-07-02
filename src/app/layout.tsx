@@ -1,8 +1,24 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
+import { Roboto } from "next/font/google";
+import { Inter } from "next/font/google";
 
-const inter = Inter({ subsets: ["latin"] });
+import { cn } from "@/lib/utils";
+import Navbar from "@/components/composed/Navbar";
+import PrivyProviderWrapper from "@/context/PrivyProvider";
+
+const fontHeading = Roboto({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-heading",
+  weight: "700",
+});
+
+const fontBody = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-body",
+});
 
 export const metadata: Metadata = {
   title: "Interested.fyi",
@@ -15,8 +31,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang='en'>
+      <body
+        className={cn("antialiased", fontHeading.variable, fontBody.variable)}
+      >
+        <PrivyProviderWrapper>
+          <Navbar />
+          {children}
+        </PrivyProviderWrapper>
+      </body>
     </html>
   );
 }

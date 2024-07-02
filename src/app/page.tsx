@@ -5,49 +5,53 @@ import { PrivyProvider, usePrivy } from '@privy-io/react-auth';
 import { useState } from "react";
 import CompanySignUpForm from '@/components/forms/CompanySignUpForm';
 import NavBar from '@/components/navigation/NavBar';
+import { SignupForms } from "./../components/composed/SignupForms";
+import Image from "next/image";
 
 export default function Home() {
-  const [formType, setFormType] = useState<'candidate' | 'company' | null>(null);
-
   return (
     <PrivyProvider 
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID!}>
-      <main className="flex min-h-screen flex-col gap-8 items-center justify-start pt-4 pb-24"> 
-        <NavBar />
-        <div>
-            <h1 className="mt-16 text-6xl font-bold">Looking for...</h1>
-        </div>
-        <div className="flex justify-around gap-8">
-          <button
-            onClick={() => setFormType('candidate')}
-            className={clsx(
-              "rounded-lg shadow-lg mt-8 py-8 px-16 flex flex-col items-center justify-center",
-              formType === 'company' ? "bg-gray-500" : "bg-[#2640EB]"
-            )}>
-            <h2 className="text-white text-2xl font-extrabold">A sweet new job</h2>
-          </button>
-          <button
-            onClick={() => setFormType('company')}  
-            className={clsx(`rounded-xl shadow-lg border-8`, 
-              formType === 'candidate' ? 'border-gray-500' : 'border-[#2640EB]',
-              `mt-8 py-8 px-16 flex flex-col items-center justify-center`)}>
-            <h2 className={clsx(
-              `text-2xl font-extrabold`,
-              formType === 'candidate' ? 'text-gray-500' : 'text-[#2640EB]')}>A star new teammate</h2>
-          </button>
-        </div>
-        {
-          formType === 'candidate' &&
-          <div>
-            <CandidateSignUpForm />
+      <main className='flex min-h-screen flex-col gap-8 items-center justify-start '>
+        <section className='w-full max-w-full bg-[#2640EB] py-24 sm:p-8 p-2 md:p-24'>
+          <div className='flex md:flex-row flex-col w-full'>
+            <div className='flex flex-col gap-8 relative z-10'>
+              <div className='flex flex-col gap-0 md:gap-4 text-nowrap'>
+                <h1 className='font-heading text-4xl md:text-6xl font-bold text-[#919CF4] h-[60px]'>
+                  LET&apos;S FIND THE WEB3
+                </h1>
+                <h1 className='font-heading text-6xl md:text-8xl font-bold text-[#ffffff] h-24'>
+                  COMPANY
+                </h1>
+                <h1 className='font-heading text-4xl md:text-6xl font-bold text-[#919CF4] h-[60px]'>
+                  THAT INTERESTS
+                </h1>
+                <h1 className='font-heading text-6xl md:text-8xl font-bold text-[#ffffff] h-24'>
+                  YOU .
+                </h1>
+              </div>
+              <p className='text-[16px]  font-body text-[#ffffff] max-w-[548px]'>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+                enim ad minim veniam, quis nostrud exercitation ullamco laboris
+                nisi ut aliquip ex ea commodo consequat.
+              </p>
+            </div>
+            <div className='absolute right-10 bottom-4 md:top-[10vh] h-full w-[50vw] z-[0] flex place-items-center'>
+              <div className='relative h-full w-full'>
+                <Image
+                  className='dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert'
+                  src='/illustration.svg'
+                  alt='Interested illustration'
+                  sizes='50vw'
+                  fill
+                  priority
+                />
+              </div>
+            </div>
           </div>
-        }
-        {
-          formType === 'company' &&
-          <div>
-            <CompanySignUpForm />
-          </div>
-        }
+          <SignupForms />
+        </section>
       </main>
     </PrivyProvider>
   );

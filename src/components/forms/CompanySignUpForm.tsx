@@ -16,26 +16,24 @@ export default function CompanySignUpForm() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
-    const validateEmail = (email: string) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    };
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
-    const validateUrl = (url: string) => {
-        try {
-            new URL(url);
-            return true;
-        } catch (_) {
-            return false;
-        }
-    };
+  const validateUrl = (url: string) => {
+    try {
+      new URL(url);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  };
 
     async function submitForm() {
         setLoading(true);
-        setUrlError('');
-        setEmailError('');
-        const delay = async () => new Promise(resolve => setTimeout(resolve, 2000));
-        await delay();
+        setUrlError("");
+        setEmailError("");
 
         if(!validateUrl(careersPageUrl)) {
             setUrlError('Invalid URL')
@@ -87,12 +85,6 @@ export default function CompanySignUpForm() {
             setLoading(false);
         }
     }
-
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            hourglass.register();
-        }
-    }, []);
 
     return (
         <div className="flex flex-col justify-center items-center gap-8">
@@ -162,5 +154,5 @@ export default function CompanySignUpForm() {
                 }
             </button>
         </div>
-    )
+    );
 }
