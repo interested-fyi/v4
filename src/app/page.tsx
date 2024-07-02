@@ -1,9 +1,10 @@
+import { Separator } from "@/components/ui/separator";
 import { SignupForms } from "./../components/composed/SignupForms";
 import Image from "next/image";
 
 export default function Home() {
   return (
-    <main className='flex min-h-screen flex-col gap-8 items-center justify-start '>
+    <main className='flex relative min-h-screen flex-col gap-8 items-center justify-start '>
       <section className='w-full max-w-full bg-[#2640EB] py-24 sm:p-8 p-2 md:p-24'>
         <div className='flex md:flex-row flex-col w-full'>
           <div className='flex flex-col gap-8 relative z-10'>
@@ -28,7 +29,8 @@ export default function Home() {
               nisi ut aliquip ex ea commodo consequat.
             </p>
           </div>
-          <div className='absolute right-10 bottom-4 md:top-[10vh] h-full w-[50vw] z-[0] flex place-items-center'>
+
+          <div className='absolute right-10 bottom-12 md:top-[0vh] h-full w-[50vw] z-[0] flex place-items-center'>
             <div className='relative h-full w-full'>
               <Image
                 className='dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert'

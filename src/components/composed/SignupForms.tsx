@@ -53,22 +53,24 @@ export function SignupForms() {
         >
           Refer
         </Button> */}
-        <section
-          id='formSection'
-          className='flex flex-col gap-12 relative z-50'
-        >
-          {formType !== null ? <Separator /> : null}
-          {formType === "candidate" && (
-            <div>
-              <CandidateSignUpForm />
-            </div>
-          )}
-          {formType === "company" && (
-            <div>
-              <CompanySignUpForm />
-            </div>
-          )}
-        </section>
+        {authenticated ? (
+          <section
+            id='formSection'
+            className='flex flex-col gap-12 relative z-50'
+          >
+            {formType !== null ? <Separator /> : null}
+            {formType === "candidate" && (
+              <div>
+                <CandidateSignUpForm />
+              </div>
+            )}
+            {formType === "company" && (
+              <div>
+                <CompanySignUpForm />
+              </div>
+            )}
+          </section>
+        ) : null}
       </div>
     </>
   );
