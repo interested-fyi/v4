@@ -68,8 +68,8 @@ export default function CandidateSignUpForm() {
         </div>
         {acceptDC ? (
           <Button
-            className='rounded-xl shadow-md border bg-[#E8FC6C] text-[#2640EB] w-max font-[500] text-xl'
             size='lg'
+            className='rounded-xl py-8 border border-[#E8FC6C] w-[350px] bg-[#2640EB] text-[#E8FC6C] font-bold text-xl shadow-md'
           >
             Create Profile
           </Button>
