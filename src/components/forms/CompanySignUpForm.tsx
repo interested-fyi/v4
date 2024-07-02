@@ -2,15 +2,19 @@ import { usePrivy } from "@privy-io/react-auth";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { hourglass } from 'ldrs';
+import User from "@/types/user";
+import Company from "@/types/company";
+import { useRouter } from "next/navigation";
 
 export default function CompanySignUpForm() {
-    const {ready, authenticated, login, user} = usePrivy();
+    const {ready, authenticated, login, user: privyUser, getAccessToken} = usePrivy();
     const [companyName, setCompanyName] = useState('');
     const [careersPageUrl, setCareersPageUrl] = useState('');
     const [email, setEmail] = useState('');
     const [urlError, setUrlError] = useState('');
     const [emailError, setEmailError] = useState('');
     const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
     const validateEmail = (email: string) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -40,19 +44,30 @@ export default function CompanySignUpForm() {
             setEmailError('Invalid Email Address')
         }
 
+        if(urlError !== '' || emailError !== '') return;
+
         try {
+            const user: User = {
+                fid: privyUser?.farcaster?.fid!,
+                privy_did: privyUser?.id!,
+                email: email,
+            }
+            const company: Company = {
+                company_name: companyName,
+                careers_page_url: careersPageUrl,
+                creator_fid: user.fid,
+                creator_privy_did: user.privy_did,
+                creator_email: user.email!,
+            }
             const response = await fetch('/api/create-company', {
                 method: 'POST',
                 headers: {
-                    'Content-type': 'application/json'
+                    'Content-type': 'application/json',
+                    'Authorization': `Bearer ${await getAccessToken()}`
                 },
                 body: JSON.stringify({
-                    fid: user?.farcaster?.fid,
-                    user_id: user?.id,
-                    owner_address: user?.farcaster?.ownerAddress,
-                    company_name: companyName,
-                    careers_url: careersPageUrl,
-                    email: email,
+                    user: user,
+                    company: company,
                 })
             });
 
@@ -61,6 +76,11 @@ export default function CompanySignUpForm() {
             }
 
             const result = await response.json();
+            console.log(`Result: ${JSON.stringify(result)}`);
+
+            if (result.company?.length > 0) {
+                router.push('/companies/add/success')
+            }
         } catch (e) {
 
         } finally {
@@ -83,12 +103,12 @@ export default function CompanySignUpForm() {
                     <div className="flex items-center gap-2">
                         <Image 
                             className="rounded-full"
-                            src={user?.farcaster?.pfp!}
-                            alt={`Profile Picture for ${user?.farcaster?.username}`}
+                            src={privyUser?.farcaster?.pfp!}
+                            alt={`Profile Picture for ${privyUser?.farcaster?.username}`}
                             width={40}
                             height={40}
                             />
-                        <p>{user?.farcaster?.displayName}</p>
+                        <p>{privyUser?.farcaster?.displayName}</p>
                     </div>
                     :
                     <button 
