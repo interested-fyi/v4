@@ -2,6 +2,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { hourglass } from "ldrs";
+import { Button } from "../ui/button";
 
 export default function CompanySignUpForm() {
   const { ready, authenticated, login, user } = usePrivy();
@@ -75,7 +76,7 @@ export default function CompanySignUpForm() {
   }, []);
 
   return (
-    <div className='flex flex-col justify-center items-start gap-8 bg-[#919CF480] p-8 rounded-xl'>
+    <div className='flex flex-col justify-center items-start gap-8 bg-[#919CF480] p-8 rounded-xl font-body'>
       {!authenticated ? (
         <div className='flex flex-col items-center gap-4'>
           <p className='text-xl font-bold'>Connect your Farcaster</p>
@@ -129,10 +130,11 @@ export default function CompanySignUpForm() {
               <p className='text-red-700 font-bold'>{emailError}</p>
             )}
           </div>
-          <button
+          <Button
             disabled={loading}
             onClick={submitForm}
-            className='px-4 py-4 rounded-xl border border-[#E8FC6C] w-[350px] bg-[#2640EB] text-[#E8FC6C] font-bold text-2xl'
+            size='lg'
+            className='rounded-xl py-8 border border-[#E8FC6C] w-[350px] bg-[#2640EB] text-[#E8FC6C] font-bold text-xl shadow-md'
           >
             {loading ? (
               <l-hourglass
@@ -144,7 +146,7 @@ export default function CompanySignUpForm() {
             ) : (
               <p>Create Company Profile</p>
             )}
-          </button>
+          </Button>
         </>
       )}
     </div>

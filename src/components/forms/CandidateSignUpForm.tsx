@@ -14,7 +14,7 @@ export default function CandidateSignUpForm() {
   };
 
   return (
-    <div className='flex flex-col justify-center items-center gap-8 bg-[#919CF480] p-8 rounded-xl'>
+    <div className='flex flex-col justify-center items-center gap-8 bg-[#919CF480] p-8 rounded-xl font-body'>
       <div className='flex flex-col w-full gap-8 justify-start'>
         <div>
           <div className='items-top flex space-x-2 text-white'>
