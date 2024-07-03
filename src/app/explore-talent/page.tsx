@@ -13,6 +13,46 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+// a mock list of users for the table
+
+const users = [
+  {
+    name: "Jeremy Perrier",
+    role: "Product Designer",
+    availability: "AVAILABLE FOR HIRE",
+    work: "Part-time work, bug bounties",
+    interests: ["Demo", "blockchain", "DAOs"],
+  },
+  {
+    name: "Jeremy Perrier",
+    role: "Product Designer",
+    availability: "AVAILABLE FOR HIRE",
+    work: "Part-time work, bug bounties",
+    interests: ["Demo", "blockchain", "DAOs"],
+  },
+  {
+    name: "Jeremy Perrier",
+    role: "Product Designer",
+    availability: "AVAILABLE FOR HIRE",
+    work: "Part-time work, bug bounties",
+    interests: ["Demo", "blockchain", "DAOs"],
+  },
+  {
+    name: "Jeremy Perrier",
+    role: "Product Designer",
+    availability: "AVAILABLE FOR HIRE",
+    work: "Part-time work, bug bounties",
+    interests: ["Demo", "blockchain", "DAOs"],
+  },
+  {
+    name: "Jeremy Perrier",
+    role: "Product Designer",
+    availability: "AVAILABLE FOR HIRE",
+    work: "Part-time work, bug bounties",
+    interests: ["Demo", "blockchain", "DAOs"],
+  },
+];
+
 export default function ExploreTalentPage() {
   return (
     <div className='flex flex-col gap-8'>
@@ -96,43 +136,3 @@ export default function ExploreTalentPage() {
     </div>
   );
 }
-
-// a mock list of users for the table
-
-export const users = [
-  {
-    name: "Jeremy Perrier",
-    role: "Product Designer",
-    availability: "AVAILABLE FOR HIRE",
-    work: "Part-time work, bug bounties",
-    interests: ["Demo", "blockchain", "DAOs"],
-  },
-  {
-    name: "Jeremy Perrier",
-    role: "Product Designer",
-    availability: "AVAILABLE FOR HIRE",
-    work: "Part-time work, bug bounties",
-    interests: ["Demo", "blockchain", "DAOs"],
-  },
-  {
-    name: "Jeremy Perrier",
-    role: "Product Designer",
-    availability: "AVAILABLE FOR HIRE",
-    work: "Part-time work, bug bounties",
-    interests: ["Demo", "blockchain", "DAOs"],
-  },
-  {
-    name: "Jeremy Perrier",
-    role: "Product Designer",
-    availability: "AVAILABLE FOR HIRE",
-    work: "Part-time work, bug bounties",
-    interests: ["Demo", "blockchain", "DAOs"],
-  },
-  {
-    name: "Jeremy Perrier",
-    role: "Product Designer",
-    availability: "AVAILABLE FOR HIRE",
-    work: "Part-time work, bug bounties",
-    interests: ["Demo", "blockchain", "DAOs"],
-  },
-];
