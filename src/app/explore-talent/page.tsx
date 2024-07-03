@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-const ExploreTalentPage = () => {
+export default function ExploreTalentPage() {
   return (
     <div className='flex flex-col gap-8'>
       <div className='flex md:flex-row flex-col px-28 h-48 max-h-full items-start md:items-center justify-center md:justify-between w-full bg-[rgba(145,156,244,0.20)] border border-r-0 border-l-0 border-[#2640EB]'>
@@ -95,9 +95,7 @@ const ExploreTalentPage = () => {
       </Table>
     </div>
   );
-};
-
-export default ExploreTalentPage;
+}
 
 // a mock list of users for the table
 
