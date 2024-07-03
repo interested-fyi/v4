@@ -55,6 +55,13 @@ interface AuthedUIControllerProps {
  * @param authedUI - Function to render the UI when the user is authenticated.
  * @param unauthedUI - Function to render the UI when the user is not authenticated.
  * @returns ReactNode - The rendered UI based on the authentication state.
+ *
+ * @example
+ * <AuthedUIController
+ *  authedUI={({ logout, user }) => <AuthedNav user={user} logout={logout} />}
+ *  unauthedUI={({ login }) => <UnauthedNav login={login} />}
+ * />
+ *
  */
 const AuthedUIController = ({
   authedUI,

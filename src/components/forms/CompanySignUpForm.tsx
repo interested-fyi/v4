@@ -2,6 +2,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { hourglass } from "ldrs";
+import { Button } from "../ui/button";
 
 export default function CompanySignUpForm() {
   const { ready, authenticated, login, user } = usePrivy();
@@ -75,7 +76,7 @@ export default function CompanySignUpForm() {
   }, []);
 
   return (
-    <div className='flex flex-col justify-center items-center gap-8'>
+    <div className='flex flex-col justify-center items-start gap-8 bg-[#919CF480] p-8 rounded-xl font-body'>
       {!authenticated ? (
         <div className='flex flex-col items-center gap-4'>
           <p className='text-xl font-bold'>Connect your Farcaster</p>
@@ -97,16 +98,18 @@ export default function CompanySignUpForm() {
         </div>
       ) : (
         <>
-          <div className='flex flex-col gap-2 items-center'>
-            <p className='text-xl font-bold'>Company Name</p>
+          <div className='flex flex-col gap-2 items-start'>
+            <p className='text-white text-xl font-bold'>Company Name</p>
             <input
               type='text'
               className='text-xl rounded-xl border-2 border-black px-2 py-1'
               onChange={(e) => setCompanyName(e.target.value)}
             />
           </div>
-          <div className='flex flex-col gap-2 items-center'>
-            <p className='text-xl font-bold'>Company Careers Page (url)</p>
+          <div className='flex flex-col gap-2 items-start'>
+            <p className='text-white text-xl font-bold'>
+              Company Careers Page (url)
+            </p>
             <input
               type='url'
               className='text-xl rounded-xl border-2 border-black px-2 py-1'
@@ -116,8 +119,8 @@ export default function CompanySignUpForm() {
               <p className='text-red-700 font-bold'>{urlError}</p>
             )}
           </div>
-          <div className='flex flex-col gap-2 items-center'>
-            <p className='text-xl font-bold'>Your Email</p>
+          <div className='flex flex-col gap-2 items-start'>
+            <p className='text-white text-xl font-bold'>Your Email</p>
             <input
               type='email'
               className='text-xl rounded-xl border-2 border-black px-2 py-1'
@@ -127,10 +130,11 @@ export default function CompanySignUpForm() {
               <p className='text-red-700 font-bold'>{emailError}</p>
             )}
           </div>
-          <button
+          <Button
             disabled={loading}
             onClick={submitForm}
-            className='px-4 py-4 rounded-xl w-[350px] bg-[#2640EB] text-white font-bold text-2xl'
+            size='lg'
+            className='rounded-xl py-8 border border-[#E8FC6C] w-96 max-w-full bg-[#2640EB] text-[#E8FC6C] font-bold text-xl shadow-md'
           >
             {loading ? (
               <l-hourglass
@@ -140,9 +144,9 @@ export default function CompanySignUpForm() {
                 color='white'
               />
             ) : (
-              <p>Create Company Profile</p>
+              "Create Company Profile"
             )}
-          </button>
+          </Button>
         </>
       )}
     </div>
