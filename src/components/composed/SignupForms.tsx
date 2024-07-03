@@ -21,7 +21,9 @@ export function SignupForms() {
 
     const formSection = document.getElementById("formSection");
     if (formSection) {
-      formSection.scrollIntoView({ behavior: "smooth" });
+      setTimeout(() => {
+        formSection.scrollIntoView({ behavior: "smooth" });
+      }, 100);
     }
   };
   return (
@@ -54,10 +56,7 @@ export function SignupForms() {
           Refer
         </Button> */}
         {authenticated ? (
-          <section
-            id='formSection'
-            className='flex flex-col gap-12 relative z-50'
-          >
+          <section className='flex flex-col gap-12 relative z-50'>
             {formType !== null ? <Separator /> : null}
             {formType === "candidate" && (
               <div>
@@ -71,6 +70,7 @@ export function SignupForms() {
             )}
           </section>
         ) : null}
+        <div id='formSection' className='h-0 w-0' />
       </div>
     </>
   );

@@ -134,7 +134,7 @@ export default function CompanySignUpForm() {
             disabled={loading}
             onClick={submitForm}
             size='lg'
-            className='rounded-xl py-8 border border-[#E8FC6C] w-[350px] bg-[#2640EB] text-[#E8FC6C] font-bold text-xl shadow-md'
+            className='rounded-xl py-8 border border-[#E8FC6C] w-96 max-w-full bg-[#2640EB] text-[#E8FC6C] font-bold text-xl shadow-md'
           >
             {loading ? (
               <l-hourglass
@@ -144,7 +144,7 @@ export default function CompanySignUpForm() {
                 color='white'
               />
             ) : (
-              <p>Create Company Profile</p>
+              "Create Company Profile"
             )}
           </Button>
         </>

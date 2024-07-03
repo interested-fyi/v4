@@ -1,4 +1,3 @@
-import { Separator } from "@/components/ui/separator";
 import { SignupForms } from "./../components/composed/SignupForms";
 import Image from "next/image";
 

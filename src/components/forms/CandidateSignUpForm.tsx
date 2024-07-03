@@ -51,7 +51,7 @@ export default function CandidateSignUpForm() {
               </p>
               <Button
                 size='lg'
-                className='flex items-center gap-4 shadow-md border bg-[#7c58c1] hover:bg-[#986de8] rounded-xl w-max'
+                className='flex items-center max-w-full w-96 gap-4 py-8 shadow-md border bg-[#7c58c1] hover:bg-[#986de8] rounded-xl'
               >
                 <Image
                   className='relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert'
@@ -69,7 +69,7 @@ export default function CandidateSignUpForm() {
         {acceptDC ? (
           <Button
             size='lg'
-            className='rounded-xl py-8 border border-[#E8FC6C] w-[350px] bg-[#2640EB] text-[#E8FC6C] font-bold text-xl shadow-md'
+            className='rounded-xl py-8 border border-[#E8FC6C] w-96 max-w-full bg-[#2640EB] text-[#E8FC6C] font-bold text-xl shadow-md'
           >
             Create Profile
           </Button>
