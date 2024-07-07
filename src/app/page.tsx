@@ -8,13 +8,13 @@ export default function Home() {
         <div className='flex relative md:flex-row flex-col w-full'>
           <div className='flex flex-col gap-8 relative z-10'>
             <div className='flex flex-col gap-0 md:gap-4 text-nowrap'>
-              <h1 className='font-heading text-4xl md:text-6xl font-bold text-[#919CF4] h-[60px]'>
+              <h1 className='font-heading text-3xl md:text-6xl font-bold text-[#919CF4] h-[60px]'>
                 LET&apos;S FIND THE WEB3
               </h1>
               <h1 className='font-heading text-6xl md:text-8xl font-bold text-[#ffffff] h-24'>
                 COMPANY
               </h1>
-              <h1 className='font-heading text-4xl md:text-6xl font-bold text-[#919CF4] h-[60px]'>
+              <h1 className='font-heading text-3xl md:text-6xl font-bold text-[#919CF4] h-[60px]'>
                 THAT INTERESTS
               </h1>
               <h1 className='font-heading text-6xl md:text-8xl font-bold text-[#ffffff] h-24'>
