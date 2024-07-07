@@ -1,5 +1,3 @@
-"use client";
-import AuthedUIController from "@/context/AuthedUIController";
 import { CompanyCard } from "./../../components/composed/companies/CompanyCard";
 import { Button } from "@/components/ui/button";
 
@@ -70,10 +68,7 @@ export default function CompaniesPage() {
         </div>
       </div>
       <div className='py-24 px-12'>
-        <AuthedUIController
-          authedUI={() => <CompanyCard />}
-          unauthedUI={() => <p>...loading</p>}
-        />
+        <CompanyCard />
       </div>
     </>
   );
