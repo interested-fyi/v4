@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Roboto_Mono } from "next/font/google";
 import { Inter } from "next/font/google";
-
+import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/composed/Navbar";
 import PrivyProviderWrapper from "@/context/PrivyProvider";
@@ -38,6 +38,7 @@ export default function RootLayout({
         <PrivyProviderWrapper>
           <Navbar />
           {children}
+          <Toaster />
         </PrivyProviderWrapper>
       </body>
     </html>
