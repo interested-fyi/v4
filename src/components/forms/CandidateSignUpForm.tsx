@@ -29,42 +29,40 @@ export default function CandidateSignUpForm() {
                 htmlFor='acceptCast'
                 className='text-lg font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
               >
-                Accept direct casts
+                Get notifications via direct casts on warpcast (optional)
               </label>
             </div>
           </div>
         </div>
         {/* Check if user follows interested.fyi and prompt if not */}
         <div className='flex flex-col justify-start min-h-24 gap-4 text-white'>
-          {acceptDC ? (
-            <>
-              <p className='text-lg font-bold'>
-                Follow{" "}
-                <a
-                  className='text-[#E8FC6C]'
-                  href='https://warpcast.com/interestedfyi'
-                  target='_blank'
-                >
-                  @interestedfyi
-                </a>{" "}
-                on Farcaster
-              </p>
-              <Button
-                size='lg'
-                className='flex items-center max-w-full w-96 gap-4 py-8 shadow-md border bg-[#7c58c1] hover:bg-[#986de8] rounded-xl'
+          <>
+            <p className='text-lg font-bold'>
+              Follow{" "}
+              <a
+                className='text-[#E8FC6C]'
+                href='https://warpcast.com/interestedfyi'
+                target='_blank'
               >
-                <Image
-                  className='relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert'
-                  src='/fc-logo-transparent-white.png'
-                  alt='Farcaster Logo'
-                  width={40}
-                  height={50}
-                  priority
-                />
-                <p className='text-xl font-bold text-white'>Follow</p>
-              </Button>
-            </>
-          ) : null}
+                @interestedfyi
+              </a>{" "}
+              on Farcaster
+            </p>
+            <Button
+              size='lg'
+              className='flex items-center max-w-full w-96 gap-4 py-8 shadow-md border bg-[#7c58c1] hover:bg-[#986de8] rounded-xl'
+            >
+              <Image
+                className='relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert'
+                src='/fc-logo-transparent-white.png'
+                alt='Farcaster Logo'
+                width={40}
+                height={50}
+                priority
+              />
+              <p className='text-xl font-bold text-white'>Follow</p>
+            </Button>
+          </>
         </div>
         {acceptDC ? (
           <Button
