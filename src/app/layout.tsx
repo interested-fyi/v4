@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/composed/Navbar";
 import PrivyProviderWrapper from "@/context/PrivyProvider";
-
+import QueryProvider from "@/context/QueryProvider";
 const fontHeading = Roboto_Mono({
   subsets: ["latin"],
   display: "swap",
@@ -36,9 +36,11 @@ export default function RootLayout({
         className={cn("antialiased", fontHeading.variable, fontBody.variable)}
       >
         <PrivyProviderWrapper>
-          <Navbar />
-          {children}
-          <Toaster />
+          <QueryProvider>
+            <Navbar />
+            {children}
+            <Toaster />
+          </QueryProvider>
         </PrivyProviderWrapper>
       </body>
     </html>
