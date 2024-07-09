@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { hourglass } from "ldrs";
 import { Button } from "../ui/button";
+import { useToast } from "../ui/use-toast";
 
 export default function CompanySignUpForm() {
   const { ready, authenticated, login, user } = usePrivy();
@@ -12,6 +13,8 @@ export default function CompanySignUpForm() {
   const [urlError, setUrlError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const { toast } = useToast();
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -37,9 +40,11 @@ export default function CompanySignUpForm() {
 
     if (!validateUrl(careersPageUrl)) {
       setUrlError("Invalid URL");
+      return;
     }
     if (!validateEmail(email)) {
       setEmailError("Invalid Email Address");
+      return;
     }
 
     try {
@@ -63,7 +68,17 @@ export default function CompanySignUpForm() {
       }
 
       const result = await response.json();
+      if (result) {
+        toast({
+          title: "Company Profile Created",
+          description: "Your company profile has been created successfully",
+        });
+      }
     } catch (e) {
+      toast({
+        title: "Error",
+        description: "There was an error creating your company profile",
+      });
     } finally {
       setLoading(false);
     }

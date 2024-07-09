@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Roboto } from "next/font/google";
+import { Roboto_Mono } from "next/font/google";
 import { Inter } from "next/font/google";
-
+import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/composed/Navbar";
 import PrivyProviderWrapper from "@/context/PrivyProvider";
-
-const fontHeading = Roboto({
+import QueryProvider from "@/context/QueryProvider";
+const fontHeading = Roboto_Mono({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-heading",
@@ -36,8 +36,11 @@ export default function RootLayout({
         className={cn("antialiased", fontHeading.variable, fontBody.variable)}
       >
         <PrivyProviderWrapper>
-          <Navbar />
-          {children}
+          <QueryProvider>
+            <Navbar />
+            {children}
+            <Toaster />
+          </QueryProvider>
         </PrivyProviderWrapper>
       </body>
     </html>
