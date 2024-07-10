@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrivyClient } from "@privy-io/server-auth";
 import supabase from "@/lib/supabase";
-import User from "@/types/user";
-import Company from "@/types/company";
+import User from "../../../types/user";
+import Company from "../../../types/company";
 
 const privyClient = new PrivyClient(process.env.NEXT_PUBLIC_PRIVY_APP_ID!, process.env.PRIVY_SECRET!);
 
