@@ -7,10 +7,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useFarcasterSigner, usePrivy } from "@privy-io/react-auth";
 import { useToast } from "../ui/use-toast";
 import { fetchFollowStatus } from "@/app/utils/helpers";
-import { ExternalEd25519Signer } from "@standard-crypto/farcaster-js";
+// import { ExternalEd25519Signer } from "@standard-crypto/farcaster-js";
 
 import { Label } from "../ui/label";
-import { privyClient } from "@/lib/privyClient";
+// import { privyClient } from "@/lib/privyClient";
 import Modal from "../composed/modals/Modal";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 export default function CandidateSignUpForm() {
@@ -26,10 +26,10 @@ export default function CandidateSignUpForm() {
     signFarcasterMessage,
   } = useFarcasterSigner();
 
-  const privySigner = new ExternalEd25519Signer(
-    signFarcasterMessage,
-    getFarcasterSignerPublicKey
-  );
+  // const privySigner = new ExternalEd25519Signer(
+  //   signFarcasterMessage,
+  //   getFarcasterSignerPublicKey
+  // );
 
   const farcasterAccount = user?.linkedAccounts.find(
     (account) => account.type === "farcaster"
@@ -78,20 +78,20 @@ export default function CandidateSignUpForm() {
       return;
     }
 
-    const followUserResponse = await privyClient.followUser(
-      parseInt(process.env.NEXT_PUBLIC_INTERESTED_FYI_FID),
-      user.farcaster.fid,
-      privySigner
-    );
+    // const followUserResponse = await privyClient.followUser(
+    //   parseInt(process.env.NEXT_PUBLIC_INTERESTED_FYI_FID),
+    //   user.farcaster.fid,
+    //   privySigner
+    // );
 
-    if (followUserResponse.hash) {
-      toast({
-        title: "Followed @interestedfyi",
-        description: "Successfully followed @interestedfyi", // TODO - update description
-      });
-      refetch();
-      setHasFollowed(true);
-    }
+    // if (followUserResponse.hash) {
+    //   toast({
+    //     title: "Followed @interestedfyi",
+    //     description: "Successfully followed @interestedfyi", // TODO - update description
+    //   });
+    //   refetch();
+    //   setHasFollowed(true);
+    // }
     setIsLoadingFollow(false);
   };
 
