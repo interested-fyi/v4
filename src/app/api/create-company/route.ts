@@ -1,24 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
+import { PrivyClient } from "@privy-io/server-auth";
 import supabase from "@/lib/supabase";
+import User from "@/types/user";
+import Company from "@/types/company";
+
+const privyClient = new PrivyClient(process.env.NEXT_PUBLIC_PRIVY_APP_ID!, process.env.PRIVY_SECRET!);
 
 export async function POST(req: NextRequest) {
-    const { fid, company_name, careers_url, email } = await req.json();
+    const { user: bodyUser, company: bodyCompany } = await req.json();
+    const user = bodyUser as User;
+    const company = bodyCompany as Company;
+    const accessToken = req.headers.get('Authorization')?.replace('Bearer ','');
+    
+    // verify authenticate user sent request
+    try {
+        const verified = await privyClient.verifyAuthToken(accessToken!);
+    } catch (e) {
+        throw new Error('Invalid access token');
+    }
 
-    console.log(`Input data: ${fid} / ${company_name} / ${careers_url} / ${email}`);
+    const { data: userCreation, error: userError } = await supabase.from('users').upsert(user, { onConflict: 'fid' }).select();
 
-    const { data: existingUser, error: userError } = await supabase.from('users').select('*').eq('fid', fid).single();
+    if(userError) throw userError;
 
-    const { data, error } = await supabase.from('companies').insert([
-        {
-            creator_fid: fid,
-            company_name: company_name,
-            careers_page_url: careers_url,
-            creator_email: email,
-        }
-    ])
+    const { data: companyCreation, error: companyError } = await supabase.from('companies').insert([company]).select();
 
-    if(error) throw error;
+    if (companyError) throw companyError;
 
-    console.log(`data: ${data}`);
-    return NextResponse.json({}, { status: 200 })
+    return NextResponse.json({ company: companyCreation, user: userCreation }, { status: 200 })
 }
