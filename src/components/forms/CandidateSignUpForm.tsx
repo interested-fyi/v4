@@ -9,8 +9,10 @@ import { useToast } from "../ui/use-toast";
 import { fetchFollowStatus } from "@/app/utils/helpers";
 import { ExternalEd25519Signer } from "@standard-crypto/farcaster-js";
 import { privyClient } from "@/lib/utils";
+import { Label } from "../ui/label";
 export default function CandidateSignUpForm() {
   const [acceptDC, setAcceptDC] = useState(false);
+  const [openToWork, setOpenToWork] = useState(false);
   const [hasFollowed, setHasFollowed] = useState(false);
   const [isLoadingFollow, setIsLoadingFollow] = useState(false);
   const { toast } = useToast();
@@ -85,10 +87,35 @@ export default function CandidateSignUpForm() {
     setAcceptDC(!acceptDC);
   };
 
+  const handleOpenToWork = async () => {
+    setOpenToWork(!openToWork);
+  };
+
+  const submitForm = async () => {
+    // TODO - implement functionality to submit form
+    const result = await fetch("/api/create-candidate", {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({
+        user,
+        acceptDC,
+        openToWork,
+      }),
+    });
+    if (!result.ok) {
+      throw new Error("Invalid API Response");
+    }
+    const data = await result.json();
+    // TODO - handle response
+    return;
+  };
+
   return (
     <div className='flex flex-col justify-center items-center gap-8 bg-[#919CF480] p-8 rounded-xl font-body'>
       <div className='flex flex-col w-full gap-8 justify-start'>
-        <div>
+        <div className='flex flex-col gap-4'>
           <div className='items-top flex space-x-2 text-white'>
             <Checkbox
               id='acceptCast'
@@ -97,12 +124,28 @@ export default function CandidateSignUpForm() {
               onClick={() => handleAcceptDC()}
             />
             <div className='grid gap-1.5 leading-none items-center'>
-              <label
+              <Label
                 htmlFor='acceptCast'
-                className='text-lg font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+                className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
               >
                 Get notifications via direct casts on warpcast (optional)
-              </label>
+              </Label>
+            </div>
+          </div>
+          <div className='items-top flex space-x-2 text-white'>
+            <Checkbox
+              id='openToWork'
+              className='h-6 w-6 border border-white checked:bg-[#8A63D2]'
+              checked={openToWork}
+              onClick={() => handleOpenToWork()}
+            />
+            <div className='grid gap-1.5 leading-none items-center'>
+              <Label
+                htmlFor='openToWork'
+                className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+              >
+                Are you open to work opportunities?
+              </Label>
             </div>
           </div>
         </div>
