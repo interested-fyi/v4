@@ -1,3 +1,4 @@
+import { User } from "@/lib/constants";
 import { NextRequest, NextResponse } from "next/server";
 
 // Check if a user follows a profile
@@ -39,27 +40,4 @@ export async function GET(req: NextRequest) {
   } while (cursor !== null);
 
   return NextResponse.json({ following: false }, { status: 200 });
-}
-
-// FOLLOW A USER
-export async function POST(req: NextRequest) {
-  const { fid, viewer_fid } = await req.json();
-  const url = `https://api.neynar.com/v2/farcaster/user/follow`;
-  const options = {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      api_key: process.env.NEYNAR_API_KEY ?? "",
-    },
-    body: JSON.stringify({ fid, viewer_fid }),
-  };
-
-  const response = await fetch(url, options);
-  if (!response.ok) {
-    // Handle non-200 status codes
-    console.error("Request failed with status:", response.status);
-    return NextResponse.error();
-  }
-
-  return NextResponse.json({}, { status: 200 });
 }

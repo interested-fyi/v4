@@ -4,41 +4,95 @@ import { Checkbox } from "../ui/checkbox";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { useQuery } from "@tanstack/react-query";
-import { usePrivy } from "@privy-io/react-auth";
+import { useFarcasterSigner, usePrivy } from "@privy-io/react-auth";
+import { useToast } from "../ui/use-toast";
+import { fetchFollowStatus } from "@/app/utils/helpers";
+// import { ExternalEd25519Signer } from "@standard-crypto/farcaster-js";
 
+import { Label } from "../ui/label";
+// import { privyClient } from "@/lib/privyClient";
+import Modal from "../composed/modals/Modal";
+import { DialogTrigger } from "@radix-ui/react-dialog";
 export default function CandidateSignUpForm() {
   const [acceptDC, setAcceptDC] = useState(false);
+  const [openToWork, setOpenToWork] = useState(false);
+  const [hasFollowed, setHasFollowed] = useState(false);
+  const [isLoadingFollow, setIsLoadingFollow] = useState(false);
+  const { toast } = useToast();
   const { user } = usePrivy();
-  const { data, error, isLoading } = useQuery({
+  const {
+    requestFarcasterSignerFromWarpcast,
+    getFarcasterSignerPublicKey,
+    signFarcasterMessage,
+  } = useFarcasterSigner();
+
+  // const privySigner = new ExternalEd25519Signer(
+  //   signFarcasterMessage,
+  //   getFarcasterSignerPublicKey
+  // );
+
+  const farcasterAccount = user?.linkedAccounts.find(
+    (account) => account.type === "farcaster"
+  );
+  const hasSigner = user?.linkedAccounts?.find(
+    (account) => account.type === "farcaster"
+  )?.signerPublicKey;
+
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["follow-status"],
-    queryFn: () => {
-      return fetch(
-        `/api/farcaster/follow?fid=${
-          user?.farcaster?.fid ?? ""
-        }&viewer_fid=${212652}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      ).then((res) => res.json());
-    },
+    queryFn: () => fetchFollowStatus(user),
   });
 
-  const isFollowing = data?.following;
+  const isFollowing = data?.following || hasFollowed;
+
+  const handleCreateSigner = async () => {
+    if (!farcasterAccount?.signerPublicKey) {
+      try {
+        await requestFarcasterSignerFromWarpcast();
+      } catch (error: any) {
+        toast({
+          title: "Error",
+          description:
+            "There was an error creating your Farcaster signer - " +
+            error.message,
+        });
+        console.error("🚀 ~ handleFollowInterestedFyi ~ error:", error);
+        return;
+      }
+    }
+    return;
+  };
 
   const handleFollowInterestedFyi = async () => {
-    const result = await fetch("/api/farcaster-follow", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        fid: user?.farcaster?.fid,
-        viewer_fid: 212652,
-      }),
-    });
+    setIsLoadingFollow(true);
+    if (!hasSigner) {
+      await handleCreateSigner();
+      return;
+    }
+
+    if (!user?.farcaster?.fid || !process.env.NEXT_PUBLIC_INTERESTED_FYI_FID) {
+      toast({
+        title: "Error",
+        description: "There was an error following @interestedfyi",
+      });
+      return;
+    }
+
+    // const followUserResponse = await privyClient.followUser(
+    //   parseInt(process.env.NEXT_PUBLIC_INTERESTED_FYI_FID),
+    //   user.farcaster.fid,
+    //   privySigner
+    // );
+
+    // if (followUserResponse.hash) {
+    //   toast({
+    //     title: "Followed @interestedfyi",
+    //     description: "Successfully followed @interestedfyi", // TODO - update description
+    //   });
+    //   refetch();
+    //   setHasFollowed(true);
+    // }
+    setIsLoadingFollow(false);
   };
 
   const handleAcceptDC = async () => {
@@ -47,10 +101,43 @@ export default function CandidateSignUpForm() {
     setAcceptDC(!acceptDC);
   };
 
+  const handleOpenToWork = async () => {
+    setOpenToWork(!openToWork);
+  };
+
+  const submitForm = async () => {
+    // TODO - implement functionality to submit form
+    const result = await fetch("/api/create-candidate", {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({
+        user,
+        acceptDC,
+        openToWork,
+      }),
+    });
+    if (!result.ok) {
+      toast({
+        title: "Error",
+        description:
+          "There was an error creating your profile. Please try again.",
+      });
+      return;
+    }
+    const modalButton = document.getElementById("modalButton");
+    if (modalButton) {
+      modalButton.click();
+    }
+
+    return;
+  };
+
   return (
     <div className='flex flex-col justify-center items-center gap-8 bg-[#919CF480] p-8 rounded-xl font-body'>
       <div className='flex flex-col w-full gap-8 justify-start'>
-        <div>
+        <div className='flex flex-col gap-4'>
           <div className='items-top flex space-x-2 text-white'>
             <Checkbox
               id='acceptCast'
@@ -59,12 +146,28 @@ export default function CandidateSignUpForm() {
               onClick={() => handleAcceptDC()}
             />
             <div className='grid gap-1.5 leading-none items-center'>
-              <label
+              <Label
                 htmlFor='acceptCast'
-                className='text-lg font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+                className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
               >
                 Get notifications via direct casts on warpcast (optional)
-              </label>
+              </Label>
+            </div>
+          </div>
+          <div className='items-top flex space-x-2 text-white'>
+            <Checkbox
+              id='openToWork'
+              className='h-6 w-6 border border-white checked:bg-[#8A63D2]'
+              checked={openToWork}
+              onClick={() => handleOpenToWork()}
+            />
+            <div className='grid gap-1.5 leading-none items-center'>
+              <Label
+                htmlFor='openToWork'
+                className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+              >
+                Are you open to work opportunities?
+              </Label>
             </div>
           </div>
         </div>
@@ -85,7 +188,7 @@ export default function CandidateSignUpForm() {
             <Button
               size='lg'
               onClick={handleFollowInterestedFyi}
-              disabled={isFollowing}
+              disabled={isFollowing || isLoadingFollow || !user?.farcaster?.fid}
               className='flex items-center max-w-full w-96 gap-4 py-8 shadow-md border bg-[#7c58c1] hover:bg-[#986de8] rounded-xl'
             >
               <Image
@@ -107,12 +210,22 @@ export default function CandidateSignUpForm() {
         {isFollowing ? (
           <Button
             size='lg'
+            onClick={submitForm}
             className='rounded-xl py-8 border border-[#E8FC6C] w-96 max-w-full bg-[#2640EB] text-[#E8FC6C] font-bold text-xl shadow-md'
           >
             Create Profile
           </Button>
         ) : null}
       </div>
+      <Modal
+        title="Thanks for signing up, we'll be online soon."
+        description="Make sure to follow along with us on our official account so you don't miss an update or message from us in the future."
+        trigger={
+          <DialogTrigger id='modalButton' className='hidden'>
+            Open
+          </DialogTrigger>
+        }
+      />
     </div>
   );
 }

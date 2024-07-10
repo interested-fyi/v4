@@ -1,4 +1,4 @@
-interface User {
+export interface User {
   object: string;
   user: {
     object: string;
@@ -27,3 +27,41 @@ interface User {
     };
   };
 }
+
+export const users = [
+  {
+    name: "Jeremy Perrier",
+    role: "Product Designer",
+    availability: "AVAILABLE FOR HIRE",
+    work: "Part-time work, bug bounties",
+    interests: ["Demo", "blockchain", "DAOs"],
+  },
+  {
+    name: "Jeremy Perrier",
+    role: "Product Designer",
+    availability: "AVAILABLE FOR HIRE",
+    work: "Part-time work, bug bounties",
+    interests: ["Demo", "blockchain", "DAOs"],
+  },
+  {
+    name: "Jeremy Perrier",
+    role: "Product Designer",
+    availability: "AVAILABLE FOR HIRE",
+    work: "Part-time work, bug bounties",
+    interests: ["Demo", "blockchain", "DAOs"],
+  },
+  {
+    name: "Jeremy Perrier",
+    role: "Product Designer",
+    availability: "AVAILABLE FOR HIRE",
+    work: "Part-time work, bug bounties",
+    interests: ["Demo", "blockchain", "DAOs"],
+  },
+  {
+    name: "Jeremy Perrier",
+    role: "Product Designer",
+    availability: "AVAILABLE FOR HIRE",
+    work: "Part-time work, bug bounties",
+    interests: ["Demo", "blockchain", "DAOs"],
+  },
+];
