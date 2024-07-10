@@ -8,8 +8,11 @@ import { useFarcasterSigner, usePrivy } from "@privy-io/react-auth";
 import { useToast } from "../ui/use-toast";
 import { fetchFollowStatus } from "@/app/utils/helpers";
 import { ExternalEd25519Signer } from "@standard-crypto/farcaster-js";
-import { privyClient } from "@/lib/utils";
+
 import { Label } from "../ui/label";
+import { privyClient } from "@/lib/privyClient";
+import Modal from "../composed/modals/Modal";
+import { DialogTrigger } from "@radix-ui/react-dialog";
 export default function CandidateSignUpForm() {
   const [acceptDC, setAcceptDC] = useState(false);
   const [openToWork, setOpenToWork] = useState(false);
@@ -46,7 +49,13 @@ export default function CandidateSignUpForm() {
     if (!farcasterAccount?.signerPublicKey) {
       try {
         await requestFarcasterSignerFromWarpcast();
-      } catch (error) {
+      } catch (error: any) {
+        toast({
+          title: "Error",
+          description:
+            "There was an error creating your Farcaster signer - " +
+            error.message,
+        });
         console.error("🚀 ~ handleFollowInterestedFyi ~ error:", error);
         return;
       }
@@ -61,8 +70,13 @@ export default function CandidateSignUpForm() {
       return;
     }
 
-    if (!user?.farcaster?.fid || !process.env.NEXT_PUBLIC_INTERESTED_FYI_FID)
-      throw new Error("Missing required parameters");
+    if (!user?.farcaster?.fid || !process.env.NEXT_PUBLIC_INTERESTED_FYI_FID) {
+      toast({
+        title: "Error",
+        description: "There was an error following @interestedfyi",
+      });
+      return;
+    }
 
     const followUserResponse = await privyClient.followUser(
       parseInt(process.env.NEXT_PUBLIC_INTERESTED_FYI_FID),
@@ -105,10 +119,18 @@ export default function CandidateSignUpForm() {
       }),
     });
     if (!result.ok) {
-      throw new Error("Invalid API Response");
+      toast({
+        title: "Error",
+        description:
+          "There was an error creating your profile. Please try again.",
+      });
+      return;
     }
-    const data = await result.json();
-    // TODO - handle response
+    const modalButton = document.getElementById("modalButton");
+    if (modalButton) {
+      modalButton.click();
+    }
+
     return;
   };
 
@@ -166,7 +188,7 @@ export default function CandidateSignUpForm() {
             <Button
               size='lg'
               onClick={handleFollowInterestedFyi}
-              disabled={isFollowing || isLoadingFollow}
+              disabled={isFollowing || isLoadingFollow || !user?.farcaster?.fid}
               className='flex items-center max-w-full w-96 gap-4 py-8 shadow-md border bg-[#7c58c1] hover:bg-[#986de8] rounded-xl'
             >
               <Image
@@ -188,12 +210,22 @@ export default function CandidateSignUpForm() {
         {isFollowing ? (
           <Button
             size='lg'
+            onClick={submitForm}
             className='rounded-xl py-8 border border-[#E8FC6C] w-96 max-w-full bg-[#2640EB] text-[#E8FC6C] font-bold text-xl shadow-md'
           >
             Create Profile
           </Button>
         ) : null}
       </div>
+      <Modal
+        title="Thanks for signing up, we'll be online soon."
+        description="Make sure to follow along with us on our official account so you don't miss an update or message from us in the future."
+        trigger={
+          <DialogTrigger id='modalButton' className='hidden'>
+            Open
+          </DialogTrigger>
+        }
+      />
     </div>
   );
 }

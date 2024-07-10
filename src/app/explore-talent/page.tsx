@@ -9,46 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-// a mock list of users for the table
-
-const users = [
-  {
-    name: "Jeremy Perrier",
-    role: "Product Designer",
-    availability: "AVAILABLE FOR HIRE",
-    work: "Part-time work, bug bounties",
-    interests: ["Demo", "blockchain", "DAOs"],
-  },
-  {
-    name: "Jeremy Perrier",
-    role: "Product Designer",
-    availability: "AVAILABLE FOR HIRE",
-    work: "Part-time work, bug bounties",
-    interests: ["Demo", "blockchain", "DAOs"],
-  },
-  {
-    name: "Jeremy Perrier",
-    role: "Product Designer",
-    availability: "AVAILABLE FOR HIRE",
-    work: "Part-time work, bug bounties",
-    interests: ["Demo", "blockchain", "DAOs"],
-  },
-  {
-    name: "Jeremy Perrier",
-    role: "Product Designer",
-    availability: "AVAILABLE FOR HIRE",
-    work: "Part-time work, bug bounties",
-    interests: ["Demo", "blockchain", "DAOs"],
-  },
-  {
-    name: "Jeremy Perrier",
-    role: "Product Designer",
-    availability: "AVAILABLE FOR HIRE",
-    work: "Part-time work, bug bounties",
-    interests: ["Demo", "blockchain", "DAOs"],
-  },
-];
+import { users } from "@/lib/constants";
 
 export default function ExploreTalentPage() {
   return (

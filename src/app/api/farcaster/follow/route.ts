@@ -1,3 +1,4 @@
+import { User } from "@/lib/constants";
 import { NextRequest, NextResponse } from "next/server";
 
 // Check if a user follows a profile
