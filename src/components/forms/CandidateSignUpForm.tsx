@@ -4,41 +4,79 @@ import { Checkbox } from "../ui/checkbox";
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { useQuery } from "@tanstack/react-query";
-import { usePrivy } from "@privy-io/react-auth";
-
+import { useFarcasterSigner, usePrivy } from "@privy-io/react-auth";
+import { useToast } from "../ui/use-toast";
+import { fetchFollowStatus } from "@/app/utils/helpers";
+import { ExternalEd25519Signer } from "@standard-crypto/farcaster-js";
+import { privyClient } from "@/lib/utils";
 export default function CandidateSignUpForm() {
   const [acceptDC, setAcceptDC] = useState(false);
+  const [hasFollowed, setHasFollowed] = useState(false);
+  const [isLoadingFollow, setIsLoadingFollow] = useState(false);
+  const { toast } = useToast();
   const { user } = usePrivy();
-  const { data, error, isLoading } = useQuery({
+  const {
+    requestFarcasterSignerFromWarpcast,
+    getFarcasterSignerPublicKey,
+    signFarcasterMessage,
+  } = useFarcasterSigner();
+
+  const privySigner = new ExternalEd25519Signer(
+    signFarcasterMessage,
+    getFarcasterSignerPublicKey
+  );
+
+  const farcasterAccount = user?.linkedAccounts.find(
+    (account) => account.type === "farcaster"
+  );
+  const hasSigner = user?.linkedAccounts?.find(
+    (account) => account.type === "farcaster"
+  )?.signerPublicKey;
+
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["follow-status"],
-    queryFn: () => {
-      return fetch(
-        `/api/farcaster/follow?fid=${
-          user?.farcaster?.fid ?? ""
-        }&viewer_fid=${212652}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      ).then((res) => res.json());
-    },
+    queryFn: () => fetchFollowStatus(user),
   });
 
-  const isFollowing = data?.following;
+  const isFollowing = data?.following || hasFollowed;
+
+  const handleCreateSigner = async () => {
+    if (!farcasterAccount?.signerPublicKey) {
+      try {
+        await requestFarcasterSignerFromWarpcast();
+      } catch (error) {
+        console.error("🚀 ~ handleFollowInterestedFyi ~ error:", error);
+        return;
+      }
+    }
+    return;
+  };
 
   const handleFollowInterestedFyi = async () => {
-    const result = await fetch("/api/farcaster-follow", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        fid: user?.farcaster?.fid,
-        viewer_fid: 212652,
-      }),
-    });
+    setIsLoadingFollow(true);
+    if (!hasSigner) {
+      await handleCreateSigner();
+      return;
+    }
+
+    if (!user?.farcaster?.fid || !process.env.NEXT_PUBLIC_INTERESTED_FYI_FID)
+      throw new Error("Missing required parameters");
+
+    const followUserResponse = await privyClient.followUser(
+      parseInt(process.env.NEXT_PUBLIC_INTERESTED_FYI_FID),
+      user.farcaster.fid,
+      privySigner
+    );
+
+    if (followUserResponse.hash) {
+      toast({
+        title: "Followed @interestedfyi",
+        description: "Successfully followed @interestedfyi", // TODO - update description
+      });
+      refetch();
+      setHasFollowed(true);
+    }
+    setIsLoadingFollow(false);
   };
 
   const handleAcceptDC = async () => {
@@ -85,7 +123,7 @@ export default function CandidateSignUpForm() {
             <Button
               size='lg'
               onClick={handleFollowInterestedFyi}
-              disabled={isFollowing}
+              disabled={isFollowing || isLoadingFollow}
               className='flex items-center max-w-full w-96 gap-4 py-8 shadow-md border bg-[#7c58c1] hover:bg-[#986de8] rounded-xl'
             >
               <Image
