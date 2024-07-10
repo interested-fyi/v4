@@ -4,13 +4,14 @@ import supabase from "@/lib/supabase";
 import User from "../../../types/user";
 import Company from "../../../types/company";
 import saveUser from "@/functions/database/save-user";
+import Candidate from "@/types/candidate";
 
 const privyClient = new PrivyClient(process.env.NEXT_PUBLIC_PRIVY_APP_ID!, process.env.PRIVY_SECRET!);
 
 export async function POST(req: NextRequest) {
-    const { user: bodyUser, company: bodyCompany } = await req.json();
+    const { user: bodyUser, candidate: bodyCandidate } = await req.json();
     const user = bodyUser as User;
-    const company = bodyCompany as Company;
+    const candidate = bodyCandidate as Candidate;
     const accessToken = req.headers.get('Authorization')?.replace('Bearer ','');
     
     // verify authenticate user sent request
@@ -22,9 +23,9 @@ export async function POST(req: NextRequest) {
 
     const userCreation = await saveUser(user);
 
-    const { data: companyCreation, error: companyError } = await supabase.from('companies').insert([company]).select();
+    const { data: candidateCreation, error: candidateError } = await supabase.from('candidates').insert([candidate]).select();
 
-    if (companyError) throw companyError;
+    if (candidateError) throw candidateError;
 
-    return NextResponse.json({ company: companyCreation, user: userCreation }, { status: 200 })
+    return NextResponse.json({ company: candidateCreation, user: userCreation }, { status: 200 })
 }
