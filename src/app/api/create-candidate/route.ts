@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrivyClient } from "@privy-io/server-auth";
 import supabase from "@/lib/supabase";
 import User from "../../../types/user";
-import Company from "../../../types/company";
 import saveUser from "@/functions/database/save-user";
 import Candidate from "@/types/candidate";
 
@@ -27,5 +26,5 @@ export async function POST(req: NextRequest) {
 
     if (candidateError) throw candidateError;
 
-    return NextResponse.json({ company: candidateCreation, user: userCreation }, { status: 200 })
+    return NextResponse.json({ candidate: candidateCreation, user: userCreation }, { status: 200 })
 }
