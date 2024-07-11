@@ -27,5 +27,5 @@ export async function POST(req: NextRequest) {
 
     if (candidateError) throw candidateError;
 
-    return NextResponse.json({ company: candidateCreation, user: userCreation }, { status: 200 })
+    return NextResponse.json({ candidate: candidateCreation, user: userCreation }, { status: 200 })
 }
