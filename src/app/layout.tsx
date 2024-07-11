@@ -7,6 +7,12 @@ import { cn } from "@/lib/utils";
 import Navbar from "@/components/composed/Navbar";
 import PrivyProviderWrapper from "@/context/PrivyProvider";
 import QueryProvider from "@/context/QueryProvider";
+import dynamic from "next/dynamic";
+import { PHProvider } from "@/context/PostHogProvider";
+
+const PostHogPageView = dynamic(() => import("../components/PostHogPageView"), {
+  ssr: false,
+});
 const fontHeading = Roboto_Mono({
   subsets: ["latin"],
   display: "swap",
@@ -32,17 +38,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <body
-        className={cn("antialiased", fontHeading.variable, fontBody.variable)}
-      >
-        <PrivyProviderWrapper>
-          <QueryProvider>
-            <Navbar />
-            {children}
-            <Toaster />
-          </QueryProvider>
-        </PrivyProviderWrapper>
-      </body>
+      <PHProvider>
+        <body
+          className={cn("antialiased", fontHeading.variable, fontBody.variable)}
+        >
+          <PrivyProviderWrapper>
+            <QueryProvider>
+              <Navbar />
+              <PostHogPageView />
+              {children}
+              <Toaster />
+            </QueryProvider>
+          </PrivyProviderWrapper>
+        </body>
+      </PHProvider>
     </html>
   );
 }
