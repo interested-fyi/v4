@@ -15,6 +15,7 @@ interface ModalProps {
   description: string;
   children?: React.ReactNode;
   className?: string;
+  followButton?: React.ReactNode;
 }
 
 const Modal = ({
@@ -23,6 +24,7 @@ const Modal = ({
   description,
   className,
   children,
+  followButton,
 }: ModalProps) => {
   return (
     <Dialog>
@@ -37,6 +39,7 @@ const Modal = ({
           {children}
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
+          {followButton}
         </DialogHeader>
       </DialogContent>
     </Dialog>
