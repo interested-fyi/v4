@@ -15,3 +15,12 @@ export const fetchFollowStatus = async (user: User | null) => {
     }
   ).then((res) => res.json());
 };
+
+export const getCandidateByFID = async (fid: string) => {
+  return await fetch(`/api/create-candidate?fid=${fid}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((res) => res.json());
+};

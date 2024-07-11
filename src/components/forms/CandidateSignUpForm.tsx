@@ -5,7 +5,7 @@ import { Button } from "../ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { usePrivy } from "@privy-io/react-auth";
 import { useToast } from "../ui/use-toast";
-import { fetchFollowStatus } from "@/app/utils/helpers";
+import { fetchFollowStatus, getCandidateByFID } from "@/app/utils/helpers";
 import Modal from "../composed/modals/Modal";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { CheckboxGroup } from "../composed/CheckboxGroup";
@@ -19,6 +19,15 @@ export default function CandidateSignUpForm() {
   const { toast } = useToast();
   const { user, getAccessToken } = usePrivy();
 
+  const { data: account } = useQuery({
+    queryKey: ["account-status"],
+    queryFn: () => {
+      return user?.farcaster?.fid
+        ? getCandidateByFID(user?.farcaster?.fid?.toString())
+        : null;
+    },
+  });
+
   const handleAcceptDC = async () => {
     // TODO - implement functionality to check if user has accepted DCs
     // Need to research
@@ -30,33 +39,35 @@ export default function CandidateSignUpForm() {
   };
 
   const submitForm = async () => {
-    const accessToken = await getAccessToken();
-    const result = await fetch("/api/create-candidate", {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({
-        user: {
-          privy_did: user?.id,
-          fid: user?.farcaster?.fid,
-          email: user?.email,
+    if (!account.id) {
+      const accessToken = await getAccessToken();
+      const result = await fetch("/api/create-candidate", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
         },
-        candidate: {
-          privy_did: user?.id,
-          accept_direct_messages: acceptDC,
-          currently_seeking: openToWork,
-        } as Candidate,
-      }),
-    });
-    if (!result.ok) {
-      toast({
-        title: "Error",
-        description:
-          "There was an error creating your profile. Please try again.",
+        body: JSON.stringify({
+          user: {
+            privy_did: user?.id,
+            fid: user?.farcaster?.fid,
+            email: user?.email,
+          },
+          candidate: {
+            privy_did: user?.id,
+            accept_direct_messages: acceptDC,
+            currently_seeking: openToWork,
+          } as Candidate,
+        }),
       });
-      return;
+      if (!result.ok) {
+        toast({
+          title: "Error",
+          description:
+            "There was an error creating your profile. Please try again.",
+        });
+        return;
+      }
     }
     const modalButton = document.getElementById("modalButton");
     if (modalButton) {

@@ -5,26 +5,49 @@ import User from "../../../types/user";
 import saveUser from "@/functions/database/save-user";
 import Candidate from "@/types/candidate";
 
-const privyClient = new PrivyClient(process.env.NEXT_PUBLIC_PRIVY_APP_ID!, process.env.PRIVY_SECRET!);
+const privyClient = new PrivyClient(
+  process.env.NEXT_PUBLIC_PRIVY_APP_ID!,
+  process.env.PRIVY_SECRET!
+);
 
 export async function POST(req: NextRequest) {
-    const { user: bodyUser, candidate: bodyCandidate } = await req.json();
-    const user = bodyUser as User;
-    const candidate = bodyCandidate as Candidate;
-    const accessToken = req.headers.get('Authorization')?.replace('Bearer ','');
-    
-    // verify authenticate user sent request
-    try {
-        const verified = await privyClient.verifyAuthToken(accessToken!);
-    } catch (e) {
-        throw new Error('Invalid access token');
-    }
+  const { user: bodyUser, candidate: bodyCandidate } = await req.json();
+  const user = bodyUser as User;
+  const candidate = bodyCandidate as Candidate;
+  const accessToken = req.headers.get("Authorization")?.replace("Bearer ", "");
 
-    const userCreation = await saveUser(user);
+  // verify authenticate user sent request
+  try {
+    const verified = await privyClient.verifyAuthToken(accessToken!);
+  } catch (e) {
+    throw new Error("Invalid access token");
+  }
 
-    const { data: candidateCreation, error: candidateError } = await supabase.from('candidates').insert([candidate]).select();
+  const userCreation = await saveUser(user);
 
-    if (candidateError) throw candidateError;
+  const { data: candidateCreation, error: candidateError } = await supabase
+    .from("candidates")
+    .insert([candidate])
+    .select();
 
-    return NextResponse.json({ candidate: candidateCreation, user: userCreation }, { status: 200 })
+  if (candidateError) throw candidateError;
+
+  return NextResponse.json(
+    { candidate: candidateCreation, user: userCreation },
+    { status: 200 }
+  );
+}
+
+export async function GET(req: NextRequest) {
+  const searchParams = req.nextUrl.searchParams;
+  const fid = searchParams.get("fid");
+  const { data: user, error } = await supabase
+    .from("users")
+    .select()
+    .eq("fid", fid);
+
+  if (error) {
+    return NextResponse.error();
+  }
+  return NextResponse.json(user[0], { status: 200 });
 }
