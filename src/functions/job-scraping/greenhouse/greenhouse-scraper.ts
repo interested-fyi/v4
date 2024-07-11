@@ -51,10 +51,6 @@ export default async function greenhouseScraper(url: string) {
             });
         }
 
-        console.log(`Job Postings--------`)
-        for (const posting of jobPostings) {
-            console.log(`${JSON.stringify(posting)}\n------\n`);
-        }
         return jobPostings;
     } catch (e) {
         console.log(`Error Scraping from Greenhouse: ${e}`);
