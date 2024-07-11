@@ -1,22 +1,21 @@
 import puppeteer, { Browser } from 'puppeteer';
 import * as cheerio from 'cheerio';
-import { findGreenhouseFrameSrc } from './find-greenhouse-frame-src'
 import getGreenhouseAccountName from './get-greenhouse-account-name';
-import getEmbedUrl from './get-embed-url';
+import getBoardUrl from './get-board-url';
 import JobPosting from '@/types/job-posting';
 
 export default async function greenhouseScraper(url: string) {
     let browser: Browser | undefined;
-    let embedUrl: string | undefined;
+    let boardUrl: string | undefined;
         
     try {
-        const { embedUrl, accountName } = await getEmbedUrl(url);
+        const { boardUrl, accountName } = await getBoardUrl(url);
         const jobPostings: JobPosting[] = [];
 
-        if (embedUrl) {
+        if (boardUrl) {
             browser = await puppeteer.launch();
             const page = await browser.newPage();
-            await page.goto(embedUrl, { waitUntil: 'networkidle2'});
+            await page.goto(boardUrl, { waitUntil: 'networkidle2'});
             
             const content = await page.content();
             const $ = cheerio.load(content);

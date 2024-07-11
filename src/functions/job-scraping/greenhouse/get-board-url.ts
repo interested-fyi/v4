@@ -2,9 +2,9 @@ import puppeteer, { Browser } from "puppeteer";
 import { findGreenhouseFrameSrc } from "./find-greenhouse-frame-src";
 import getGreenhouseAccountName from "./get-greenhouse-account-name";
 
-export default async function getEmbedUrl(url: string) {
+export default async function getBoardUrl(url: string) {
     let browser: Browser | undefined;
-    let embedUrl: string | undefined;
+    let boardUrl: string | undefined;
 
     try {
         browser = await puppeteer.launch();
@@ -16,18 +16,19 @@ export default async function getEmbedUrl(url: string) {
         const accountName = getGreenhouseAccountName(url);
 
         if (src) {
-            embedUrl = src
-            return { embedUrl, accountName }
+            boardUrl = src
+            return { boardUrl, accountName }
         } 
         if (accountName) {
-            embedUrl = `https://boards.greenhouse.io/embed/job_board?for=${accountName}`;
+
+            boardUrl = `https://boards.greenhouse.io/embed/job_board?for=${accountName}`;
         }
 
-        console.log(`Embed URL: ${embedUrl}`)
-        return { embedUrl, accountName };
+        console.log(`Embed URL: ${boardUrl}`)
+        return { boardUrl, accountName };
     } catch (e) {
-        console.log(`Error Getting embedUrl from Greenhouse: ${e}`);
-        return { embedUrl: null, accountName: null };
+        console.log(`Error Getting boardUrl from Greenhouse: ${e}`);
+        return { boardUrl: null, accountName: null };
     } finally {
         if (browser) {
             await browser.close();
