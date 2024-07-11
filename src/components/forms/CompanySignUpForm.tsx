@@ -1,9 +1,11 @@
-import { usePrivy } from "@privy-io/react-auth";
+import { getAccessToken, usePrivy } from "@privy-io/react-auth";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { hourglass } from "ldrs";
 import { Button } from "../ui/button";
 import { useToast } from "../ui/use-toast";
+import User from "@/types/user";
+import Company from "@/types/company";
 
 export default function CompanySignUpForm() {
   const { ready, authenticated, login, user } = usePrivy();
@@ -40,26 +42,37 @@ export default function CompanySignUpForm() {
 
     if (!validateUrl(careersPageUrl)) {
       setUrlError("Invalid URL");
+      setLoading(false);
       return;
     }
     if (!validateEmail(email)) {
       setEmailError("Invalid Email Address");
+      setLoading(false);
       return;
     }
 
     try {
+      const accessToken = await getAccessToken();
       const response = await fetch("/api/create-company", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
-          fid: user?.farcaster?.fid,
-          user_id: user?.id,
-          owner_address: user?.farcaster?.ownerAddress,
-          company_name: companyName,
-          careers_url: careersPageUrl,
-          email: email,
+          user: {
+            created_at: user?.createdAt,
+            privy_did: user?.id,
+            fid: user?.farcaster?.fid,
+            email: user?.email,
+          } as User,
+          company: {
+            company_name: companyName,
+            careers_page_url: careersPageUrl,
+            creator_email: email,
+            creator_fid: user?.farcaster?.fid,
+            creator_privy_did: user?.id
+          } as Company,
         }),
       });
 
@@ -127,6 +140,7 @@ export default function CompanySignUpForm() {
             </p>
             <input
               type='url'
+              placeholder="https://"
               className='text-xl rounded-xl border-2 border-black px-2 py-1'
               onChange={(e) => setCareersPageUrl(e.target.value)}
             />
