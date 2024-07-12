@@ -6,25 +6,31 @@ import saveUser from "@/functions/database/save-user";
 import Candidate from "@/types/candidate";
 import sendDirectCast from "@/functions/farcaster/send-direct-cast";
 
-const privyClient = new PrivyClient(process.env.NEXT_PUBLIC_PRIVY_APP_ID!, process.env.PRIVY_SECRET!);
+const privyClient = new PrivyClient(
+  process.env.NEXT_PUBLIC_PRIVY_APP_ID!,
+  process.env.PRIVY_SECRET!
+);
 
 export async function POST(req: NextRequest) {
-    const { user: bodyUser, candidate: bodyCandidate } = await req.json();
-    const user = bodyUser as User;
-    const candidate = bodyCandidate as Candidate;
-    const accessToken = req.headers.get('Authorization')?.replace('Bearer ','');
-    
+  const { user: bodyUser, candidate: bodyCandidate } = await req.json();
+  const user = bodyUser as User;
+  const candidate = bodyCandidate as Candidate;
+  const accessToken = req.headers.get("Authorization")?.replace("Bearer ", "");
+
     // verify authenticate user sent request
     try {
         const verified = await privyClient.verifyAuthToken(accessToken!);
     } catch (e) {
-        throw new Error('Invalid access token');
+        throw new Error("Invalid access token");
     }
 
     const { username, ...userObj } = user;
     const userCreation = await saveUser(userObj);
 
-    const { data: candidateCreation, error: candidateError } = await supabase.from('candidates').insert([candidate]).select();
+    const { data: candidateCreation, error: candidateError } = await supabase
+        .from("candidates")
+        .insert([candidate])
+        .select();
 
     if (candidateError) throw candidateError;
 
@@ -46,7 +52,9 @@ cheers all`
 }
 
 export async function GET(req: NextRequest) {
+    console.log(`getting params`)
     const searchParams = req.nextUrl.searchParams;
+    console.log(`params: ${searchParams}`)
     const fid = searchParams.get("fid");
     const { data: user, error } = await supabase
       .from("users")
@@ -56,5 +64,6 @@ export async function GET(req: NextRequest) {
     if (error) {
       return NextResponse.error();
     }
-    return NextResponse.json(user[0], { status: 200 });
+    console.log(`user: ${JSON.stringify(user[0])}`)
+    return NextResponse.json(user[0] ?? {}, { status: 200 });
   }
