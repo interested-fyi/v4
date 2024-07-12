@@ -29,7 +29,7 @@ export default function Home() {
             </p> */}
           </div>
 
-          <div className='absolute right-10 top-12 md:top-0 h-full w-[50vw] z-[0] flex place-items-center'>
+          <div className='absolute right-0 md:right-10 top-0 h-full w-[50vw] z-[0] flex place-items-center'>
             <div className='relative h-full w-full'>
               <Image
                 className='dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert'
