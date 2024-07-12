@@ -1,12 +1,22 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export interface ShareButtonProps {
   icon: React.ReactNode;
-  text: string;
+  className?: string;
 }
-export const ShareButton: React.FC<ShareButtonProps> = ({ icon }) => {
+export const ShareButton: React.FC<ShareButtonProps> = ({
+  icon,
+  className,
+}) => {
   return (
-    <Button size={"icon"} className='flex gap-2 items-center justify-center'>
+    <Button
+      size={"icon"}
+      className={cn(
+        "flex gap-2 items-center bg-transparent justify-center",
+        className
+      )}
+    >
       {icon}
     </Button>
   );
