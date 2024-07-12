@@ -56,7 +56,7 @@ export default function JobDetailsPage() {
                 width={20}
                 alt='thumb icon'
                 className='w-full max-w-[14.09px] h-4'
-                src='/thumb.svg'
+                src='/svg/thumb.svg'
               />
               <div className='text-blue-700 text-sm font-medium font-body leading-[21px]'>
                 I&apos;m interested

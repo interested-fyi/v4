@@ -19,7 +19,7 @@ const config = {
     },
     extend: {
       backgroundImage: {
-        "mail-icon": "url('/mail-icon.svg')",
+        "mail-icon": "url('/svg/mail-icon.svg')",
         "repeated-square": "url('/repeated-square.png')",
       },
       fontFamily: {

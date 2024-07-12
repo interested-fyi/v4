@@ -9,7 +9,7 @@ export function InterestedButton() {
         width={20}
         alt='thumb icon'
         className='w-full max-w-[14.09px] h-4'
-        src='/whiteThumb.svg'
+        src='/svg/whiteThumb.svg'
       />
       <div className='text-sm font-medium font-body leading-[21px]'>
         I&apos;m interested
