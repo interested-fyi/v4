@@ -62,6 +62,7 @@ export async function GET(req: NextRequest) {
       .eq("fid", fid);
   
     if (error) {
+        console.log(`error from supabase: ${error}`)
       return NextResponse.error();
     }
     console.log(`user: ${JSON.stringify(user)}`)
