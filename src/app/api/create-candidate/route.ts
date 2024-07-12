@@ -64,6 +64,10 @@ export async function GET(req: NextRequest) {
     if (error) {
       return NextResponse.error();
     }
-    console.log(`user: ${JSON.stringify(user[0])}`)
-    return NextResponse.json(user[0] ?? {}, { status: 200 });
+    console.log(`user: ${JSON.stringify(user)}`)
+    if(user && user.length > 0) {
+        return NextResponse.json(user[0] ?? {}, { status: 200 });
+    } else {
+        return NextResponse.json({}, { status: 200 });
+    }
   }
