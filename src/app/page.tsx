@@ -1,22 +1,49 @@
+import { SignupForms } from "./../components/composed/SignupForms";
 import Image from "next/image";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24"> 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/Interested-logo.png"
-          alt="Interested Logo"
-          width={240}
-          height={50}
-          priority
-        />
-      </div>
-      <div className="rounded-lg shadow-lg bg-[#2640EB] mt-8 py-8 px-16 flex flex-col items-center justify-center">
-        <h2 className="text-white text-2xl font-extrabold">Looking for us?</h2>
-        <div className="text-white text-xl">We&apos;re revamping. Check back soon!</div>
-      </div>
+    <main className='flex  min-h-screen flex-col gap-8 items-center justify-start '>
+      <section className='w-full max-w-full bg-[#2640EB] py-24 sm:p-8 p-2 md:p-24'>
+        <div className='flex relative md:flex-row flex-col w-full'>
+          <div className='flex flex-col gap-8 relative z-10'>
+            <div className='flex flex-col gap-0 md:gap-4 text-nowrap'>
+              <h1 className='font-heading text-3xl md:text-6xl font-bold text-[#919CF4] h-[60px]'>
+                LET&apos;S FIND THE CRYPTO
+              </h1>
+              <h1 className='font-heading text-6xl md:text-8xl font-bold text-[#ffffff] h-24'>
+                COMPANY
+              </h1>
+              <h1 className='font-heading text-3xl md:text-6xl font-bold text-[#919CF4] h-[60px]'>
+                THAT INTERESTS
+              </h1>
+              <h1 className='font-heading text-6xl md:text-8xl font-bold text-[#ffffff] h-24'>
+                YOU .
+              </h1>
+            </div>
+            {/* <p className='text-[16px]  font-body text-[#ffffff] max-w-[548px]'>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat.
+            </p> */}
+          </div>
+
+          <div className='absolute right-10 top-12 md:top-0 h-full w-[50vw] z-[0] flex place-items-center'>
+            <div className='relative h-full w-full'>
+              <Image
+                className='dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert'
+                src='/illustration.svg'
+                alt='Interested illustration'
+                sizes='50vw'
+                fill
+                priority
+              />
+            </div>
+          </div>
+        </div>
+        <SignupForms />
+      </section>
     </main>
   );
 }
