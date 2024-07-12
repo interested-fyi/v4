@@ -4,6 +4,7 @@ import supabase from "@/lib/supabase";
 import User from "../../../types/user";
 import saveUser from "@/functions/database/save-user";
 import Candidate from "@/types/candidate";
+import sendDirectCast from "@/functions/farcaster/send-direct-cast";
 
 const privyClient = new PrivyClient(process.env.NEXT_PUBLIC_PRIVY_APP_ID!, process.env.PRIVY_SECRET!);
 
@@ -20,11 +21,26 @@ export async function POST(req: NextRequest) {
         throw new Error('Invalid access token');
     }
 
-    const userCreation = await saveUser(user);
+    const { username, ...userObj } = user;
+    const userCreation = await saveUser(userObj);
 
     const { data: candidateCreation, error: candidateError } = await supabase.from('candidates').insert([candidate]).select();
 
     if (candidateError) throw candidateError;
+
+    if(candidate.accept_direct_messages) {
+        const message = `gm @${username},
+
+we’re so thankful to have you 🙂 
+            
+keep an eye on your DCs and our channel + account for upcoming announcements, job postings, status updates, and more. we're committed to keeping you informed and helping you make the most of your search for interesting connections.
+            
+if you have any questions or need assistance, feel free to reach out to @alec.eth. here to help!
+            
+cheers all`
+        
+            await sendDirectCast(user.fid, message);
+    }
 
     return NextResponse.json({ candidate: candidateCreation, user: userCreation }, { status: 200 })
 }

@@ -3,5 +3,6 @@ export default interface User {
     created_at?: Date,
     privy_did: string,
     fid: number,
-    email?: string
+    email?: string,
+    username?: string,
 }

@@ -51,6 +51,7 @@ export default function CandidateSignUpForm() {
           privy_did: user?.id,
           fid: user?.farcaster?.fid,
           email: user?.email,
+          username: user?.farcaster?.username
         },
         candidate: {
           privy_did: user?.id,

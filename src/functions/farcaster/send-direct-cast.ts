@@ -1,5 +1,8 @@
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
+require('dotenv').config();
+
+const apiKey = process.env.WC_DC_API_KEY;
 
 export default async function sendDirectCast(recipientFid: number, message: string) {
     const url = "https://api.warpcast.com/v2/ext-send-direct-cast";
@@ -12,7 +15,7 @@ export default async function sendDirectCast(recipientFid: number, message: stri
             idempotencyKey
         }, {
             headers: {
-                'Authorization': `Bearer ${process.env.WC_DC_API_KEY}`,
+                'Authorization': `Bearer ${apiKey}`,
                 'Content-Type': 'application/json'
             }
         });

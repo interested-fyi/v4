@@ -51,6 +51,7 @@ export default function CompanySignUpForm() {
       return;
     }
 
+    console.log(`FC User: ${JSON.stringify(user?.farcaster?.username)}`)
     try {
       const accessToken = await getAccessToken();
       const response = await fetch("/api/create-company", {
@@ -65,6 +66,7 @@ export default function CompanySignUpForm() {
             privy_did: user?.id,
             fid: user?.farcaster?.fid,
             email: user?.email,
+            username: user?.farcaster?.username
           } as User,
           company: {
             company_name: companyName,
