@@ -39,8 +39,22 @@ if you have any questions or need assistance, feel free to reach out to @alec.et
             
 cheers all`
         
-            await sendDirectCast(user.fid, message);
+        await sendDirectCast(user.fid, message);
     }
 
     return NextResponse.json({ candidate: candidateCreation, user: userCreation }, { status: 200 })
 }
+
+export async function GET(req: NextRequest) {
+    const searchParams = req.nextUrl.searchParams;
+    const fid = searchParams.get("fid");
+    const { data: user, error } = await supabase
+      .from("users")
+      .select()
+      .eq("fid", fid);
+  
+    if (error) {
+      return NextResponse.error();
+    }
+    return NextResponse.json(user[0], { status: 200 });
+  }
