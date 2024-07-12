@@ -1,8 +1,12 @@
 export default interface JobPosting {
+    id?: number;
+    created_at?: Date;
+    company_id?: number;
     department: string;
-    subDepartment?: string;
+    sub_department?: string;
     type?: string;
-    role: string;
+    role_title?: string;
     location: string;
-    url: string;
+    posting_url: string;
+    active?: boolean;
 }

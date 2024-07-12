@@ -13,18 +13,17 @@ export default async function getBoardUrl(url: string) {
         
         const content = await page.content();
         const src = findGreenhouseFrameSrc(content);
-        const accountName = getGreenhouseAccountName(url);
+        const accountName = getGreenhouseAccountName(src ?? url);
 
-        if (src) {
-            boardUrl = src
-            return { boardUrl, accountName }
-        } 
         if (accountName) {
-
-            boardUrl = `https://boards.greenhouse.io/embed/job_board?for=${accountName}`;
+            boardUrl = `https://boards.greenhouse.io/${accountName}`;
+            await page.goto(boardUrl, { waitUntil: 'networkidle2'});
+            const redirectedUrl = page.url();
+            if(redirectedUrl !== boardUrl) {
+                boardUrl = `https://boards.greenhouse.io/embed/job_board?for=${accountName}`;
+            }
         }
 
-        console.log(`Embed URL: ${boardUrl}`)
         return { boardUrl, accountName };
     } catch (e) {
         console.log(`Error Getting boardUrl from Greenhouse: ${e}`);

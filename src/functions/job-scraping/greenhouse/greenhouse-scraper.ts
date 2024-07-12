@@ -4,7 +4,7 @@ import getGreenhouseAccountName from './get-greenhouse-account-name';
 import getBoardUrl from './get-board-url';
 import JobPosting from '@/types/job-posting';
 
-export default async function greenhouseScraper(url: string) {
+export default async function greenhouseScraper(url: string, company_id?: number) {
     let browser: Browser | undefined;
     let boardUrl: string | undefined;
         
@@ -27,14 +27,20 @@ export default async function greenhouseScraper(url: string) {
                 section.find('.opening').each((_, opening) => {
                     const role = $(opening).find('a').text().trim();
                     const location = $(opening).find('.location').text().trim();
-                    const url = $(opening).find('a').attr('href') ?? '';
+                    let url = $(opening).find('a').attr('href') ?? '';
+                    if (!url.startsWith('http')) {
+                        url = `https://boards.greenhouse.io${url}`;
+                    }
     
                     jobPostings.push({
-                        department,
-                        subDepartment,
-                        role,
-                        location,
-                        url,
+                        department: department,
+                        sub_department: subDepartment,
+                        role_title: role,
+                        location: location,
+                        posting_url: url,
+                        active: true,
+                        type: 'greenhouse',
+                        company_id: company_id                        
                     });
                 });
     

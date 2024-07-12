@@ -74,7 +74,6 @@ export default function CompanySignUpForm() {
             }
 
             const result = await response.json();
-            console.log(`Result: ${JSON.stringify(result)}`);
 
             if (result.company?.length > 0) {
                 router.push('/companies/add/success')
