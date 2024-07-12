@@ -52,7 +52,7 @@ cheers all`
 }
 
 export async function GET(req: NextRequest) {
-    console.log(`getting params`)
+    console.log(`getting params: supabase key: ${process.env.SUPABASE_SERVICE_ROLE_KEY?.slice(1, 10)}`)
     const searchParams = req.nextUrl.searchParams;
     console.log(`params: ${searchParams}`)
     const fid = searchParams.get("fid");
