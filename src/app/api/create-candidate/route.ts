@@ -52,9 +52,7 @@ cheers all`
 }
 
 export async function GET(req: NextRequest) {
-    console.log(`getting params: supabase key: ${process.env.SUPABASE_SERVICE_ROLE_KEY?.slice(1, 10)}`)
     const searchParams = req.nextUrl.searchParams;
-    console.log(`params: ${searchParams}`)
     const fid = searchParams.get("fid");
     const { data: user, error } = await supabase
       .from("users")
@@ -62,10 +60,8 @@ export async function GET(req: NextRequest) {
       .eq("fid", fid);
   
     if (error) {
-        console.log(`error from supabase: ${JSON.stringify(error)}`);
         return NextResponse.error();
     }
-    console.log(`user: ${JSON.stringify(user)}`)
     if(user && user.length > 0) {
         return NextResponse.json(user[0] ?? {}, { status: 200 });
     } else {
