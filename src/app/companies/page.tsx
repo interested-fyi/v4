@@ -46,7 +46,7 @@ export default function CompaniesPage() {
                   height='34'
                   rx='17'
                   stroke='#2640EB'
-                  stroke-width='2'
+                  strokeWidth='2'
                 />
                 <path
                   d='M23.7826 21.6874L9.90039 21.6874L9.90039 22.9623L23.7826 22.9623L21.0512 25.6994L21.9537 26.6L26.2199 22.3248L21.9537 18.0497L21.0512 18.9503L23.7826 21.6874Z'
@@ -68,7 +68,9 @@ export default function CompaniesPage() {
         </div>
       </div>
       <div className='py-24 px-12'>
-        <CompanyCard />
+        <a href='/company-details/1'>
+          <CompanyCard />
+        </a>
       </div>
     </>
   );

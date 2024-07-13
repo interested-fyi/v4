@@ -26,7 +26,7 @@ export default function ExploreTalentPage() {
           <Breadcrumb>
             <BreadcrumbItem className='self-stretch justify-start items-center gap-[1068px] inline-flex'>
               <BreadcrumbLink
-                href='/'
+                href='/companies'
                 className='rounded-lg justify-center items-center gap-2 flex'
               >
                 <div className='w-4 h-4 relative'>

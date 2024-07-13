@@ -3,12 +3,17 @@ import { usePathname } from "next/navigation";
 import { ShareButton } from "./buttons/ShareButton";
 import { usePrivy } from "@privy-io/react-auth";
 import { LinkIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface ShareJobDetailsProps {
   title: string;
+  className?: string;
 }
 
-export const ShareJobDetails: React.FC<ShareJobDetailsProps> = ({ title }) => {
+export const ShareJobDetails: React.FC<ShareJobDetailsProps> = ({
+  title,
+  className,
+}) => {
   const { user } = usePrivy();
   const pathName = usePathname();
 
@@ -19,12 +24,15 @@ export const ShareJobDetails: React.FC<ShareJobDetailsProps> = ({ title }) => {
     "i+found+this+job+on+%40interestedFYI+and+wanted+to+share+it!+Nominate+me+or+apply+for+the+role+if+you+think+you+would+be+a+good+fit!";
   return (
     <>
-      <div className='w-full h-full max-h-[173px] flex-col justify-start items-start gap-2 inline-flex'>
+      <div
+        className={cn(
+          "w-full h-full max-h-[173px] flex-col justify-start items-start gap-2 inline-flex",
+          className
+        )}
+      >
         <div className='text-center uppercase text-indigo-400 text-sm font-medium font-body leading-[21px]'>
           {title}
         </div>
-        {/* share buttons for twitter facebook linkedin and email */}
-
         <div className='flex gap-4 md:flex-row flex-col'>
           <div className='flex gap-4'>
             <a
@@ -60,7 +68,7 @@ export const ShareJobDetails: React.FC<ShareJobDetailsProps> = ({ title }) => {
                     fill='none'
                     xmlns='http://www.w3.org/2000/svg'
                   >
-                    <g clip-path='url(#clip0_1_2)'>
+                    <g clipPath='url(#clip0_1_2)'>
                       <path
                         d='M947.747 1259.61H311.861C139.901 1259.61 0 1119.72 0 947.752V311.871C0 139.907 139.901 0.00541362 311.861 0.00541362H947.747C1119.71 0.00541362 1259.61 139.907 1259.61 311.871V947.752C1259.61 1119.72 1119.71 1259.61 947.747 1259.61Z'
                         fill='#472A91'

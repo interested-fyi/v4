@@ -32,13 +32,7 @@ export function JobRow({ index, job }: JobRowProps) {
       </TableCell>
       <TableCell>
         <div className='flex justify-center flex-col items-start gap-2'>
-          <div className='flex items-center gap-2'>
-            <Image
-              alt='location'
-              src='/svg/location.svg'
-              width={12}
-              height={12}
-            />
+          <div className='flex items-center gap-2 font-semibold'>
             <p>{job.compensation}</p>
           </div>
           <p>{job.commitment}</p>

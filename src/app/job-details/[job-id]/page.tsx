@@ -181,7 +181,7 @@ export default function JobDetailsPage() {
             ]}
             listType='unordered'
           />
-          <InterestedButton />
+          <InterestedButton id='modal1' />
         </div>
         <div className='flex w-full max-w-96 md:max-w-80 flex-row lg:flex-col gap-6 items-start justify-center md:py-0 pb-14'>
           <div className='flex w-full max-w-40 flex-col gap-6 '>
@@ -205,7 +205,7 @@ export default function JobDetailsPage() {
             />
             <JobDetails title='hiring bounty' description='$10k' />
             <ShareJobDetails title='Share this job' />
-            <InterestedButton />
+            <InterestedButton id='modal2' />
           </div>
         </div>
       </div>
