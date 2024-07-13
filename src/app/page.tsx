@@ -48,9 +48,9 @@ export default function Home() {
               />
             </div>
           </div>
-          <SignupForms />
-          </div>
-        </section>
-      </main>
+        </div>
+        <SignupForms />
+      </section>
+    </main>
   );
 }
