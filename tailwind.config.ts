@@ -18,6 +18,10 @@ const config = {
       },
     },
     extend: {
+      backgroundImage: {
+        "mail-icon": "url('/svg/mail-icon.svg')",
+        "repeated-square": "url('/repeated-square.png')",
+      },
       fontFamily: {
         heading: ["var(--font-heading)", ...fontFamily.sans],
         body: ["var(--font-body)", ...fontFamily.sans],
