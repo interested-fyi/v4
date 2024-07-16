@@ -20,6 +20,10 @@ const config = {
     extend: {
       backgroundImage: {
         "mail-icon": "url('/svg/mail-icon.svg')",
+        "user-icon": "url('/svg/user-icon.svg')",
+        "twitter-icon": "url('/svg/twitter-icon.svg')",
+        "location-icon": "url('/svg/location-icon.svg')",
+        "linkedin-icon": "url('/svg/linkedin-icon.svg')",
         "repeated-square": "url('/repeated-square.png')",
       },
       fontFamily: {
@@ -59,6 +63,18 @@ const config = {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        slate: {
+          400: "#778CA7",
+        },
+        violet: {
+          200: "#D3D8FB",
+        },
+        blue: {
+          700: "#2640EB",
+        },
+        yellow: {
+          200: "#E8FC6C",
         },
       },
       borderRadius: {

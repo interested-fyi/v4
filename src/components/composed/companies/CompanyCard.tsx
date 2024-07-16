@@ -9,7 +9,7 @@ import {
 import React from "react";
 export function CompanyCard() {
   return (
-    <Card className='relative w-[252px] max-w-full rounded-[8px] border border-[#919CF4] bg-[#fff] shadow-md shadow-[0px 8px 14px 0px rgba(38, 64, 235, 0.10)]'>
+    <Card className='relative w-full sm:w-[252px] max-w-full rounded-[8px] border border-[#919CF4] bg-[#fff] shadow-md shadow-[0px 8px 14px 0px rgba(38, 64, 235, 0.10)]'>
       <div className='absolute top-[-38px] left-6'>
         <svg
           xmlns='http://www.w3.org/2000/svg'
