@@ -1,4 +1,5 @@
 export const MOCK_COMPANY_DATA = {
+  id: "1",
   name: "Optimism",
   logo: "/src.jpg",
   description:

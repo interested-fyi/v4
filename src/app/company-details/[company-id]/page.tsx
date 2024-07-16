@@ -14,6 +14,7 @@ import {
   BreadcrumbLink,
 } from "@/components/ui/breadcrumb";
 import { JobRow } from "@/components/composed/jobs/JobRow";
+import Link from "next/link";
 
 export default function ExploreTalentPage() {
   const company = MOCK_COMPANY_DATA;
@@ -26,21 +27,23 @@ export default function ExploreTalentPage() {
             <Breadcrumb>
               <BreadcrumbItem className='self-stretch justify-start items-center gap-[1068px] inline-flex'>
                 <BreadcrumbLink
-                  href='/explore'
+                  asChild
                   className='rounded-lg justify-center items-center gap-2 flex'
                 >
-                  <div className='w-4 h-4 relative'>
-                    {" "}
-                    <Image
-                      src='/svg/arrow-left.svg'
-                      alt='back'
-                      width={16}
-                      height={16}
-                    />
-                  </div>
-                  <div className='text-center text-blue-700 text-sm md:text-base font-bold font-heading leading-normal'>
-                    Back
-                  </div>
+                  <Link href='/explore'>
+                    <div className='w-4 h-4 relative'>
+                      {" "}
+                      <Image
+                        src='/svg/arrow-left.svg'
+                        alt='back'
+                        width={16}
+                        height={16}
+                      />
+                    </div>
+                    <div className='text-center text-blue-700 text-sm md:text-base font-bold font-heading leading-normal'>
+                      Back
+                    </div>
+                  </Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
             </Breadcrumb>
@@ -117,12 +120,7 @@ export default function ExploreTalentPage() {
         </TableHeader>
         <TableBody className='font-body'>
           {jobs.map((job, index) => (
-            <JobRow
-              key={index}
-              index={index}
-              job={job}
-              company={company.name}
-            />
+            <JobRow key={index} index={index} job={job} company={company} />
           ))}
         </TableBody>
       </Table>

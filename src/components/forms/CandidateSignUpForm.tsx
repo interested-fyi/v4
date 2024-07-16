@@ -53,7 +53,7 @@ export default function CandidateSignUpForm() {
             privy_did: user?.id,
             fid: user?.farcaster?.fid,
             email: user?.email,
-            username: user?.farcaster?.username
+            username: user?.farcaster?.username,
           },
           candidate: {
             privy_did: user?.id,
@@ -77,8 +77,8 @@ export default function CandidateSignUpForm() {
     }
 
     return;
-  }
-  
+  };
+
   return (
     <div className='flex flex-col justify-center items-center gap-8 bg-[#919CF480] p-8 rounded-xl font-body'>
       <div className='flex flex-col w-full gap-8 justify-start'>
@@ -120,13 +120,13 @@ const FollowSection = ({ isFollowing }: FollowSectionProps) => {
     <div className='flex flex-col justify-start min-h-24 gap-4 text-primary'>
       <p className='text-lg font-bold text-center'>
         Follow{" "}
-        <a
+        <Link
           className='text-[#7c58c1] hover:underline'
           href='https://warpcast.com/interestedfyi'
           target='_blank'
         >
           @interestedfyi
-        </a>{" "}
+        </Link>{" "}
         on Farcaster
       </p>
       <Link href='https://warpcast.com/interestedfyi' passHref>

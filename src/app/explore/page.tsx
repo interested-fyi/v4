@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { CompanyCard } from "@/components/composed/companies/CompanyCard";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function ExplorePage() {
   const [activeButton, setActiveButton] = useState("companies");
@@ -30,18 +31,18 @@ export default function ExplorePage() {
         </div>
       </div>
       <div className='py-24 px-4 justify-items-center md:px-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-16 md:gap-8'>
-        <a href='/company-details/1'>
+        <Link href='/company-details/1'>
           <CompanyCard />
-        </a>
-        <a href='/company-details/2'>
+        </Link>
+        <Link href='/company-details/2'>
           <CompanyCard />
-        </a>
-        <a href='/company-details/3'>
+        </Link>
+        <Link href='/company-details/3'>
           <CompanyCard />
-        </a>
-        <a href='/company-details/4'>
+        </Link>
+        <Link href='/company-details/4'>
           <CompanyCard />
-        </a>
+        </Link>
         {/* Add more CompanyCard components as needed */}
       </div>
     </>

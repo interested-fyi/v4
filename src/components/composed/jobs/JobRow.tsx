@@ -20,7 +20,7 @@ export interface Job {
 
 interface JobRowProps {
   index: number;
-  company: string;
+  company: { name: string; id: string };
   job: Job;
 }
 
@@ -32,7 +32,11 @@ export function JobRow({ index, job, company }: JobRowProps) {
       manager: job.manager.name,
       teammates: "",
     };
-    const queryParams = new URLSearchParams({ ...flattenedJob, company });
+    const queryParams = new URLSearchParams({
+      ...flattenedJob,
+      companyName: company.name,
+      companyId: company.id,
+    });
     router.push(`/job-details/${job.id}?${queryParams}`);
   };
   return (

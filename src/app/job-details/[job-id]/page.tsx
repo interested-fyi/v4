@@ -9,8 +9,8 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Job } from "@/components/composed/jobs/JobRow";
 import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 export default function JobDetailsPage() {
   const searchParams = useSearchParams();
@@ -32,7 +32,8 @@ export default function JobDetailsPage() {
         };
         teammates: [];
         posted: string;
-        company: string;
+        companyName: string;
+        companyId: string;
       }
     | undefined
   >();
@@ -40,7 +41,6 @@ export default function JobDetailsPage() {
   useEffect(() => {
     const jobId = searchParams.get("job-id");
     const position = searchParams.get("position");
-    console.log("🚀 ~ useEffect ~ position:", position);
     const compensation = searchParams.get("compensation");
     const location = searchParams.get("location");
     const commitment = searchParams.get("commitment");
@@ -51,7 +51,8 @@ export default function JobDetailsPage() {
     const managerLinkedin = searchParams.get("managerLinkedin");
     const managerImgSrc = searchParams.get("managerImgSrc");
     const posted = searchParams.get("posted");
-    const company = searchParams.get("company");
+    const company = searchParams.get("companyName");
+    const companyId = searchParams.get("companyId");
 
     setJobDetails({
       id: jobId as string,
@@ -69,12 +70,12 @@ export default function JobDetailsPage() {
       },
       teammates: [],
       posted: posted as string,
-      company: company as string,
+      companyName: company as string,
+      companyId: companyId as string,
     });
   }, [searchParams]);
 
   if (!jobDetails?.position) {
-    // Skeleton loading state
     return (
       <div className='flex flex-col w-full'>
         <div className='relative w-full h-[276px] text-center bg-blue-overlay bg-contain bg-[#3720ca] bg-opacity-80 bg-center bg-repeat px-4'>
@@ -104,16 +105,20 @@ export default function JobDetailsPage() {
       <div className='relative w-full h-[276px] text-center bg-blue-overlay bg-contain bg-[#3720ca] bg-opacity-80 bg-center bg-repeat px-4'>
         <div className='w-full max-w-[1200px] mx-auto h-[276px] flex-col justify-center items-start gap-8 inline-flex'>
           <div className='text-center'>
-            <span className='text-[#E7FB6C] text-base font-bold font-heading leading-normal'>
-              Companies
-            </span>
+            <Link href='/explore'>
+              <span className='text-[#E7FB6C] text-base font-bold font-heading leading-normal'>
+                Companies
+              </span>
+            </Link>
             <span className='text-white text-base font-bold font-heading leading-normal'>
               {" "}
               /{" "}
             </span>
-            <span className='text-[#E7FB6C] text-base font-bold font-heading leading-normal'>
-              {jobDetails?.company}
-            </span>
+            <Link href={`/company-details/${jobDetails.companyId}`}>
+              <span className='text-[#E7FB6C] text-base font-bold font-heading leading-normal'>
+                {jobDetails.companyName}
+              </span>
+            </Link>
             <span className='text-white text-base font-bold font-heading leading-normal'>
               {" "}
               /{" "}
@@ -136,7 +141,7 @@ export default function JobDetailsPage() {
                   src='https://via.placeholder.com/40x40'
                 />
                 <div className='max-w-[630px] w-full text-white text-lg font-bold font-body leading-normal'>
-                  {jobDetails.company}
+                  {jobDetails.companyName}
                 </div>
               </div>
             </div>
