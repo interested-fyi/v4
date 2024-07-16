@@ -53,7 +53,7 @@ export function InterestedButton({ id }: InterestedButtonProps) {
         followButton={
           <div className='flex items-center flex-col justify-between w-full gap-12 pt-4'>
             <div className='flex gap-4'>
-              <a href='/companies'>
+              <a href='/explore'>
                 <Button
                   className='bg-[#2640EB] text-[#E8FC6C]
               '
