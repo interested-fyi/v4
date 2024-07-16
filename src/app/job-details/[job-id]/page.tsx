@@ -1,3 +1,4 @@
+"use client";
 import { JobDetails } from "@/components/composed/JobDetails";
 import { ShareJobDetails } from "@/components/composed/ShareJobDetails";
 import { InfoCard } from "@/components/composed/InfoCard";
@@ -6,8 +7,97 @@ import { InterestedButton } from "@/components/composed/buttons/InterestedButton
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Job } from "@/components/composed/jobs/JobRow";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function JobDetailsPage() {
+  const searchParams = useSearchParams();
+
+  const [jobDetails, setJobDetails] = useState<
+    | {
+        id: string;
+        position: string;
+        compensation: string;
+        location: string;
+        commitment: string;
+        manager: {
+          name: string;
+          title: string;
+          bio: string;
+          twitter: string;
+          linkedin: string;
+          imgSrc: string;
+        };
+        teammates: [];
+        posted: string;
+        company: string;
+      }
+    | undefined
+  >();
+
+  useEffect(() => {
+    const jobId = searchParams.get("job-id");
+    const position = searchParams.get("position");
+    console.log("🚀 ~ useEffect ~ position:", position);
+    const compensation = searchParams.get("compensation");
+    const location = searchParams.get("location");
+    const commitment = searchParams.get("commitment");
+    const managerName = searchParams.get("managerName");
+    const managerTitle = searchParams.get("managerTitle");
+    const managerBio = searchParams.get("managerBio");
+    const managerTwitter = searchParams.get("managerTwitter");
+    const managerLinkedin = searchParams.get("managerLinkedin");
+    const managerImgSrc = searchParams.get("managerImgSrc");
+    const posted = searchParams.get("posted");
+    const company = searchParams.get("company");
+
+    setJobDetails({
+      id: jobId as string,
+      position: position as string,
+      compensation: compensation as string,
+      location: location as string,
+      commitment: commitment as string,
+      manager: {
+        name: managerName as string,
+        title: managerTitle as string,
+        bio: managerBio as string,
+        twitter: managerTwitter as string,
+        linkedin: managerLinkedin as string,
+        imgSrc: managerImgSrc as string,
+      },
+      teammates: [],
+      posted: posted as string,
+      company: company as string,
+    });
+  }, [searchParams]);
+
+  if (!jobDetails?.position) {
+    // Skeleton loading state
+    return (
+      <div className='flex flex-col w-full'>
+        <div className='relative w-full h-[276px] text-center bg-blue-overlay bg-contain bg-[#3720ca] bg-opacity-80 bg-center bg-repeat px-4'>
+          <div className='w-full max-w-[1200px] mx-auto h-[276px] flex-col justify-center items-start gap-8 inline-flex'>
+            <Skeleton className='w-full h-10 mb-4' />
+            <Skeleton className='w-1/2 h-8' />
+            <div className='flex items-center gap-4 mt-4'>
+              <Skeleton className='w-10 h-10 rounded-full' />
+              <Skeleton className='w-40 h-8' />
+            </div>
+          </div>
+        </div>
+        <div className='w-full bg-[#E7FB6C] h-full min-h-[137px] px-4'>
+          <div className='w-full max-w-[1200px] h-full mx-auto min-h-[137px] py-8 lg:gap-0 gap-8 justify-between items-center  flex lg:flex-row flex-col'>
+            <Skeleton className='w-1/3 h-10' />
+            <Skeleton className='w-1/3 h-10' />
+            <Skeleton className='w-1/3 h-10' />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className='flex flex-col w-full'>
       {/* header */}
@@ -22,20 +112,20 @@ export default function JobDetailsPage() {
               /{" "}
             </span>
             <span className='text-[#E7FB6C] text-base font-bold font-heading leading-normal'>
-              UMA
+              {jobDetails?.company}
             </span>
             <span className='text-white text-base font-bold font-heading leading-normal'>
               {" "}
               /{" "}
             </span>
             <span className='text-white text-base font-normal font-heading leading-normal'>
-              Product Lead
+              {jobDetails.position}
             </span>
           </div>
           <div className='w-full justify-between items-start gap-8 inline-flex'>
             <div className='grow shrink basis-0 flex-col justify-center items-start gap-2 inline-flex'>
               <div className='text-white text-3xl md:text-5xl font-bold font-heading md:leading-[72px] text-left'>
-                Product Lead
+                {jobDetails.position}
               </div>
               <div className='justify-start items-center gap-4 inline-flex'>
                 <Image
@@ -46,7 +136,7 @@ export default function JobDetailsPage() {
                   src='https://via.placeholder.com/40x40'
                 />
                 <div className='max-w-[630px] w-full text-white text-lg font-bold font-body leading-normal'>
-                  UMA
+                  {jobDetails.company}
                 </div>
               </div>
             </div>
@@ -185,11 +275,11 @@ export default function JobDetailsPage() {
         </div>
         <div className='flex w-full max-w-96 md:max-w-80 flex-row lg:flex-col gap-6 items-start justify-center md:py-0 pb-14'>
           <div className='flex w-full max-w-40 flex-col gap-6 '>
-            <JobDetails title='Location' description='Remote' />
-            <JobDetails title='Job Type' description='Full-time' />
+            <JobDetails title='Location' description={jobDetails.location} />
+            <JobDetails title='Job Type' description={jobDetails.commitment} />
             <JobDetails
               title='Compensation'
-              description='$100,000 - $150,000'
+              description={jobDetails.compensation}
             />
             <JobDetails
               title='Role type(s)'
