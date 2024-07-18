@@ -17,12 +17,12 @@ import {
 } from "@/components/ui/select";
 import React, { ChangeEvent, FormEvent, useState } from "react";
 
-export interface SalaryFormData {
+export type SalaryFormData = {
   category: string;
   role: string;
   seniority: string;
   location: string;
-}
+};
 interface SalaryRangeFinderProps {
   onSubmit: (formData: SalaryFormData) => void;
 }
@@ -52,25 +52,6 @@ export function SalaryRangeFinder({ onSubmit }: SalaryRangeFinderProps) {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
-
-    try {
-      const response = await fetch("https://mockapi.io/endpoint", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const data = await response.json();
-      console.log("Form submitted successfully:", data);
-    } catch (error) {
-      console.error("Error submitting form:", error);
-    }
   };
 
   const isReadyToSubmit =
