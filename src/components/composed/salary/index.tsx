@@ -1,17 +1,18 @@
 "use client";
 
 import React from "react";
-import { SalaryRangeFinder, FormData } from "./SalaryRangeFinder";
+import { SalaryRangeFinder, SalaryFormData } from "./SalaryRangeFinder";
 import { SalaryRange } from "../../SalaryRange";
 import SalaryQuizCopy from "./SalaryQuizCopy";
+
 export function SalaryRangeComposed() {
-  const [formData, setFormData] = React.useState<FormData>({
+  const [formData, setFormData] = React.useState<SalaryFormData>({
     category: "",
     role: "",
     seniority: "",
     location: "",
   });
-  const handleChange = (formData: FormData) => {
+  const handleChange = (formData: SalaryFormData) => {
     setFormData(formData);
     scrollToTop();
   };
@@ -34,7 +35,7 @@ export function SalaryRangeComposed() {
         <SalaryQuizCopy />
       )}
       <SalaryRangeFinder
-        onSubmit={(formData: FormData) => {
+        onSubmit={(formData: SalaryFormData) => {
           handleChange(formData);
         }}
       />

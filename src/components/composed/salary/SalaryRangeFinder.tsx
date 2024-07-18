@@ -17,17 +17,17 @@ import {
 } from "@/components/ui/select";
 import React, { ChangeEvent, FormEvent, useState } from "react";
 
-export interface FormData {
+export interface SalaryFormData {
   category: string;
   role: string;
   seniority: string;
   location: string;
 }
 interface SalaryRangeFinderProps {
-  onSubmit: (formData: FormData) => void;
+  onSubmit: (formData: SalaryFormData) => void;
 }
 export function SalaryRangeFinder({ onSubmit }: SalaryRangeFinderProps) {
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<SalaryFormData>({
     category: "",
     role: "",
     seniority: "",
@@ -42,7 +42,7 @@ export function SalaryRangeFinder({ onSubmit }: SalaryRangeFinderProps) {
     }));
   };
 
-  const handleSelectChange = (name: keyof FormData, value: string) => {
+  const handleSelectChange = (name: keyof SalaryFormData, value: string) => {
     setFormData((prevState) => ({
       ...prevState,
       [name]: value,
