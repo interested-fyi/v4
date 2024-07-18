@@ -25,6 +25,7 @@ const config = {
         "location-icon": "url('/svg/location-icon.svg')",
         "linkedin-icon": "url('/svg/linkedin-icon.svg')",
         "repeated-square": "url('/repeated-square.png')",
+        coins: "url('/svg/coins.svg')",
       },
       fontFamily: {
         heading: ["var(--font-heading)", ...fontFamily.sans],
