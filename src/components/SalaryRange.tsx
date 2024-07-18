@@ -10,27 +10,15 @@ interface SalaryRangeProps {
   maxSalary: number;
   role: string;
 }
-/**
- * Renders a salary range component.
- *
- * @component
 
- * @param {string} roleLevel - The role level.
- * @param {string} location - The location.
- * @param {number} minSalary - The minimum salary.
- * @param {number} medianSalary - The median salary.
- * @param {number} maxSalary - The maximum salary.
- * @param {string} role - The role.
- * @returns {JSX.Element} The rendered SalaryRange component.
- */
-export const SalaryRange: React.FC<SalaryRangeProps> = ({
+export function SalaryRange({
   roleLevel,
   location,
   role,
   minSalary,
   medianSalary,
   maxSalary,
-}) => {
+}: SalaryRangeProps) {
   const [isHourly, setIsHourly] = React.useState(false);
   const handleCalculateHourlyRate = () => {
     const hoursInYearOfWork = 2080;
@@ -105,4 +93,4 @@ export const SalaryRange: React.FC<SalaryRangeProps> = ({
       </div>
     </div>
   );
-};
+}

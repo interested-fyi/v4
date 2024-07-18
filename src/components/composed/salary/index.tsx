@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { FormData, SalaryRangeFinder } from "./SalaryRangeFinder";
+import { SalaryRangeFinder, FormData } from "./SalaryRangeFinder";
 import { SalaryRange } from "../../SalaryRange";
 import SalaryQuizCopy from "./SalaryQuizCopy";
 export function SalaryRangeComposed() {
@@ -34,7 +34,7 @@ export function SalaryRangeComposed() {
         <SalaryQuizCopy />
       )}
       <SalaryRangeFinder
-        onSubmit={(formData) => {
+        onSubmit={(formData: FormData) => {
           handleChange(formData);
         }}
       />
