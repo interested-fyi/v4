@@ -1,10 +1,75 @@
-export const MOCK_COMPANY_DATA = {
-  id: "1",
-  name: "Optimism",
-  logo: "/src.jpg",
-  description:
-    "Optimism is a decentralized layer 2 scaling solution for Ethereum, which reduces transaction costs and latency and provides a better user experience.",
-};
+export const MOCK_COMPANY_DATA = [
+  {
+    id: "1",
+    name: "Optimism",
+    logo: "/src1.jpg",
+    description:
+      "Optimism is a decentralized layer 2 scaling solution for Ethereum, which reduces transaction costs and latency and provides a better user experience.",
+  },
+  {
+    id: "2",
+    name: "Acme Corporation",
+    logo: "/src2.jpg",
+    description:
+      "Acme Corporation is a leading provider of innovative products and services in the tech industry.",
+  },
+  {
+    id: "3",
+    name: "XYZ Co",
+    logo: "/src3.jpg",
+    description:
+      "XYZ Co is a global company specializing in software development and consulting services.",
+  },
+  {
+    id: "4",
+    name: "Tech Solutions Inc",
+    logo: "/src4.jpg",
+    description:
+      "Tech Solutions Inc is a technology company that offers cutting-edge solutions for businesses.",
+  },
+  {
+    id: "5",
+    name: "Innovative Startups",
+    logo: "/src5.jpg",
+    description:
+      "Innovative Startups is a venture capital firm that invests in early-stage technology companies.",
+  },
+  {
+    id: "6",
+    name: "Global Enterprises",
+    logo: "/src6.jpg",
+    description:
+      "Global Enterprises is a multinational corporation with diverse business interests.",
+  },
+  {
+    id: "7",
+    name: "Code Wizards",
+    logo: "/src7.jpg",
+    description:
+      "Code Wizards is a team of highly skilled software engineers specializing in web development.",
+  },
+  {
+    id: "8",
+    name: "Data Analytics Co",
+    logo: "/src8.jpg",
+    description:
+      "Data Analytics Co provides advanced analytics solutions to help businesses make data-driven decisions.",
+  },
+  {
+    id: "9",
+    name: "Cloud Innovators",
+    logo: "/src9.jpg",
+    description:
+      "Cloud Innovators is a cloud computing company that offers scalable and secure infrastructure solutions.",
+  },
+  {
+    id: "10",
+    name: "AI Tech",
+    logo: "/src10.jpg",
+    description:
+      "AI Tech is a leading provider of artificial intelligence solutions for various industries.",
+  },
+];
 
 export const MOCK_JOB_DATA = [
   {

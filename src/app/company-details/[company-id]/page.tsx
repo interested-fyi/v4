@@ -17,7 +17,7 @@ import { JobRow } from "@/components/composed/jobs/JobRow";
 import Link from "next/link";
 
 export default function ExploreTalentPage() {
-  const company = MOCK_COMPANY_DATA;
+  const company = MOCK_COMPANY_DATA[0];
   const jobs = MOCK_JOB_DATA;
   return (
     <div className='flex flex-col gap-8'>

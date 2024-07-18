@@ -3,9 +3,10 @@ import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { InterestedButton } from "../buttons/InterestedButton";
-import { ProfileModal, TeamMember } from "@/components/profile-modal";
+
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { ProfileModal, TeamMember } from "@/components/ProfileModal";
 
 export interface Job {
   id: string;
