@@ -3,9 +3,19 @@ import { useState } from "react";
 import { CompanyCard } from "@/components/composed/companies/CompanyCard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 
 export default function ExplorePage() {
   const [activeButton, setActiveButton] = useState("companies");
+
+  const { data } = useQuery({
+    queryKey: ["companies"],
+    queryFn: async () => {
+      const res = await fetch("/api/companies");
+      return res.json();
+    },
+  });
+  console.log("🚀 ~ ExplorePage ~ data:", data);
 
   const handleButtonClick = (button: string) => {
     setActiveButton(button);
@@ -30,19 +40,20 @@ export default function ExplorePage() {
           />
         </div>
       </div>
-      <div className='py-24 px-4 justify-items-center md:px-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-16 md:gap-8'>
-        <Link href='/company-details/1'>
-          <CompanyCard />
-        </Link>
-        <Link href='/company-details/2'>
-          <CompanyCard />
-        </Link>
-        <Link href='/company-details/3'>
-          <CompanyCard />
-        </Link>
-        <Link href='/company-details/4'>
-          <CompanyCard />
-        </Link>
+      <div className='py-24 px-4 justify-items-center md:px-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-16 md:gap-8 md:gap-y-20'>
+        {data?.map(
+          (company: {
+            id: number;
+            name: string;
+            logo: string;
+            description: string;
+          }) => (
+            <Link href={`/company-details/${company.id}`} key={company.id}>
+              <CompanyCard company={company} />
+            </Link>
+          )
+        )}
+
         {/* Add more CompanyCard components as needed */}
       </div>
     </>
