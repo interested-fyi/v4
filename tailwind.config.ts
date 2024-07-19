@@ -65,6 +65,10 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        gray: {
+          100: "#F3F4F6",
+          600: "#4B5563",
+        },
         slate: {
           400: "#778CA7",
         },
