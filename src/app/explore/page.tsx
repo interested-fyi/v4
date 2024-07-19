@@ -69,7 +69,7 @@ function Selector({ activeButton, handleButtonClick }: SelectorProps) {
     <div className='flex gap-4 relative'>
       <Button
         size='lg'
-        className={`w-52 rounded-[8px] font-heading font-bold uppercase justify-start ${
+        className={`w-40 md:w-52 rounded-[8px] font-heading font-bold uppercase justify-start ${
           activeButton === "companies"
             ? "bg-[#2640EB] hover:bg-blue-600 hover:text-white text-white"
             : "border-[#D3D8FB] border-2 bg-[#fff] text-[#919CF4]"
@@ -86,7 +86,7 @@ function Selector({ activeButton, handleButtonClick }: SelectorProps) {
             ? handleButtonClick("companies")
             : handleButtonClick("jobs")
         }
-        className='bg-transparent hover:bg-transparent active:scale-95 transition-all duration-100 absolute right-[46%]'
+        className='bg-transparent hover:bg-transparent active:scale-95 transition-all duration-100 absolute right-[45%] md:right-[46%]'
       >
         <svg
           xmlns='http://www.w3.org/2000/svg'
@@ -117,7 +117,7 @@ function Selector({ activeButton, handleButtonClick }: SelectorProps) {
       </Button>
       <Button
         size='lg'
-        className={`w-52 rounded-[8px] font-heading font-bold uppercase justify-start ${
+        className={`w-40 md:w-52 rounded-[8px] font-heading font-bold uppercase justify-start ${
           activeButton === "jobs"
             ? "bg-[#2640EB] text-white hover:bg-blue-600 hover:text-white"
             : "border-[#D3D8FB] border-2 bg-[#fff] text-[#919CF4]"

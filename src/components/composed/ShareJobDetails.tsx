@@ -34,7 +34,7 @@ export const ShareJobDetails: React.FC<ShareJobDetailsProps> = ({
         <div className='text-center uppercase text-indigo-400 text-sm font-medium font-body leading-[21px]'>
           {title}
         </div>
-        <div className='flex gap-4 md:flex-row flex-col'>
+        <div className='flex gap-4 flex-row'>
           <div className='flex gap-4'>
             <Link
               href={`https://twitter.com/intent/tweet?post?original_referer=https%3A%2F%2Finterested.fyi%2F&related=twitterapi%2Ctwitter&text=i+found+this+job+on+%40interestedFYI+and+wanted+to+share+it!+Nominate+me+or+apply+for+the+role+if+you+think+you+would+be+a+good+fit!&url=${pathNameURLEncoded}&via=interestedfyi`}

@@ -23,7 +23,7 @@ export default function ExploreTalentPage() {
     <div className='flex flex-col gap-8'>
       <div>
         <div className='flex md:flex-row flex-col px-4  h-80  max-h-full items-start md:items-center justify-center md:justify-between w-full bg-[rgba(145,156,244,0.20)] border border-r-0 border-l-0 border-[#2640EB]'>
-          <div className='w-[1200px] mx-auto max-w-full h-[301px] px-4  pt-10 pb-[60px] bg-violet-100 flex-col justify-center items-start gap-8 inline-flex'>
+          <div className='w-[1200px] mx-auto max-w-full h-[301px] px-0   pt-10 pb-[60px] bg-violet-100 flex-col justify-center items-start gap-8 inline-flex'>
             <Breadcrumb>
               <BreadcrumbItem className='self-stretch justify-start items-center gap-[1068px] inline-flex'>
                 <BreadcrumbLink
@@ -50,9 +50,9 @@ export default function ExploreTalentPage() {
             <div className='self-stretch justify-start items-center gap-8 flex'>
               <Image
                 alt='company logo'
-                width={122}
-                height={122}
-                className='w-[122px] h-[122px]'
+                width={75}
+                height={75}
+                className='w-[75px] h-[75px]'
                 src={company.logo}
               />
               <div className='w-[630px] flex-col justify-center items-start gap-2 inline-flex'>
