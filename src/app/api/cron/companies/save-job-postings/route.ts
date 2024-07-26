@@ -3,6 +3,8 @@ import supabase from "@/lib/supabase";
 import User from "@/types/user";
 import Company from "@/types/company";
 import JobPosting from "@/types/job-posting";
+import extractJobBody from "@/functions/job-scraping/description_scraper/extract-job-body";
+import extractJobData from "@/functions/job-scraping/description_scraper/ai-description-scraper";
 
 export async function POST(req: NextRequest, res: NextResponse) {
     if (req.headers.get('Authorization') !== `Bearer ${process.env.INTERNAL_SECRET}`) {
@@ -31,9 +33,20 @@ export async function POST(req: NextRequest, res: NextResponse) {
         });
 
         if (newPostings && newPostings.length > 0) {
-            const { data: saveData, error: saveError } = await supabase.from('job_postings').insert(newPostings);
+            const { data: saveData, error: saveError } = await supabase.from('job_postings').insert(newPostings).select();
 
-            if (saveError) throw new Error("Error saving new job postings to database")
+            if (saveError) throw new Error("Error saving new job postings to database");
+
+            for (const posting of saveData) {
+                fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/companies/scrape-job-details`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${process.env.INTERNAL_SECRET}`
+                    },
+                    body: JSON.stringify({ posting: posting })
+                });
+            }
         }
 
         // find which postings in the db are no longer active
@@ -49,11 +62,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
             const inactiveIds = inactivePostings.map((p) => p.id);
             const { data: updateData, error: updateError } = await supabase.from('job_postings').update({ active: false }).in('id', inactiveIds);
 
-            if (updateError) throw new Error("Error updating inactive job postings");
+            if (updateError) {
+                throw new Error("Error updating inactive job postings");
+            }
         }
 
         return NextResponse.json({ success: true, new_postings: newPostings }, { status: 200 })
     } catch (e) {
-        return NextResponse.error();
+        return NextResponse.json({ error: e }, { status: 500 });
     }
 }
