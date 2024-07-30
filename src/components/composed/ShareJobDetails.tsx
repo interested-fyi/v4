@@ -4,6 +4,7 @@ import { ShareButton } from "./buttons/ShareButton";
 import { usePrivy } from "@privy-io/react-auth";
 import { LinkIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 export interface ShareJobDetailsProps {
   title: string;
@@ -35,7 +36,7 @@ export const ShareJobDetails: React.FC<ShareJobDetailsProps> = ({
         </div>
         <div className='flex gap-4 md:flex-row flex-col'>
           <div className='flex gap-4'>
-            <a
+            <Link
               href={`https://twitter.com/intent/tweet?post?original_referer=https%3A%2F%2Finterested.fyi%2F&related=twitterapi%2Ctwitter&text=i+found+this+job+on+%40interestedFYI+and+wanted+to+share+it!+Nominate+me+or+apply+for+the+role+if+you+think+you+would+be+a+good+fit!&url=${pathNameURLEncoded}&via=interestedfyi`}
               target='_blank'
             >
@@ -53,8 +54,8 @@ export const ShareJobDetails: React.FC<ShareJobDetailsProps> = ({
                   </svg>
                 }
               />
-            </a>
-            <a
+            </Link>
+            <Link
               href={`https://warpcast.com/~/compose?text=${shareText}&embeds%5B%5D=${pathNameURLEncoded}`}
               target='_blank'
             >
@@ -90,10 +91,10 @@ export const ShareJobDetails: React.FC<ShareJobDetailsProps> = ({
                   </svg>
                 }
               />
-            </a>
+            </Link>
           </div>
           <div className='flex gap-4 items-center'>
-            <a
+            <Link
               href={`mailto:?subject=Check out this job on Interested.fyi&body=I found this job on Interested.fyi and wanted to share it! Nominate me or apply for the role if you think you would be a good fit!%0D%0A%0D%0Ahttp://localhost:3000${pathName}?referral=${user?.farcaster?.fid}`}
             >
               <ShareButton
@@ -114,7 +115,7 @@ export const ShareJobDetails: React.FC<ShareJobDetailsProps> = ({
                   </svg>
                 }
               />
-            </a>{" "}
+            </Link>{" "}
             <ShareButton
               className='w-6 h-6  justify-center'
               icon={<LinkIcon stroke='#444444' />}

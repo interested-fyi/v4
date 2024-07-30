@@ -1,34 +1,60 @@
+"use client";
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TableRow, TableCell } from "@/components/ui/table";
-import Image from "next/image";
 import { InterestedButton } from "../buttons/InterestedButton";
 
-interface Job {
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { ProfileModal, TeamMember } from "@/components/ProfileModal";
+
+export interface Job {
+  id: string;
   position: string;
   compensation: string;
   location: string;
   commitment: string;
-  manager: string;
-  teammates: string[];
+  manager: TeamMember;
+  teammates: TeamMember[];
   posted: string;
 }
 
 interface JobRowProps {
   index: number;
+  company: { name: string; id: string };
   job: Job;
 }
 
-export function JobRow({ index, job }: JobRowProps) {
+export function JobRow({ index, job, company }: JobRowProps) {
+  const router = useRouter();
+  const navigateToJobDetails = (job: Job) => {
+    const flattenedJob = {
+      ...job,
+      manager: job.manager.name,
+      teammates: "",
+    };
+    const queryParams = new URLSearchParams({
+      ...flattenedJob,
+      companyName: company.name,
+      companyId: company.id,
+    });
+    router.push(`/job-details/${job.id}?${queryParams}`);
+  };
   return (
     <TableRow key={index} className='py-3 items-center font-body'>
       <TableCell className='font-medium'>
-        <div className='flex flex-col gap-1'>
-          <span className='text-[#2640EB] text-base font-semibold '>
-            {job.position}
-          </span>
-          <span className='text-muted-foreground'>{job.location}</span>
-        </div>
+        <Button
+          variant={"link"}
+          className='hover:no-underline text-left hover:cursor-pointer'
+          onClick={() => navigateToJobDetails(job)}
+        >
+          <div className='flex flex-col gap-1'>
+            <span className='text-[#2640EB] text-base font-semibold '>
+              {job.position}
+            </span>
+            <span className='text-muted-foreground'>{job.location}</span>
+          </div>
+        </Button>
       </TableCell>
       <TableCell>
         <div className='flex justify-center flex-col items-start gap-2'>
@@ -40,29 +66,43 @@ export function JobRow({ index, job }: JobRowProps) {
       </TableCell>
       <TableCell>
         <div className='flex md:flex-row flex-col gap-2'>
-          <Avatar key={index}>
-            <AvatarImage src={job.manager} />
-            <AvatarFallback>{job.position.slice(0, 2)}</AvatarFallback>
-          </Avatar>
+          <ProfileModal
+            teamMember={job.manager}
+            trigger={
+              <Avatar
+                className={`border-2 hover:cursor-pointer border-white relative `}
+              >
+                <AvatarImage src={job.manager.imgSrc} />
+                <AvatarFallback>{job.manager.name.slice(0, 2)}</AvatarFallback>
+              </Avatar>
+            }
+          />
         </div>
       </TableCell>
       <TableCell>
         <div className='flex md:flex-row flex-col gap-[-8px]'>
-          {job.teammates.map((teammate, jobIndex) => (
-            <Avatar
+          {job.teammates.map((teammate: TeamMember, jobIndex) => (
+            <ProfileModal
+              teamMember={teammate}
+              trigger={
+                <Avatar
+                  className={`border-2 hover:cursor-pointer border-white relative right-${
+                    jobIndex * 2
+                  }`}
+                >
+                  <AvatarImage src={teammate.name} />
+                  <AvatarFallback>{teammate.name.slice(0, 2)}</AvatarFallback>
+                </Avatar>
+              }
               key={jobIndex}
-              className={`border-2 border-white relative right-${jobIndex * 2}`}
-            >
-              <AvatarImage src={teammate} />
-              <AvatarFallback>TM</AvatarFallback>
-            </Avatar>
+            />
           ))}
         </div>
       </TableCell>
       <TableCell className='text-left'>
         <span>{job.posted}</span>
       </TableCell>
-      <TableCell className='text-right'>
+      <TableCell className='text-right float-end pr-0'>
         <InterestedButton />
       </TableCell>
     </TableRow>

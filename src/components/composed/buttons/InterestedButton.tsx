@@ -5,6 +5,7 @@ import Modal from "@/components/composed/modals/Modal";
 import { DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { ShareJobDetails } from "../ShareJobDetails";
 import { usePathname, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 interface InterestedButtonProps {
   id?: string;
@@ -53,14 +54,14 @@ export function InterestedButton({ id }: InterestedButtonProps) {
         followButton={
           <div className='flex items-center flex-col justify-between w-full gap-12 pt-4'>
             <div className='flex gap-4'>
-              <a href='/companies'>
+              <Link href='/explore'>
                 <Button
                   className='bg-[#2640EB] text-[#E8FC6C]
               '
                 >
                   Back to search
                 </Button>
-              </a>
+              </Link>
               <DialogClose asChild>
                 <Button
                   variant={"outline"}

@@ -5,4 +5,5 @@ export default interface User {
     fid: number,
     email?: string,
     username?: string,
+    is_admin: boolean,
 }
