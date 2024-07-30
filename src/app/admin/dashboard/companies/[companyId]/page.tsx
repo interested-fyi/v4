@@ -11,7 +11,7 @@ export default function AdminDashboardJobs() {
   const companyId = searchParams.get("companyId");
   const url = searchParams.get("url");
 
-  const { data: jobs, error } = useQuery({
+  const { data, error } = useQuery({
     queryKey: ["scrape-jobs"],
     queryFn: async () => {
       const accessToken = await getAccessToken();
@@ -48,7 +48,7 @@ export default function AdminDashboardJobs() {
     );
   }
 
-  if (!jobs) {
+  if (!data) {
     return (
       <div className='flex flex-col gap-8'>
         <div className='flex md:flex-row flex-col px-28 h-36 max-h-full items-start md:items-center justify-center md:justify-between w-full bg-[rgba(145,156,244,0.20)] border border-r-0 border-l-0 border-[#2640EB]'>
@@ -69,9 +69,13 @@ export default function AdminDashboardJobs() {
       </div>
 
       <div className='max-w-[950px] px-4 w-full mx-auto space-y-6 font-body'>
-        {jobs.map((job: JobPosting, index: number) => (
-          <JobPostingCard key={job.id} job={job} />
-        ))}
+        {data.job_postings.length > 0 ? (
+          data.job_postings.map((job: JobPosting, index: number) => (
+            <JobPostingCard key={job.id} job={job} />
+          ))
+        ) : (
+          <div>No jobs found</div>
+        )}
       </div>
     </div>
   );
