@@ -2,6 +2,7 @@
   "name": "web-new",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -44,6 +45,7 @@
     "ldrs": "^1.0.2",
     "lucide-react": "^0.400.0",
     "next": "14.2.4",
+    "openai": "^4.52.7",
     "posthog-js": "^1.146.0",
     "puppeteer": "^22.12.1",
     "react": "^18",
@@ -68,6 +70,7 @@
     "tailwindcss": "^3.4.1",
     "ts-jest": "^29.2.0",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5"
   }
 }
