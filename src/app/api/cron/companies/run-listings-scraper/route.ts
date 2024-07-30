@@ -4,7 +4,7 @@ import supabase from "@/lib/supabase";
 
 
 export async function POST(req: NextRequest, res: NextResponse) {
-    if (req.headers.get('Authorization') !== `Bearer ${process.env.INTERNAL_SECRET}`) {
+    if (req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
         return NextResponse.json('Unauthorized', { status: 401 });
     }
 
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${process.env.INTERNAL_SECRET}`
+                            'Authorization': `Bearer ${process.env.CRON_SECRET}`
                         },
                         body: JSON.stringify({ url: company.careers_page_url, company_id: company.id })
                     });
@@ -41,11 +41,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
                     const scrapeData = await scrapeResponse.json();
                     const jobPostings = scrapeData.job_postings;
                     // save new job postings
-                    const saveResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/cron/companies/save-job-postings`, {
+                    const saveResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/companies/save-job-postings`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${process.env.INTERNAL_SECRET}`
+                            'Authorization': `Bearer ${process.env.CRON_SECRET}`
                         },
                         body: JSON.stringify({ job_postings: jobPostings, company_id: company.id })
                     });

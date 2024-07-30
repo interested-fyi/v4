@@ -3,7 +3,7 @@ import greenhouseScraper from "@/functions/job-scraping/greenhouse/greenhouse-sc
 
 
 export async function POST(req: NextRequest, res: NextResponse) {
-    if (req.headers.get('Authorization') !== `Bearer ${process.env.INTERNAL_SECRET}`) {
+    if (req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
         return NextResponse.json('Unauthorized', { status: 401 });
     }
 

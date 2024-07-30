@@ -7,7 +7,7 @@ import extractJobBody from "@/functions/job-scraping/description_scraper/extract
 import extractJobData from "@/functions/job-scraping/description_scraper/ai-description-scraper";
 
 export async function POST(req: NextRequest, res: NextResponse) {
-    if (req.headers.get('Authorization') !== `Bearer ${process.env.INTERNAL_SECRET}`) {
+    if (req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
         return NextResponse.json('Unauthorized', { status: 401 });
     }
 
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${process.env.INTERNAL_SECRET}`
+                        'Authorization': `Bearer ${process.env.CRON_SECRET}`
                     },
                     body: JSON.stringify({ posting: posting })
                 });
