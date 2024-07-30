@@ -1,4 +1,5 @@
 "use client";
+import { ApprovalButtonGroup } from "@/components/composed/admin/jobs/ApprovalButtonGroup";
 import { JobPostingCard } from "@/components/composed/admin/jobs/JobPostingCard";
 import JobPosting from "@/types/job-posting";
 import { usePrivy } from "@privy-io/react-auth";
@@ -69,10 +70,15 @@ export default function AdminDashboardJobs() {
       </div>
 
       <div className='max-w-[950px] px-4 w-full mx-auto space-y-6 font-body'>
-        {data.job_postings.length > 0 ? (
-          data.job_postings.map((job: JobPosting, index: number) => (
-            <JobPostingCard key={job.id} job={job} />
-          ))
+        {data.job_postings.length >= 0 ? (
+          <>
+            {companyId ? (
+              <ApprovalButtonGroup companyId={parseInt(companyId)} jobs={[]} />
+            ) : null}
+            {data.job_postings.map((job: JobPosting, index: number) => (
+              <JobPostingCard key={job.id} job={job} />
+            ))}
+          </>
         ) : (
           <div>No jobs found</div>
         )}
