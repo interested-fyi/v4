@@ -8,15 +8,15 @@ export default async function extractJobBody(url: string) {
         browser = await puppeteer.launch();
         const page = await browser.newPage();
         await page.goto(url, { waitUntil: 'networkidle2', timeout: 300000});
-        await page.waitForSelector('body');
+        await page.waitForSelector('body', { timeout: 300000 });
         const content = await page.content();
         const $ = cheerio.load(content);
         const body = $('body').html() || '';
 
-        return { body };
+        return body;
     } catch (e) {
         console.error(`Error getting job body: ${e}`);
-        return { body: null };
+        return null ;
     } finally {
         if (browser) {
             await browser.close();

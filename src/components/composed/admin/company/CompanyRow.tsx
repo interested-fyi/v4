@@ -5,16 +5,24 @@ import { TableRow, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { CompanyRowType } from "@/app/admin/dashboard/page";
+import { usePrivy } from "@privy-io/react-auth";
 
 interface CompanyRowProps {
   index: number;
   company: CompanyRowType;
 }
 export function CompanyRow({ index, company }: CompanyRowProps) {
+  const { getAccessToken } = usePrivy();
+
   const handleRevoke = async () => {
-    const result = await fetch(`/api/companies/${company.id}`, {
+    const accessToken = await getAccessToken();
+    const result = await fetch(`/api/companies/revoke`, {
       method: "POST",
-      body: JSON.stringify({ approved: false }),
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Content-Type": "application",
+      },
+      body: JSON.stringify({ companyId: company.id }),
     });
     if (result.ok) {
       console.log("Company revoked");
@@ -58,7 +66,7 @@ export function CompanyRow({ index, company }: CompanyRowProps) {
         ) : (
           <>
             {" "}
-            <ApprovalButtonGroup companyId={company.id} jobs={[]} />
+            <ApprovalButtonGroup companyId={company.id} jobs={null} url={company.careers_page_url} />
           </>
         )}
       </TableCell>

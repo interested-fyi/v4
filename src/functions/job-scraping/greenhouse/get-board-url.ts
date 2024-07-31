@@ -19,7 +19,9 @@ export default async function getBoardUrl(url: string) {
             boardUrl = `https://boards.greenhouse.io/${accountName}`;
             await page.goto(boardUrl, { waitUntil: 'networkidle2'});
             const redirectedUrl = page.url();
-            if(redirectedUrl !== boardUrl) {
+            if (redirectedUrl.includes('job-boards.eu.greenhouse.io') || redirectedUrl.includes('job-boards.greenhouse.io')) {
+                boardUrl = redirectedUrl;
+            } else if (redirectedUrl !== boardUrl) {
                 boardUrl = `https://boards.greenhouse.io/embed/job_board?for=${accountName}`;
             }
         }

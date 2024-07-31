@@ -1,22 +1,34 @@
 import { Button } from "@/components/ui/button";
+import JobPosting from "@/types/job-posting";
+import { usePrivy } from "@privy-io/react-auth";
+import { User } from "@privy-io/server-auth";
 import React from "react";
 
 interface ApprovalButtonGroupProps {
   companyId: number;
-  jobs: string[];
+  jobs: JobPosting[] | null;
+  url: string | null;
 }
 
 export function ApprovalButtonGroup({
   companyId,
   jobs,
+  url,
 }: ApprovalButtonGroupProps) {
-  const handleApproveCompany = async () => {
-    const result = await fetch(`/api/companies/${companyId}`, {
+  const { getAccessToken } = usePrivy();
+
+  const handleApproveCompany = async () => {  
+    const accessToken = await getAccessToken();
+    const result = await fetch(`/api/companies/approve`, {
       method: "POST",
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Content-Type": "application",
+      },
       body: JSON.stringify({
         companyId: companyId,
-        jobs: jobs ?? [],
-        approved: true,
+        jobs: jobs,
+        url: url,
       }),
     });
     if (result.ok) {
@@ -24,11 +36,16 @@ export function ApprovalButtonGroup({
     }
   };
   const handleDenyCompany = async () => {
-    const result = await fetch(`/api/companies/${companyId}`, {
+    const accessToken = await getAccessToken();
+    const result = await fetch(`/api/companies/deny`, {
       method: "POST",
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Content-Type": "application",
+      },
       body: JSON.stringify({
         companyId: companyId,
-        jobs: jobs ?? [],
+        jobs: jobs,
         approved: false,
       }),
     });

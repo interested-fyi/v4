@@ -73,7 +73,7 @@ export default function AdminDashboardJobs() {
         {data.job_postings.length >= 0 ? (
           <>
             {companyId ? (
-              <ApprovalButtonGroup companyId={parseInt(companyId)} jobs={[]} />
+              <ApprovalButtonGroup companyId={parseInt(companyId)} jobs={data.job_postings} url={url}/>
             ) : null}
             {data.job_postings.map((job: JobPosting, index: number) => (
               <JobPostingCard key={job.id} job={job} />
