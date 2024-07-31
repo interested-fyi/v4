@@ -14,9 +14,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const { posting } = await req.json();
 
     try { 
-        const { content: enrichedData } = await extractJobData(posting.posting_url);
+        const jobData = await extractJobData(posting.posting_url);
+        if(!jobData) {
+            throw new Error(`Failed to scrape and parse job details for: ${posting.posting_url} (${posting.posting_id})`)
+        }
+        const enrichedData = jobData?.content;
 
-        if (enrichedData.description && enrichedData.title) {
+        if (enrichedData && enrichedData.description && enrichedData.title) {
             const { data, error: detailsError } = await supabase.rpc('update_job_details_and_scraping', {
                 p_job_posting_id: posting.id,
                 p_description: enrichedData.description,
@@ -30,9 +34,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
             return NextResponse.json({ success: true, ids: data?.[0] }, { status: 200 })
         } else {
-            throw new Error(`Failed to scrape and parse job details for: ${posting.posting_url} (${posting.posting_id})`)
+            throw new Error(`Job Details Not Complete: ${posting.posting_url} (${posting.posting_id})`)
         }
     } catch (e) {
+        console.log(`Error: ${e}`)
         return NextResponse.json({ error: e }, { status: 500 });
     }
 }

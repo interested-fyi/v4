@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import greenhouseScraper from "@/functions/job-scraping/greenhouse/greenhouse-scraper";
 import supabase from "@/lib/supabase";
 import { AuthTokenClaims, PrivyClient } from "@privy-io/server-auth";
 import User from "@/types/user";
+import greenhouseScraper from "@/functions/job-scraping/greenhouse/greenhouse-scraper";
 
 const privyClient = new PrivyClient(process.env.NEXT_PUBLIC_PRIVY_APP_ID!, process.env.PRIVY_SECRET!);
 
 export async function POST(req: NextRequest, res: NextResponse) {
     const authToken = req.headers.get('Authorization')?.replace('Bearer ', '');
-
-    if (authToken === process.env.INTERNAL_SECRET) {
-        return handleRequest(req, res);
-    }
-
     try {
         if(!authToken) {
             return NextResponse.json(`Unauthorized`, { status: 401 });
@@ -45,12 +40,44 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
 async function handleRequest(req: NextRequest, res: NextResponse) {
     try {
-        const { url, company_id } = await req.json();
+        let { url, jobs, companyId } = await req.json();
 
-        // scrape company url
-        const jobPostings = await greenhouseScraper(url, company_id);
+        if (!jobs) {
+            jobs = await greenhouseScraper(url, companyId);
+        }
+        
+        // save jobs
+        const saveResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/companies/save-job-postings`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${process.env.CRON_SECRET}`
+            },
+            body: JSON.stringify({ job_postings: jobs, company_id: companyId })
+        });
 
-        return NextResponse.json({ success: true, job_postings: jobPostings }, { status: 200 })
+        const saveData = await saveResponse.json();
+
+        if(!saveResponse.ok) {
+            throw new Error(saveData.message || "Error saving new job postings")
+        };
+
+        const newPostings = saveData.new_postings;
+
+        const { error: insertError } = await supabase.from('companies_job_scrapings').insert({
+            company_id: companyId,
+            success: true,
+            jobs_scraped: saveData.new_postings?.length
+        });
+
+        // 
+        const { data: company, error: companyError } = await supabase.from('companies').update({ approved: true }).eq('id', companyId).select();
+
+        if (companyError) {
+            throw new Error('Error updating company approval');
+        }
+
+        return NextResponse.json({ success: true, job_postings: newPostings, company: company }, { status: 200 })
     } catch (e) {
         return NextResponse.json(`Error scraping jobs: ${e}`, { status: 500 });
     }

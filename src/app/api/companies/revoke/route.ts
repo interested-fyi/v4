@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import greenhouseScraper from "@/functions/job-scraping/greenhouse/greenhouse-scraper";
 import supabase from "@/lib/supabase";
 import { AuthTokenClaims, PrivyClient } from "@privy-io/server-auth";
 import User from "@/types/user";
+import greenhouseScraper from "@/functions/job-scraping/greenhouse/greenhouse-scraper";
 
 const privyClient = new PrivyClient(process.env.NEXT_PUBLIC_PRIVY_APP_ID!, process.env.PRIVY_SECRET!);
 
 export async function POST(req: NextRequest, res: NextResponse) {
     const authToken = req.headers.get('Authorization')?.replace('Bearer ', '');
-
-    if (authToken === process.env.INTERNAL_SECRET) {
-        return handleRequest(req, res);
-    }
-
     try {
         if(!authToken) {
             return NextResponse.json(`Unauthorized`, { status: 401 });
@@ -45,12 +40,16 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
 async function handleRequest(req: NextRequest, res: NextResponse) {
     try {
-        const { url, company_id } = await req.json();
+        let { companyId } = await req.json();
+        
+        // 
+        const { data: company, error: companyError } = await supabase.from('companies').update({ approved: false }).eq('id', companyId).select();
 
-        // scrape company url
-        const jobPostings = await greenhouseScraper(url, company_id);
+        if (companyError) {
+            throw new Error('Error revoking company approval');
+        }
 
-        return NextResponse.json({ success: true, job_postings: jobPostings }, { status: 200 })
+        return NextResponse.json({ success: true, company: company }, { status: 200 })
     } catch (e) {
         return NextResponse.json(`Error scraping jobs: ${e}`, { status: 500 });
     }
