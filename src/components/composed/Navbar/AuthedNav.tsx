@@ -32,9 +32,9 @@ const AuthedNav = ({ user, logout }: AuthedNavProps) => {
       <AvatarMenu
         avatar={
           <Avatar className='h-8 w-8'>
-            <AvatarImage src={user?.farcaster?.pfp ?? "object-cover"} />
+            <AvatarImage src={user?.telegram?.photoUrl ?? "object-cover"} />
             <AvatarFallback>
-              {user?.farcaster?.displayName?.slice(0, 2)}
+              {user?.telegram?.username?.slice(0, 2)}
             </AvatarFallback>
           </Avatar>
         }

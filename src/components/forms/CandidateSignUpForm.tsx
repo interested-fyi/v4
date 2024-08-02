@@ -13,7 +13,7 @@ import Link from "next/link";
 import Candidate from "@/types/candidate";
 
 export default function CandidateSignUpForm() {
-  const [acceptDC, setAcceptDC] = useState(false);
+  const [joinTelegram, setJoinTelegram] = useState(false);
   const [openToWork, setOpenToWork] = useState(false);
 
   const { toast } = useToast();
@@ -22,16 +22,16 @@ export default function CandidateSignUpForm() {
   const { data: account } = useQuery({
     queryKey: ["account-status"],
     queryFn: () => {
-      return user?.farcaster?.fid
-        ? getCandidateByFID(user?.farcaster?.fid?.toString())
+      return user?.telegram?.telegramUserId
+        ? getCandidateByFID(user?.telegram?.telegramUserId?.toString())
         : null;
     },
   });
 
-  const handleAcceptDC = async () => {
+  const handlejoinTelegram = async () => {
     // TODO - implement functionality to check if user has accepted DCs
     // Need to research
-    setAcceptDC(!acceptDC);
+    setJoinTelegram(!joinTelegram);
   };
 
   const handleOpenToWork = async () => {
@@ -51,13 +51,13 @@ export default function CandidateSignUpForm() {
           user: {
             created_at: user?.createdAt,
             privy_did: user?.id,
-            fid: user?.farcaster?.fid,
+            tid: user?.telegram?.telegramUserId,
             email: user?.email,
-            username: user?.farcaster?.username,
+            username: user?.telegram?.username,
           },
           candidate: {
             privy_did: user?.id,
-            accept_direct_messages: acceptDC,
+            joined_telegram: joinTelegram,
             currently_seeking: openToWork,
           } as Candidate,
         }),
@@ -84,10 +84,10 @@ export default function CandidateSignUpForm() {
       <div className='flex flex-col w-full gap-8 justify-start'>
         <div className='flex flex-col gap-4'>
           <CheckboxGroup
-            id={"acceptCast"}
-            label={"Get notifications via direct casts on warpcast (optional)"}
-            checked={acceptDC}
-            onChange={handleAcceptDC}
+            id={"joinTelegram"}
+            label={"Join the Interested Telegram group"}
+            checked={joinTelegram}
+            onChange={handlejoinTelegram}
           />
           <CheckboxGroup
             id={"openToWork"}
@@ -132,7 +132,7 @@ const FollowSection = ({ isFollowing }: FollowSectionProps) => {
       <Link href='https://warpcast.com/interestedfyi' passHref>
         <Button
           size='lg'
-          disabled={isFollowing || !user?.farcaster?.fid}
+          disabled={isFollowing || !user?.telegram?.telegramUserId}
           className='flex items-center max-w-full w-96 gap-4 py-8 shadow-md border bg-[#7c58c1] hover:bg-[#986de8] rounded-xl'
         >
           <Image

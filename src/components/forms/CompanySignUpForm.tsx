@@ -1,4 +1,4 @@
-import { getAccessToken, usePrivy } from "@privy-io/react-auth";
+import { usePrivy } from "@privy-io/react-auth";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { hourglass } from "ldrs";
@@ -6,17 +6,15 @@ import { Button } from "../ui/button";
 import { useToast } from "../ui/use-toast";
 import User from "@/types/user";
 import Company from "@/types/company";
-import { useRouter } from "next/navigation";
 
 export default function CompanySignUpForm() {
-    const {ready, authenticated, login, user, getAccessToken} = usePrivy();
-    const [companyName, setCompanyName] = useState('');
-    const [careersPageUrl, setCareersPageUrl] = useState('');
-    const [email, setEmail] = useState('');
-    const [urlError, setUrlError] = useState('');
-    const [emailError, setEmailError] = useState('');
-    const [loading, setLoading] = useState(false);
-    const router = useRouter();
+  const { ready, authenticated, login, user, getAccessToken } = usePrivy();
+  const [companyName, setCompanyName] = useState("");
+  const [careersPageUrl, setCareersPageUrl] = useState("");
+  const [email, setEmail] = useState("");
+  const [urlError, setUrlError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const { toast } = useToast();
 
@@ -34,10 +32,10 @@ export default function CompanySignUpForm() {
     }
   };
 
-    async function submitForm() {
-        setLoading(true);
-        setUrlError("");
-        setEmailError("");
+  async function submitForm() {
+    setLoading(true);
+    setUrlError("");
+    setEmailError("");
 
     if (!validateUrl(careersPageUrl)) {
       setUrlError("Invalid URL");
@@ -50,7 +48,7 @@ export default function CompanySignUpForm() {
       return;
     }
 
-    console.log(`FC User: ${JSON.stringify(user?.farcaster?.username)}`)
+    console.log(`Telegram User: ${JSON.stringify(user?.telegram?.username)}`);
     try {
       const accessToken = await getAccessToken();
       const response = await fetch("/api/create-company", {
@@ -63,16 +61,16 @@ export default function CompanySignUpForm() {
           user: {
             created_at: user?.createdAt,
             privy_did: user?.id,
-            fid: user?.farcaster?.fid,
+            tid: user?.telegram?.telegramUserId,
             email: user?.email,
-            username: user?.farcaster?.username
+            username: user?.telegram?.username,
           } as User,
           company: {
             company_name: companyName,
             careers_page_url: careersPageUrl,
             creator_email: email,
-            creator_fid: user?.farcaster?.fid,
-            creator_privy_did: user?.id
+            creator_tid: user?.telegram?.telegramUserId,
+            creator_privy_did: user?.id,
           } as Company,
         }),
       });
@@ -108,7 +106,7 @@ export default function CompanySignUpForm() {
     <div className='flex flex-col justify-center items-start gap-8 bg-[#919CF480] p-8 rounded-xl font-body'>
       {!authenticated ? (
         <div className='flex flex-col items-center gap-4'>
-          <p className='text-xl font-bold'>Connect your Farcaster</p>
+          <p className='text-xl font-bold'>Connect your Telegram</p>
 
           <button
             onClick={login}
@@ -141,7 +139,7 @@ export default function CompanySignUpForm() {
             </p>
             <input
               type='url'
-              placeholder="https://"
+              placeholder='https://'
               className='text-xl rounded-xl border-2 border-black px-2 py-1'
               onChange={(e) => setCareersPageUrl(e.target.value)}
             />
