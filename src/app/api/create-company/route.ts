@@ -40,7 +40,7 @@ we're committed to keeping you informed and helping you make the most of your se
         
 cheers`
 
-    await sendDirectCast(user.fid, message);
+    // await sendDirectCast(user.fid, message);
 
     return NextResponse.json({ company: companyCreation, user: userCreation }, { status: 200 })
 }
