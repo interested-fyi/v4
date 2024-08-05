@@ -4,23 +4,56 @@ import { CompanyCard } from "@/components/composed/companies/CompanyCard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import { usePrivy } from "@privy-io/react-auth";
+import { CompanyResponse } from "../api/companies/get-approved-companies/route";
+import JobPosting from "@/types/job-posting";
+import { JobPostingList } from "@/components/JobPostingList";
 
 export default function ExplorePage() {
   const [activeButton, setActiveButton] = useState("companies");
+  const { getAccessToken } = usePrivy();
 
   const { data } = useQuery({
     queryKey: ["companies"],
     queryFn: async () => {
-      const res = await fetch("/api/companies");
-      return res.json();
+      const accessToken = await getAccessToken();
+      const res = await fetch("/api/companies/get-approved-companies", {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json",
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return (await res.json()) as {
+        success: boolean;
+        companies: CompanyResponse[];
+      };
     },
   });
-  console.log("🚀 ~ ExplorePage ~ data:", data);
+
+  const { data: jobs } = useQuery({
+    queryKey: ["jobs"],
+    queryFn: async () => {
+      const accessToken = await getAccessToken();
+      const res = await fetch("/api/jobs/get-all-jobs", {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json",
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return (await res.json()) as {
+        success: boolean;
+        jobs: JobPosting[];
+      };
+    },
+  });
 
   const handleButtonClick = (button: string) => {
     setActiveButton(button);
   };
 
+  console.log("🚀 ~ ExplorePage ~ jobs:", jobs);
   return (
     <>
       <div className='flex flex-col px-4 md:px-28 h-64 max-h-full items-start md:items-center justify-center md:justify-between w-full bg-[#919CF4] border border-r-0 border-l-0 border-[#2640EB]'>
@@ -40,22 +73,21 @@ export default function ExplorePage() {
           />
         </div>
       </div>
-      <div className='py-24 px-4 justify-items-center md:px-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-16 md:gap-8 md:gap-y-20'>
-        {data?.map(
-          (company: {
-            id: number;
-            name: string;
-            logo: string;
-            description: string;
-          }) => (
-            <Link href={`/company-details/${company.id}`} key={company.id}>
+      {activeButton === "companies" ? (
+        <section className='grid grid-cols-1 gap-6 p-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:p-6'>
+          {data?.companies?.map((company: CompanyResponse) => (
+            <Link
+              className='w-full'
+              href={`/company-details/${company.id}`}
+              key={company.id}
+            >
               <CompanyCard company={company} />
             </Link>
-          )
-        )}
-
-        {/* Add more CompanyCard components as needed */}
-      </div>
+          ))}
+        </section>
+      ) : (
+        <JobPostingList jobs={jobs?.jobs ?? []} />
+      )}
     </>
   );
 }
@@ -69,7 +101,7 @@ function Selector({ activeButton, handleButtonClick }: SelectorProps) {
     <div className='flex gap-4 relative'>
       <Button
         size='lg'
-        className={`w-52 rounded-[8px] font-heading font-bold uppercase justify-start ${
+        className={`w-40 md:w-52 max-w-full rounded-[8px] font-heading font-bold uppercase justify-start ${
           activeButton === "companies"
             ? "bg-[#2640EB] hover:bg-blue-600 hover:text-white text-white"
             : "border-[#D3D8FB] border-2 bg-[#fff] text-[#919CF4]"
@@ -86,7 +118,7 @@ function Selector({ activeButton, handleButtonClick }: SelectorProps) {
             ? handleButtonClick("companies")
             : handleButtonClick("jobs")
         }
-        className='bg-transparent hover:bg-transparent active:scale-95 transition-all duration-100 absolute right-[46%]'
+        className='bg-transparent hover:bg-transparent active:scale-95 transition-all duration-100 absolute right-[45%] md:right-[46%]'
       >
         <svg
           xmlns='http://www.w3.org/2000/svg'
@@ -117,7 +149,7 @@ function Selector({ activeButton, handleButtonClick }: SelectorProps) {
       </Button>
       <Button
         size='lg'
-        className={`w-52 rounded-[8px] font-heading font-bold uppercase justify-start ${
+        className={`w-40 md:w-52 rounded-[8px] font-heading font-bold uppercase justify-start ${
           activeButton === "jobs"
             ? "bg-[#2640EB] text-white hover:bg-blue-600 hover:text-white"
             : "border-[#D3D8FB] border-2 bg-[#fff] text-[#919CF4]"

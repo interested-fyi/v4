@@ -48,31 +48,24 @@ export default function ExploreTalentPage() {
               </BreadcrumbItem>
             </Breadcrumb>
             <div className='self-stretch justify-start items-center gap-8 flex'>
-              <Image
-                alt='company logo'
-                width={122}
-                height={122}
-                className='w-[122px] h-[122px]'
-                src={company.logo}
-              />
               <div className='w-[630px] flex-col justify-center items-start gap-2 inline-flex'>
                 <div className='text-blue-700 text-5xl font-bold font-heading leading-[72px]'>
                   {company.name}
                 </div>
-                <div className='self-stretch h-[65px] text-black text-sm font-normal font-body leading-[21px]'>
+                {/* <div className='self-stretch h-[65px] text-black text-sm font-normal font-body leading-[21px]'>
                   {company.description}
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
         </div>
         <div className='w-full h-full  py-4 bg-[#2640EB] justify-between items-center gap-8 inline-flex'>
           <div className='flex w-[1200px] max-w-full mx-auto justify-between items-center gap-8 flex-wrap px-4'>
-            <div className='px-3 py-0.5 bg-yellow-200 rounded-md justify-center items-center flex'>
+            {/* <div className='px-3 py-0.5 bg-yellow-200 rounded-md justify-center items-center flex'>
               <div className='text-center text-blue-700 text-sm md:text-base font-medium font-body leading-normal'>
                 Layer 2
               </div>
-            </div>
+            </div> */}
             <div className='flex gap-2 md:flex-row flex-col-reverse justify-between items-center'>
               <div className='justify-start items-center gap-2 flex'>
                 <Image
