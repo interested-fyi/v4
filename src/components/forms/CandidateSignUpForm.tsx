@@ -8,9 +8,7 @@ import { useToast } from "../ui/use-toast";
 import { fetchFollowStatus, getCandidateByFID } from "@/app/utils/helpers";
 import Modal from "../composed/modals/Modal";
 import { DialogTrigger } from "@radix-ui/react-dialog";
-import { CheckboxGroup } from "../composed/CheckboxGroup";
 import Link from "next/link";
-import Candidate from "@/types/candidate";
 
 export default function CandidateSignUpForm() {
   const [joinTelegram, setJoinTelegram] = useState(false);
@@ -34,78 +32,25 @@ export default function CandidateSignUpForm() {
     setJoinTelegram(!joinTelegram);
   };
 
-  const handleOpenToWork = async () => {
-    setOpenToWork(!openToWork);
-  };
-
-  const submitForm = async () => {
-    if (!account.id) {
-      const accessToken = await getAccessToken();
-      const result = await fetch("/api/create-candidate", {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          user: {
-            created_at: user?.createdAt,
-            privy_did: user?.id,
-            tid: user?.telegram?.telegramUserId,
-            email: user?.email,
-            username: user?.telegram?.username,
-          },
-          candidate: {
-            privy_did: user?.id,
-            joined_telegram: joinTelegram,
-            currently_seeking: openToWork,
-          } as Candidate,
-        }),
-      });
-      if (!result.ok) {
-        toast({
-          title: "Error",
-          description:
-            "There was an error creating your profile. Please try again.",
-        });
-        return;
-      }
-    }
-    const modalButton = document.getElementById("modalButton");
-    if (modalButton) {
-      modalButton.click();
-    }
-
-    return;
-  };
-
   return (
     <div className='flex flex-col justify-center items-center gap-8 bg-[#919CF480] p-8 rounded-xl font-body'>
       <div className='flex flex-col w-full gap-8 justify-start'>
-        <div className='flex flex-col gap-4'>
-          <CheckboxGroup
-            id={"joinTelegram"}
-            label={"Join the Interested Telegram group"}
-            checked={joinTelegram}
-            onChange={handlejoinTelegram}
-          />
-          <CheckboxGroup
-            id={"openToWork"}
-            label={"Are you open to work opportunities?"}
-            checked={openToWork}
-            onChange={handleOpenToWork}
-          />
-        </div>
-
         <Button
           size='lg'
-          onClick={submitForm}
-          className='rounded-xl py-8 border border-[#E8FC6C] w-96 max-w-full bg-[#2640EB] text-[#E8FC6C] font-bold text-xl shadow-md'
+          onClick={handlejoinTelegram}
+          className='flex items-center justify-center max-w-full w-96 py-8 shadow-md border bg-[#0088cc] hover:bg-[#007ab8] text-white hover:text-white rounded-xl'
         >
-          Create Profile
+          Join the Interested Telegram channel
         </Button>
+        <Link href='/explore'>
+          <Button
+            size='lg'
+            className='max-w-full w-96 py-8 shadow-md border bg-[#7c58c1] hover:bg-[#986de8] rounded-xl'
+          >
+            Explore work opportunities
+          </Button>
+        </Link>
       </div>
-      <SuccessModal />
     </div>
   );
 }

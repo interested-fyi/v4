@@ -1,55 +1,32 @@
+import { CompanyResponse } from "@/app/api/companies/get-approved-companies/route";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardTitle,
-} from "@/components/ui/card";
-import Image from "next/image";
+import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
 import React from "react";
 
 interface CompanyCardProps {
-  company: {
-    name: string;
-    logo: string;
-    description: string;
-    badges?: string[];
-  };
+  company: CompanyResponse;
 }
 
 export function CompanyCard({ company }: CompanyCardProps) {
   return (
-    <Card className='relative min-h-full w-full sm:w-[252px] max-w-full rounded-[8px] border border-[#919CF4] bg-[#fff] shadow-md shadow-[0px 8px 14px 0px rgba(38, 64, 235, 0.10)]'>
-      <div className='absolute top-[-38px] left-6'>
-        <Image
-          src={`/images/${company.logo}-logo.png`}
-          width={80}
-          height={80}
-          alt={`${company.name} logo`}
-        />
-      </div>
-      <CardContent className='p-6 pt-[58px] flex flex-col gap-2 justify-start items-start w-full'>
-        <CardTitle className='text-[#111928] font-heading text-xl font-bold'>
-          {company.name}
-        </CardTitle>
-        <CardDescription className='text-[#000] font-body text-sm font-[400]'>
-          {company.description}
-        </CardDescription>
-        <CardFooter className='px-0 pb-0'>
-          {company.badges
-            ? company.badges.map((badge) => {
-                return (
-                  <Badge
-                    key={badge}
-                    className='rounded-[8px] border-[#919CF4] font-body text-[#2640EB]'
-                    variant={"outline"}
-                  >
-                    {badge}
-                  </Badge>
-                );
-              })
-            : null}
+    <Card className='relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2'>
+      <Link
+        href={`/company-details/${company.id}`}
+        className='absolute inset-0 z-10'
+        prefetch={false}
+      >
+        <span className='sr-only'>View company</span>
+      </Link>
+      <CardContent className='p-6 space-y-4'>
+        <CardTitle className='text-lg font-semibold'>{company.name}</CardTitle>
+        <CardFooter className='px-0 pb-0 justify-end'>
+          <Badge
+            className='rounded-[8px] border-[#919CF4] font-body text-[#2640EB] place-self-end'
+            variant={"outline"}
+          >
+            {company.jobCount} jobs available
+          </Badge>
         </CardFooter>
       </CardContent>
     </Card>
