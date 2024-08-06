@@ -4,33 +4,48 @@ import { PrivyClient } from "@privy-io/server-auth";
 import User from "@/types/user";
 import Company from "@/types/company";
 
-const privyClient = new PrivyClient(process.env.NEXT_PUBLIC_PRIVY_APP_ID!, process.env.PRIVY_SECRET!);
+const privyClient = new PrivyClient(
+  process.env.NEXT_PUBLIC_PRIVY_APP_ID!,
+  process.env.PRIVY_SECRET!
+);
 
 export async function GET(req: NextRequest, res: NextResponse) {
-    const authToken = req.headers.get('Authorization')?.replace('Bearer ', '');
-    try {
-        const verificationClaim = await privyClient.verifyAuthToken(authToken!);
+  const authToken = req.headers.get("Authorization")?.replace("Bearer ", "");
+  try {
+    const verificationClaim = await privyClient.verifyAuthToken(authToken!);
 
-        // get user and check if is admin
-        const { data: userData, error: userError } = await supabase.from('users').select().eq('privy_did', verificationClaim.userId).returns<User[]>();
+    // get user and check if is admin
+    const { data: userData, error: userError } = await supabase
+      .from("users")
+      .select()
+      .eq("privy_did", verificationClaim.userId)
+      .returns<User[]>();
 
-        if (userError) {
-            throw new Error(`Error fetching user for the supplied auth token: ${userError}`);
-        }
-
-        const user = userData?.[0];
-        if (!user.is_admin) {
-            throw new Error('User is not an admin');
-        }
-
-        const { data: companyData, error: companyError } = await supabase.from('companies').select().returns<Company[]>();
-        
-        if (companyError) {
-            throw new Error(`Error fetching company data: ${companyError}`);
-        }
-
-        return NextResponse.json({ success: true, companies: companyData }, { status: 200 });
-    } catch (e) {
-        return NextResponse.json(`Error Fetching Companies: ${e}`, { status: 401 });
+    if (userError) {
+      throw new Error(
+        `Error fetching user for the supplied auth token: ${userError}`
+      );
     }
+
+    const user = userData?.[0];
+    if (!user.is_admin) {
+      throw new Error("User is not an admin");
+    }
+
+    const { data: companyData, error: companyError } = await supabase
+      .from("companies")
+      .select()
+      .returns<Company[]>();
+
+    if (companyError) {
+      throw new Error(`Error fetching company data: ${companyError}`);
+    }
+
+    return NextResponse.json(
+      { success: true, companies: companyData },
+      { status: 200 }
+    );
+  } catch (e) {
+    return NextResponse.json(`Error Fetching Companies: ${e}`, { status: 401 });
+  }
 }

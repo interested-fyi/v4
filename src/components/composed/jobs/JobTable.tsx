@@ -40,7 +40,11 @@ const JobTable = () => {
     },
   });
 
-  const { data: jobs, isLoading: isLoadingJobs } = useQuery({
+  const {
+    data: jobs,
+    isLoading: isLoadingJobs,
+    isRefetching,
+  } = useQuery({
     queryKey: ["jobs"],
     queryFn: async () => {
       const accessToken = await getAccessToken();
@@ -61,7 +65,7 @@ const JobTable = () => {
     },
   });
 
-  if (isLoadingJobs) {
+  if (isLoadingJobs || isRefetching) {
     return (
       // Loading state
       <div className='text-center'>Loading...</div>
