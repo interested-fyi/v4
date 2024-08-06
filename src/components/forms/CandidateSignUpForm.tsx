@@ -4,27 +4,13 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { usePrivy } from "@privy-io/react-auth";
-import { useToast } from "../ui/use-toast";
-import { fetchFollowStatus, getCandidateByFID } from "@/app/utils/helpers";
+import { fetchFollowStatus } from "@/app/utils/helpers";
 import Modal from "../composed/modals/Modal";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import Link from "next/link";
 
 export default function CandidateSignUpForm() {
   const [joinTelegram, setJoinTelegram] = useState(false);
-  const [openToWork, setOpenToWork] = useState(false);
-
-  const { toast } = useToast();
-  const { user, getAccessToken } = usePrivy();
-
-  const { data: account } = useQuery({
-    queryKey: ["account-status"],
-    queryFn: () => {
-      return user?.telegram?.telegramUserId
-        ? getCandidateByFID(user?.telegram?.telegramUserId?.toString())
-        : null;
-    },
-  });
 
   const handlejoinTelegram = async () => {
     // TODO - implement functionality to check if user has accepted DCs

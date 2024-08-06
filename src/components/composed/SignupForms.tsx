@@ -13,7 +13,7 @@ export function SignupForms() {
   const { login, authenticated } = usePrivy();
 
   const handleClick = (value: "candidate" | "company" | null) => {
-    if (!authenticated) {
+    if (!authenticated && value === "company") {
       login();
       return;
     }
@@ -55,21 +55,21 @@ export function SignupForms() {
         >
           Refer
         </Button> */}
-        {authenticated ? (
-          <section className='flex flex-col gap-12 relative z-50'>
-            {formType !== null ? <Separator /> : null}
-            {formType === "candidate" && (
-              <div>
-                <CandidateSignUpForm />
-              </div>
-            )}
-            {formType === "company" && (
-              <div>
-                <CompanySignUpForm />
-              </div>
-            )}
-          </section>
-        ) : null}
+
+        <section className='flex flex-col gap-12 relative z-50'>
+          {formType !== null ? <Separator /> : null}
+          {formType === "candidate" && (
+            <div>
+              <CandidateSignUpForm />
+            </div>
+          )}
+          {authenticated && formType === "company" && (
+            <div>
+              <CompanySignUpForm />
+            </div>
+          )}
+        </section>
+
         <div id='formSection' className='h-0 w-0' />
       </div>
     </>
