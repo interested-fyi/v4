@@ -21,13 +21,15 @@ export default function CandidateSignUpForm() {
   return (
     <div className='flex flex-col justify-center items-center gap-8 bg-[#919CF480] p-8 rounded-xl font-body'>
       <div className='flex flex-col w-full gap-8 justify-start'>
-        <Button
-          size='lg'
-          onClick={handlejoinTelegram}
-          className='flex items-center justify-center max-w-full w-96 py-8 shadow-md border bg-[#0088cc] hover:bg-[#007ab8] text-white hover:text-white rounded-xl'
-        >
-          Join the Interested Telegram channel
-        </Button>
+        <Link href='https://t.me/interestedfyi' passHref>
+          <Button
+            size='lg'
+            onClick={handlejoinTelegram}
+            className='flex items-center justify-center max-w-full w-96 py-8 shadow-md border bg-[#0088cc] hover:bg-[#007ab8] text-white hover:text-white rounded-xl'
+          >
+            Join the Interested Telegram channel
+          </Button>
+        </Link>
         <Link href='/explore'>
           <Button
             size='lg'
