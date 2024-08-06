@@ -77,8 +77,7 @@ const JobTable = () => {
       <TableHeader>
         <TableRow className='font-heading text-[#4B5563] font-bold text-[16px] border-b-0'>
           <TableHead className=''>Position</TableHead>
-          <TableHead>Company</TableHead>
-          <TableHead>Date Posted</TableHead>
+          <TableHead>Department</TableHead>
           <TableHead className='text-right'></TableHead>
         </TableRow>
       </TableHeader>

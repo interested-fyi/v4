@@ -21,7 +21,7 @@ export default function CandidateSignUpForm() {
   return (
     <div className='flex flex-col justify-center items-center gap-8 bg-[#919CF480] p-8 rounded-xl font-body'>
       <div className='flex flex-col w-full gap-8 justify-start'>
-        <Link href='https://t.me/interestedfyi' passHref>
+        <Link href='https://t.me/interestedfyi' passHref target='_blank'>
           <Button
             size='lg'
             onClick={handlejoinTelegram}
@@ -30,7 +30,7 @@ export default function CandidateSignUpForm() {
             Join the Interested Telegram channel
           </Button>
         </Link>
-        <Link href='/explore'>
+        <Link href='/explore' passHref>
           <Button
             size='lg'
             className='max-w-full w-96 py-8 shadow-md border bg-[#7c58c1] hover:bg-[#986de8] rounded-xl'
