@@ -3,7 +3,6 @@ export default interface Company {
   created_at?: Date;
   company_name: string;
   careers_page_url: string;
-  creator_tid: string;
   creator_email: string;
   creator_privy_did: string;
   approved?: boolean;

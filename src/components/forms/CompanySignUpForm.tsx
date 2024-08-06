@@ -61,7 +61,14 @@ export default function CompanySignUpForm() {
           user: {
             created_at: user?.createdAt,
             privy_did: user?.id,
-            tid: user?.telegram?.telegramUserId,
+            telegram_user: {
+              privy_did: user?.id,
+              telegram_user_id: user?.telegram?.telegramUserId,
+              username: user?.telegram?.username,
+              photo_url: user?.telegram?.photoUrl,
+              first_name: user?.telegram?.firstName,
+              last_name: user?.telegram?.lastName,
+            },
             email: user?.email,
             username: user?.telegram?.username,
           } as User,
@@ -69,7 +76,6 @@ export default function CompanySignUpForm() {
             company_name: companyName,
             careers_page_url: careersPageUrl,
             creator_email: email,
-            creator_tid: user?.telegram?.telegramUserId,
             creator_privy_did: user?.id,
           } as Company,
         }),
