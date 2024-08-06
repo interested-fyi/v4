@@ -42,5 +42,5 @@ cheers`
 
     // await sendDirectCast(user.fid, message);
 
-    return NextResponse.json({ company: companyCreation, user: userCreation }, { status: 200 })
+    return NextResponse.json({ company: companyCreation, user: userCreation.user, telegram_user: userCreation.telegram_user }, { status: 200 })
 }
