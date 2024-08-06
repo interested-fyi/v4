@@ -1,3 +1,4 @@
+import jobUrlBuilder from "@/functions/general/job-url-builder";
 import JobPosting from "@/types/job-posting";
 import Link from "next/link";
 
@@ -38,7 +39,8 @@ export function JobPostingCard({ job }: { job: JobPosting }) {
       </div>
       <div className='mt-2 md:mt-0'>
         <Link
-          href={job.posting_url}
+          href={jobUrlBuilder(job.posting_url)}
+          target="_blank"
           className='text-sm font-medium text-primary underline underline-offset-4 hover:text-primary/80'
           prefetch={false}
         >

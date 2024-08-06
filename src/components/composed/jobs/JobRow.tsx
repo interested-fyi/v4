@@ -4,6 +4,7 @@ import { TableRow, TableCell } from "@/components/ui/table";
 import { InterestedButton } from "../buttons/InterestedButton";
 import JobPosting from "@/types/job-posting";
 import Link from "next/link";
+import jobUrlBuilder from "@/functions/general/job-url-builder";
 
 interface JobRowProps {
   index: number;
@@ -67,7 +68,7 @@ export function JobRow({ index, job }: JobRowProps) {
       </TableCell> */}
 
       <TableCell className='text-right float-end pr-0'>
-        <Link href={job.posting_url}>
+        <Link href={jobUrlBuilder(job.posting_url)} target="_blank">
           <InterestedButton />
         </Link>
       </TableCell>

@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import JobPosting from "@/types/job-posting";
+import jobUrlBuilder from "@/functions/general/job-url-builder";
 
 interface JobPostingListProps {
   jobs: JobPosting[];
@@ -16,7 +17,8 @@ export function JobPostingList({ jobs }: JobPostingListProps) {
           className='relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2'
         >
           <Link
-            href={job.posting_url}
+            href={jobUrlBuilder(job.posting_url)}
+            target="_blank"
             className='absolute inset-0 z-10'
             prefetch={false}
           >
