@@ -13,7 +13,7 @@ export default function ExplorePage() {
   const [activeButton, setActiveButton] = useState("companies");
   const { getAccessToken } = usePrivy();
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["companies"],
     queryFn: async () => {
       const accessToken = await getAccessToken();
@@ -53,7 +53,6 @@ export default function ExplorePage() {
     setActiveButton(button);
   };
 
-  console.log("🚀 ~ ExplorePage ~ jobs:", jobs);
   return (
     <>
       <div className='flex flex-col px-4 md:px-28 h-64 max-h-full items-start md:items-center justify-center md:justify-between w-full bg-[#919CF4] border border-r-0 border-l-0 border-[#2640EB]'>
@@ -75,15 +74,21 @@ export default function ExplorePage() {
       </div>
       {activeButton === "companies" ? (
         <section className='grid grid-cols-1 gap-6 p-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:p-6'>
-          {data?.companies?.map((company: CompanyResponse) => (
-            <Link
-              className='w-full'
-              href={`/company-details/${company.id}`}
-              key={company.id}
-            >
-              <CompanyCard company={company} />
-            </Link>
-          ))}
+          {isLoading ? (
+            <div className='text-center'>
+              <p>Loading...</p>
+            </div>
+          ) : (
+            data?.companies?.map((company: CompanyResponse) => (
+              <Link
+                className='w-full'
+                href={`/company-details/${company.id}`}
+                key={company.id}
+              >
+                <CompanyCard company={company} />
+              </Link>
+            ))
+          )}
         </section>
       ) : (
         <JobPostingList jobs={jobs?.jobs ?? []} />

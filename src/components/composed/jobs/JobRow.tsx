@@ -25,9 +25,9 @@ export function JobRow({ index, job }: JobRowProps) {
       <TableCell>
         <div className='flex justify-center flex-col items-start gap-2'>
           <div className='flex items-center gap-2 font-semibold'>
-            <p>{job.type}</p>
+            <p>{job.department}</p>
           </div>
-          <p>{job.department}</p>
+          <p>{job.sub_department}</p>
         </div>
       </TableCell>
       {/* <TableCell>
@@ -65,9 +65,7 @@ export function JobRow({ index, job }: JobRowProps) {
           ))}
         </div>
       </TableCell> */}
-      <TableCell className='text-left'>
-        <span>{new Date(job.created_at!).toLocaleDateString()}</span>
-      </TableCell>
+
       <TableCell className='text-right float-end pr-0'>
         <Link href={job.posting_url}>
           <InterestedButton />
