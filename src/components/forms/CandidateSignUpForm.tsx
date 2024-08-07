@@ -19,13 +19,13 @@ export default function CandidateSignUpForm() {
   };
 
   return (
-    <div className='flex flex-col justify-center items-center gap-8 bg-[#919CF480] p-8 rounded-xl font-body'>
-      <div className='flex flex-col w-full gap-8 justify-start'>
+    <div className='flex flex-col justify-center items-center gap-8 bg-[#919CF480] w-fit p-8 rounded-xl font-body'>
+      <div className='flex flex-col md:flex-row w-full gap-8 justify-start'>
         <Link href='https://t.me/interestedfyi' passHref target='_blank'>
           <Button
             size='lg'
             onClick={handlejoinTelegram}
-            className='flex items-center justify-center max-w-full w-96 py-8 shadow-md border bg-[#0088cc] hover:bg-[#007ab8] text-white hover:text-white rounded-xl'
+            className='flex items-center justify-center max-w-full w-72 py-8 shadow-md border bg-[#0088cc] hover:bg-[#007ab8] text-white hover:text-white rounded-xl'
           >
             Join the Interested Telegram channel
           </Button>
@@ -33,7 +33,7 @@ export default function CandidateSignUpForm() {
         <Link href='/explore' passHref>
           <Button
             size='lg'
-            className='max-w-full w-96 py-8 shadow-md border bg-[#7c58c1] hover:bg-[#986de8] rounded-xl'
+            className='max-w-full w-72 py-8 shadow-md border bg-[#7c58c1] hover:bg-[#986de8] rounded-xl'
           >
             Explore work opportunities
           </Button>
