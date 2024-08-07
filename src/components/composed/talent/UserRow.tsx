@@ -34,7 +34,12 @@ export function UserRow({ index, user }: UserRowProps) {
       <TableCell>
         <div className='flex justify-center flex-col items-start gap-2'>
           <div className='flex items-center gap-2'>
-            <Image alt='checkmark' src='/check.svg' width={12} height={12} />
+            <Image
+              alt='checkmark'
+              src='/svg/check.svg'
+              width={12}
+              height={12}
+            />
             <p>{user.availability}</p>
           </div>
           <p>{user.work}</p>
@@ -47,7 +52,7 @@ export function UserRow({ index, user }: UserRowProps) {
               key={index}
               className='gap-2 rounded-sm border border-[#919CF4] bg-[rgba(145,156,244,0.20)] text-[#5063EF] hover:bg-[rgba(145,156,244,.4)] font-body font-medium '
             >
-              <Image src='/amm.svg' alt='amm' height={12} width={12} />{" "}
+              <Image src='/svg/amm.svg' alt='amm' height={12} width={12} />{" "}
               {interest}
             </Badge>
           ))}

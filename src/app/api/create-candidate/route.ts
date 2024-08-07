@@ -17,54 +17,57 @@ export async function POST(req: NextRequest) {
   const candidate = bodyCandidate as Candidate;
   const accessToken = req.headers.get("Authorization")?.replace("Bearer ", "");
 
-    // verify authenticate user sent request
-    try {
-        const verified = await privyClient.verifyAuthToken(accessToken!);
-    } catch (e) {
-        throw new Error("Invalid access token");
-    }
+  // verify authenticate user sent request
+  try {
+    const verified = await privyClient.verifyAuthToken(accessToken!);
+  } catch (e) {
+    throw new Error("Invalid access token");
+  }
 
-    const { username, ...userObj } = user;
-    const userCreation = await saveUser(userObj);
+  const { username, ...userObj } = user;
+  const userCreation = await saveUser(userObj);
 
-    const { data: candidateCreation, error: candidateError } = await supabase
-        .from("candidates")
-        .insert([candidate])
-        .select();
+  const { data: candidateCreation, error: candidateError } = await supabase
+    .from("candidates")
+    .insert([candidate])
+    .select();
 
-    if (candidateError) throw candidateError;
+  if (candidateError) throw candidateError;
 
-    if(candidate.accept_direct_messages) {
-        const message = `gm @${username},
+  //     if(candidate.accept_direct_messages) {
+  //         const message = `gm @${username},
 
-we’re so thankful to have you 🙂 
-            
-keep an eye on your DCs and our channel + account for upcoming announcements, job postings, status updates, and more. we're committed to keeping you informed and helping you make the most of your search for interesting connections.
-            
-if you have any questions or need assistance, feel free to reach out to @alec.eth. here to help!
-            
-cheers all`
-        
-        await sendDirectCast(user.fid, message);
-    }
+  // we’re so thankful to have you 🙂
 
-    return NextResponse.json({ candidate: candidateCreation, user: userCreation }, { status: 200 })
+  // keep an eye on your DCs and our channel + account for upcoming announcements, job postings, status updates, and more. we're committed to keeping you informed and helping you make the most of your search for interesting connections.
+
+  // if you have any questions or need assistance, feel free to reach out to @alec.eth. here to help!
+
+  // cheers all`
+
+  //         await sendDirectCast(user.fid, message);
+  //     }
+
+  return NextResponse.json(
+    { candidate: candidateCreation, user: userCreation },
+    { status: 200 }
+  );
 }
 
 export async function GET(req: NextRequest) {
-    const searchParams = req.nextUrl.searchParams;
-    const fid = searchParams.get("fid");
-    const { data: user, error } = await supabase
-      .from("users")
-      .select()
-      .eq("fid", fid);
-  
-    if (error) {
-        return NextResponse.error();
-    }
-    if(user && user.length > 0) {
-        return NextResponse.json(user[0] ?? {}, { status: 200 });
-    } else {
-        return NextResponse.json({}, { status: 200 });
-    }
+  const searchParams = req.nextUrl.searchParams;
+  const fid = searchParams.get("fid");
+  const { data: user, error } = await supabase
+    .from("users")
+    .select()
+    .eq("fid", fid);
+
+  if (error) {
+    return NextResponse.error();
   }
+  if (user && user.length > 0) {
+    return NextResponse.json(user[0] ?? {}, { status: 200 });
+  } else {
+    return NextResponse.json({}, { status: 200 });
+  }
+}

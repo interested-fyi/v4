@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { User } from "@privy-io/react-auth";
+import Link from "next/link";
 import React from "react";
 interface UnauthedNavProps {
   login: () => void;
@@ -8,10 +8,9 @@ interface UnauthedNavProps {
 const UnauthedNav = ({ login }: UnauthedNavProps) => {
   return (
     <>
-      <Button variant={"secondary"}>Explore Jobs</Button>
-      <Button variant={"secondary"} onClick={login}>
-        Login
-      </Button>
+      <Link href={"/explore"}>
+        <Button variant={"secondary"}>Explore Jobs</Button>
+      </Link>
     </>
   );
 };
