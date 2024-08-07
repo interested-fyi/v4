@@ -1,4 +1,5 @@
-import puppeteer, { Browser } from "puppeteer";
+import chromium from 'chrome-aws-lambda';
+import puppeteer, { Browser } from 'puppeteer-core';
 import { findGreenhouseFrameSrc } from "./find-greenhouse-frame-src";
 import getGreenhouseAccountName from "./get-greenhouse-account-name";
 
@@ -7,7 +8,12 @@ export default async function getBoardUrl(url: string) {
     let boardUrl: string | undefined;
 
     try {
-        browser = await puppeteer.launch();
+        const executablePath = await chromium.executablePath || 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe';
+        browser = await puppeteer.launch({
+            executablePath,
+            args: chromium.args,
+            headless: false,
+        });
         const page = await browser.newPage();
         await page.goto(url, { waitUntil: 'networkidle2'});
         

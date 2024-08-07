@@ -1,4 +1,5 @@
-import puppeteer, { Browser } from 'puppeteer';
+import chromium from 'chrome-aws-lambda';
+import puppeteer, { Browser } from 'puppeteer-core';
 import * as cheerio from 'cheerio';
 import getGreenhouseAccountName from './get-greenhouse-account-name';
 import getBoardUrl from './get-board-url';
@@ -12,7 +13,12 @@ export default async function greenhouseScraper(url: string, company_id?: number
         const jobPostings: JobPosting[] = [];
 
         if (boardUrl) {
-            browser = await puppeteer.launch();
+            const executablePath = await chromium.executablePath || 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe';
+            browser = await puppeteer.launch({
+                executablePath,
+                args: chromium.args,
+                headless: false,
+            });
             const page = await browser.newPage();
             await page.goto(boardUrl, { waitUntil: 'networkidle2', timeout: 300000});
             await page.waitForSelector('body', { timeout: 300000 });
