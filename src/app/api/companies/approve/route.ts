@@ -34,6 +34,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         return handleRequest(req, res);
     } catch (e) {
+        console.log(`ERROR APPROVING: ${e}`)
         return NextResponse.json(`Error: ${e}`, { status: 500 });
     }
 }
@@ -42,11 +43,13 @@ async function handleRequest(req: NextRequest, res: NextResponse) {
     try {
         let { url, jobs, companyId } = await req.json();
 
+
         if (!jobs) {
             jobs = await greenhouseScraper(url, companyId);
         }
         
         // save jobs
+        console.log(`Jobs: ${jobs}`)
         const saveResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/companies/save-job-postings`, {
             method: 'POST',
             headers: {
@@ -57,6 +60,8 @@ async function handleRequest(req: NextRequest, res: NextResponse) {
         });
 
         const saveData = await saveResponse.json();
+        console.log(`SAVE JOBS: ${saveData}`);
+
 
         if(!saveResponse.ok) {
             throw new Error(saveData.message || "Error saving new job postings")
