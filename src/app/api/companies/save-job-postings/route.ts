@@ -44,7 +44,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
             for (const posting of saveData) {
                 console.log(`scraping details for: ${posting}`)
-                fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/companies/scrape-job-details`, {
+                fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? ''}/api/companies/scrape-job-details`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

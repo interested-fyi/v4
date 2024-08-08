@@ -52,7 +52,7 @@ async function handleRequest(req: NextRequest, res: NextResponse) {
         console.log(`Jobs (${companyId}): ${JSON.stringify(jobs)}`)
         console.log(`Body: ${JSON.stringify({ job_postings: jobs, company_id: companyId })}`);
         console.log(`fetching save job...`)
-        const saveResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/companies/save-job-postings`, {
+        const saveResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? ''}/api/companies/save-job-postings`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

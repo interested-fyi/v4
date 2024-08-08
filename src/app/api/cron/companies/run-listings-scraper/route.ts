@@ -25,7 +25,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
             for (const company of companiesToScrape) {
                 try {
                     // scrape company url
-                    const scrapeResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/companies/scrape-jobs`, {
+                    const scrapeResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? ''}/api/companies/scrape-jobs`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
                     const scrapeData = await scrapeResponse.json();
                     const jobPostings = scrapeData.job_postings;
                     // save new job postings
-                    const saveResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/companies/save-job-postings`, {
+                    const saveResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? ''}/api/companies/save-job-postings`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
