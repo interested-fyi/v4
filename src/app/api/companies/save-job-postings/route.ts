@@ -19,8 +19,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     try { 
         // get saved jobs for company
+        console.log(`getting active jobs`)
         const { data: activePostings, error: activeError } = await supabase.from('job_postings').select('*').eq('active', true).eq('company_id', company_id);
 
+        console.log(`active Jobs: ${activePostings}`);
         if (activeError) throw new Error('Error fetching existings jobs from database');
 
         // find which postings are new and save them
@@ -32,12 +34,15 @@ export async function POST(req: NextRequest, res: NextResponse) {
             );
         });
 
+        console.log(`new postings: ${newPostings}`);
+
         if (newPostings && newPostings.length > 0) {
             const { data: saveData, error: saveError } = await supabase.from('job_postings').insert(newPostings).select();
 
             if (saveError) throw new Error("Error saving new job postings to database");
 
             for (const posting of saveData) {
+                console.log(`scraping details for: ${posting}`)
                 fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/companies/scrape-job-details`, {
                     method: 'POST',
                     headers: {
@@ -69,6 +74,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         return NextResponse.json({ success: true, new_postings: newPostings }, { status: 200 })
     } catch (e) {
+        console.log(`Error saving job: ${e}`);
         return NextResponse.json({ error: e }, { status: 500 });
     }
 }
