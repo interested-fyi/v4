@@ -87,6 +87,7 @@ async function handleRequest(req: NextRequest, res: NextResponse) {
 
         return NextResponse.json({ success: true, job_postings: newPostings, company: company }, { status: 200 })
     } catch (e) {
-        return NextResponse.json(`Error scraping jobs: ${e}`, { status: 500 });
+        console.log(`Error approving company: ${e}`)
+        return NextResponse.json(`Error approving company: ${e}`, { status: 500 });
     }
 }
