@@ -7,6 +7,7 @@ import extractJobBody from "@/functions/job-scraping/description_scraper/extract
 import extractJobData from "@/functions/job-scraping/description_scraper/ai-description-scraper";
 
 export async function POST(req: NextRequest, res: NextResponse) {
+    console.log(`save job headers: ${JSON.stringify(req.headers)}`)
     if (req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
         return NextResponse.json('Unauthorized', { status: 401 });
     }

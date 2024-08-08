@@ -58,6 +58,7 @@ async function handleRequest(req: NextRequest, res: NextResponse) {
             },
             body: JSON.stringify({ job_postings: jobs, company_id: companyId })
         });
+        console.log(`response: ${saveResponse} `)
 
         const saveData = await saveResponse.json();
         console.log(`SAVE JOBS: ${saveData}`);
