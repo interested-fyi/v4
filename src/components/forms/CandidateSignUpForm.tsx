@@ -109,7 +109,7 @@ function SuccessModal() {
     >
       <div className='flex w-full justify-center items-center gap-8'>
         <Image
-          src='/main-logo.png'
+          src='/images/main-logo.png'
           alt='Interested illustration'
           width={200}
           height={200}
