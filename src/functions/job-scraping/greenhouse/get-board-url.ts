@@ -10,8 +10,10 @@ export default async function getBoardUrl(url: string) {
 
     try {
         if (process.env.NODE_ENV === 'development') {
+            console.log(`using development puppeteer`)
             browser = await puppeteerDev.launch();
         } else {
+            console.log(`using production puppeteer`)
             browser = await puppeteer.launch({
                 args: chromium.args,
                 defaultViewport: chromium.defaultViewport,
