@@ -9,19 +9,30 @@ export default async function getBoardUrl(url: string) {
     let boardUrl: string | undefined;
 
     try {
-        if (process.env.NODE_ENV === 'development') {
-            console.log(`using development puppeteer`)
-            browser = await puppeteerDev.launch();
-        } else {
-            console.log(`using production puppeteer`)
-            browser = await puppeteer.launch({
-                args: chromium.args,
-                defaultViewport: chromium.defaultViewport,
-                executablePath: await chromium.executablePath(),
-                headless: true,
-                ignoreHTTPSErrors: true,
-              });
-        }
+        // Uncomment for development
+        // if (process.env.NODE_ENV === 'development') {
+        //     console.log(`using development puppeteer`)
+        //     browser = await puppeteerDev.launch();
+        // } else {
+        //     console.log(`using production puppeteer`)
+        //     browser = await puppeteer.launch({
+        //         args: chromium.args,
+        //         defaultViewport: chromium.defaultViewport,
+        //         executablePath: await chromium.executablePath(),
+        //         headless: true,
+        //         ignoreHTTPSErrors: true,
+        //       });
+        // }
+
+        // comment for development
+        browser = await puppeteer.launch({
+            args: chromium.args,
+            defaultViewport: chromium.defaultViewport,
+            executablePath: await chromium.executablePath(),
+            headless: true,
+            ignoreHTTPSErrors: true,
+        });
+
         const page = await browser.newPage();
         await page.goto(url, { waitUntil: 'networkidle2'});
         
