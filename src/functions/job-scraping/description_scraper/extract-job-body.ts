@@ -1,18 +1,26 @@
 import chromium from '@sparticuz/chromium';
-import puppeteer, { Browser } from 'puppeteer-core';
+import puppeteer from 'puppeteer-core';
+import puppeteerDev from 'puppeteer';
 import * as cheerio from 'cheerio';
 
 export default async function extractJobBody(url: string) {
     let browser;
     
     try {
-        browser = await puppeteer.launch({
-            args: chromium.args,
-            defaultViewport: chromium.defaultViewport,
-            executablePath: await chromium.executablePath(),
-            headless: true,
-            ignoreHTTPSErrors: true,
-          });        
+        if(process.env.NODE_ENV === 'development') {
+            browser = await puppeteerDev.launch({
+                headless: true,
+                
+            });
+        } else {
+            browser = await puppeteer.launch({
+                args: chromium.args,
+                defaultViewport: chromium.defaultViewport,
+                executablePath: await chromium.executablePath(),
+                headless: true,
+                ignoreHTTPSErrors: true,
+              });   
+        }
         const page = await browser.newPage();
         await page.goto(url, { waitUntil: 'networkidle2', timeout: 300000});
         await page.waitForSelector('body', { timeout: 300000 });

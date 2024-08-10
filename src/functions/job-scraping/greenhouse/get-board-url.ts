@@ -1,20 +1,25 @@
 import chromium from '@sparticuz/chromium';
 import puppeteer, { Browser } from 'puppeteer-core';
+import puppeteerDev, { Browser as DevBrowser } from 'puppeteer';
 import { findGreenhouseFrameSrc } from "./find-greenhouse-frame-src";
 import getGreenhouseAccountName from "./get-greenhouse-account-name";
 
 export default async function getBoardUrl(url: string) {
-    let browser: Browser | undefined;
+    let browser: Browser | DevBrowser | undefined;
     let boardUrl: string | undefined;
 
     try {
-        browser = await puppeteer.launch({
-            args: chromium.args,
-            defaultViewport: chromium.defaultViewport,
-            executablePath: await chromium.executablePath(),
-            headless: true,
-            ignoreHTTPSErrors: true,
-          });
+        if (process.env.NODE_ENV === 'development') {
+            browser = await puppeteerDev.launch();
+        } else {
+            browser = await puppeteer.launch({
+                args: chromium.args,
+                defaultViewport: chromium.defaultViewport,
+                executablePath: await chromium.executablePath(),
+                headless: true,
+                ignoreHTTPSErrors: true,
+              });
+        }
         const page = await browser.newPage();
         await page.goto(url, { waitUntil: 'networkidle2'});
         
