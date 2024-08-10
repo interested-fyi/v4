@@ -9,7 +9,7 @@ const privyClient = new PrivyClient(process.env.NEXT_PUBLIC_PRIVY_APP_ID!, proce
 export async function POST(req: NextRequest, res: NextResponse) {
     const authToken = req.headers.get('Authorization')?.replace('Bearer ', '');
 
-    if (authToken === process.env.INTERNAL_SECRET) {
+    if (authToken === process.env.CRON_SECRET) {
         return handleRequest(req, res);
     }
 

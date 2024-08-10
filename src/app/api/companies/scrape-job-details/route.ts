@@ -7,6 +7,7 @@ import extractJobBody from "@/functions/job-scraping/description_scraper/extract
 import extractJobData from "@/functions/job-scraping/description_scraper/ai-description-scraper";
 
 export async function POST(req: NextRequest, res: NextResponse) {
+    console.log(`scraping details...`)
     if (req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
         return NextResponse.json('Unauthorized', { status: 401 });
     }
@@ -20,6 +21,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         }
         const enrichedData = jobData?.content;
 
+        console.log(`Enriched Data: ${JSON.stringify(enrichedData)}\nTitle: ${enrichedData.title}, description: ${enrichedData.description}`)
         if (enrichedData && enrichedData.description && enrichedData.title) {
             const { data, error: detailsError } = await supabase.rpc('update_job_details_and_scraping', {
                 p_job_posting_id: posting.id,

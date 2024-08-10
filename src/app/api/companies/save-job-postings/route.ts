@@ -29,8 +29,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
         // find which postings are new and save them
         const newPostings = job_postings?.filter((posting: JobPosting) => {
             return !activePostings?.some((p) => 
-                p.role_title === posting.role_title &&
-                p.location === posting.location &&
                 p.posting_url === posting.posting_url
             );
         });
@@ -38,7 +36,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         console.log(`new postings: ${newPostings}`);
 
         if (newPostings && newPostings.length > 0) {
-            const { data: saveData, error: saveError } = await supabase.from('job_postings').insert(newPostings).select();
+            const { data: saveData, error: saveError } = await supabase.from('job_postings').upsert(newPostings, { onConflict: 'posting_url' }).select();
 
             if (saveError) throw new Error("Error saving new job postings to database");
 
@@ -58,8 +56,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
         // find which postings in the db are no longer active
         const inactivePostings = activePostings?.filter((posting) => {
             return !job_postings?.some((p: JobPosting) =>
-                p.role_title === posting.role_title &&
-                p.location === posting.location &&
                 p.posting_url === posting.posting_url
             );
         });

@@ -1,25 +1,30 @@
 import chromium from '@sparticuz/chromium';
 import puppeteer, { Browser } from 'puppeteer-core';
+import puppeteerDev, { Browser as DevBrowser } from 'puppeteer';
 import * as cheerio from 'cheerio';
 import getGreenhouseAccountName from './get-greenhouse-account-name';
 import getBoardUrl from './get-board-url';
 import JobPosting from '@/types/job-posting';
 
 export default async function greenhouseScraper(url: string, company_id?: number) {
-    let browser: Browser | undefined;
+    let browser: Browser | DevBrowser | undefined;
         
     try {
         const { boardUrl, accountName } = await getBoardUrl(url);
         const jobPostings: JobPosting[] = [];
 
         if (boardUrl) {
-            browser = await puppeteer.launch({
-                args: chromium.args,
-                defaultViewport: chromium.defaultViewport,
-                executablePath: await chromium.executablePath(),
-                headless: true,
-                ignoreHTTPSErrors: true,
-              });
+            if (process.env.NODE_ENV) {
+                browser = await puppeteerDev.launch();
+            } else {
+                browser = await puppeteer.launch({
+                    args: chromium.args,
+                    defaultViewport: chromium.defaultViewport,
+                    executablePath: await chromium.executablePath(),
+                    headless: true,
+                    ignoreHTTPSErrors: true,
+                  });
+            }
             const page = await browser.newPage();
             await page.goto(boardUrl, { waitUntil: 'networkidle2', timeout: 300000});
             await page.waitForSelector('body', { timeout: 300000 });
