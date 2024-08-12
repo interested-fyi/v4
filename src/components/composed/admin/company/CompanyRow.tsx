@@ -13,19 +13,30 @@ interface CompanyRowProps {
 }
 export function CompanyRow({ index, company }: CompanyRowProps) {
   const { getAccessToken } = usePrivy();
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const handleRevoke = async () => {
-    const accessToken = await getAccessToken();
-    const result = await fetch(`/api/companies/revoke`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${accessToken}`,
-        "Content-Type": "application",
-      },
-      body: JSON.stringify({ companyId: company.id }),
-    });
-    if (result.ok) {
-      console.log("Company revoked");
+    setIsLoading(true);
+    try {
+      const accessToken = await getAccessToken();
+      const result = await fetch(`/api/companies/deny`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application",
+        },
+        body: JSON.stringify({
+          companyId: company.id,
+          approved: false,
+        }),
+      });
+      if (result.ok) {
+        console.log("Company denied");
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -60,13 +71,21 @@ export function CompanyRow({ index, company }: CompanyRowProps) {
       </TableCell>
       <TableCell className='md:space-x-2 lg:space-x-4 space-y-4'>
         {company.approved ? (
-          <Button className='border-black border w-full' onClick={handleRevoke}>
+          <Button
+            disabled={isLoading}
+            className='border-black border w-full'
+            onClick={handleRevoke}
+          >
             Revoke Approval
           </Button>
         ) : (
           <>
             {" "}
-            <ApprovalButtonGroup companyId={company.id} jobs={null} url={company.careers_page_url} />
+            <ApprovalButtonGroup
+              companyId={company.id}
+              jobs={null}
+              url={company.careers_page_url}
+            />
           </>
         )}
       </TableCell>
