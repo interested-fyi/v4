@@ -7,23 +7,16 @@ import extractJobBody from "@/functions/job-scraping/description_scraper/extract
 import extractJobData from "@/functions/job-scraping/description_scraper/ai-description-scraper";
 
 export async function POST(req: NextRequest, res: NextResponse) {
-    console.log(`save job headers: ${JSON.stringify(req.headers.get('Authorization'))} / cron sec: ${process.env.CRON_SECRET}`)
     if (req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
         return NextResponse.json('Unauthorized', { status: 401 });
     }
 
     const { job_postings, company_id } = await req.json();
 
-    // get companies from supabase, and last scraping time
-    // const { data: companiesData, error: companiesError } = await supabase.from('companies_last_scraping').select();
-    // console.log(`Company Data: ${JSON.stringify(companiesData)}`)
-
     try { 
         // get saved jobs for company
-        console.log(`getting active jobs`)
         const { data: activePostings, error: activeError } = await supabase.from('job_postings').select('*').eq('active', true).eq('company_id', company_id);
 
-        console.log(`active Jobs: ${activePostings}`);
         if (activeError) throw new Error('Error fetching existings jobs from database');
 
         // find which postings are new and save them
@@ -32,8 +25,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
                 p.posting_url === posting.posting_url
             );
         });
-
-        console.log(`new postings: ${newPostings}`);
 
         if (newPostings && newPostings.length > 0) {
             const { data: saveData, error: saveError } = await supabase.from('job_postings').upsert(newPostings, { onConflict: 'posting_url' }).select();

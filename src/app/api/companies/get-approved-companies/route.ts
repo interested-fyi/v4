@@ -31,7 +31,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
             `
       )
       .eq("approved", true);
-    console.log(`Companies: ${companyData}`)
 
     if (companyError) {
       throw new Error(`Error fetching company data: ${companyError}`);
@@ -54,7 +53,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
       })
     );
 
-    console.log(`Companies with job count: ${companiesWithJobCount}`)
     return NextResponse.json(
       { success: true, companies: companiesWithJobCount },
       { status: 200 }

@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import supabase from "@/lib/supabase";
 
 export async function GET(req: NextRequest) {
-    console.log(`running details scraper`)
     if (req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
         return NextResponse.json('Unauthorized', { status: 401 });
     }
@@ -16,8 +15,6 @@ export async function GET(req: NextRequest) {
             .select('*')
             .eq('active', true)
             .or(`last_scraped.is.null,last_scraped.lt.${sevenDaysAgo}`);
-
-        console.log(`JOBS TO SCRAPE: ${JSON.stringify(jobs)}`)
         
         if (jobError) throw new Error(`Error fetching jobs: ${jobError.message}`);
         
@@ -44,7 +41,6 @@ export async function GET(req: NextRequest) {
             }
         }
 
-        console.log(`success. postings saved: ${postingsSaved}`)
         return NextResponse.json({ success: true, postings_saved: postingsSaved }, { status: 200 });
     } catch (e) {
         console.error(`Error in job scraping endpoint: ${e}`);

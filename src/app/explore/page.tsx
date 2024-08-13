@@ -31,7 +31,6 @@ export default function ExplorePage() {
       };
     },
   });
-  console.log(`Companies: ${data}`)
 
   const { data: jobs } = useQuery({
     queryKey: ["jobs"],
