@@ -44,8 +44,8 @@ export async function GET(req: NextRequest) {
             }
         }
 
+        console.log(`success. postings saved: ${postingsSaved}`)
         return NextResponse.json({ success: true, postings_saved: postingsSaved }, { status: 200 });
-        
     } catch (e) {
         console.error(`Error in job scraping endpoint: ${e}`);
         return NextResponse.json({ error: e }, { status: 500 });
