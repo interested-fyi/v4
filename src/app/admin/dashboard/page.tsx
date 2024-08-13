@@ -30,6 +30,7 @@ export default function AdminDashboard() {
       const accessToken = await getAccessToken();
       const res = await fetch("/api/companies/get-all-companies", {
         method: "GET",
+        cache: 'no-store',
         headers: {
           "Content-type": "application/json",
           Authorization: `Bearer ${accessToken}`,

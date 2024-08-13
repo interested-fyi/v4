@@ -19,11 +19,12 @@ export default function ExplorePage() {
       const accessToken = await getAccessToken();
       const res = await fetch("/api/companies/get-approved-companies", {
         method: "GET",
+        cache: 'no-store',
         headers: {
           "Content-type": "application/json",
           authorization: `Bearer ${accessToken}`,
         },
-      });
+      },);
       return (await res.json()) as {
         success: boolean;
         companies: CompanyResponse[];
