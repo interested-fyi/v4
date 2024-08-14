@@ -8,7 +8,8 @@ const bot = new Bot(botToken);
 bot.on("callback_query:data", async (ctx) => {
     console.log(`Processing referral for ${ctx.callbackQuery.data} from ${JSON.stringify(ctx.callbackQuery.from)}`);
     await ctx.answerCallbackQuery({
-        text: 'Test Response' // generate referral url
+        text: 'Test Response', // generate referral url
+        show_alert: true,
     }); // remove loading animation
 });
 
