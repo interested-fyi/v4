@@ -6,8 +6,10 @@ console.log(`bot token: ${botToken}`)
 const bot = new Bot(botToken);
 
 bot.on("callback_query:data", async (ctx) => {
-    console.log("Unknown button event with payload ", ctx.callbackQuery.data);
-    await ctx.answerCallbackQuery(); // remove loading animation
+    console.log(`Processing referral for ${ctx.callbackQuery.data} from ${JSON.stringify(ctx.callbackQuery.from)}`);
+    await ctx.answerCallbackQuery({
+        text: 'Test Response' // generate referral url
+    }); // remove loading animation
 });
 
 export default bot;
