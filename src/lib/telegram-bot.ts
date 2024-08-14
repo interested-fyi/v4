@@ -6,9 +6,10 @@ console.log(`bot token: ${botToken}`)
 const bot = new Bot(botToken);
 
 bot.on("callback_query:data", async (ctx) => {
-    console.log(`Processing referral for ${ctx.callbackQuery.data} from ${JSON.stringify(ctx.callbackQuery.from)}`);
+    console.log(`Processing referral for ${ctx.callbackQuery.data} from ${JSON.stringify(ctx.callbackQuery.from)}\nMore Context: ${JSON.stringify(ctx)}`);
+    const url = 'https://test.com'
     await ctx.answerCallbackQuery({
-        text: 'Test Response', // generate referral url
+        text: `Share the below link to share this job\n${url}`, // generate referral url
         show_alert: true,
     }); // remove loading animation
 });
