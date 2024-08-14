@@ -14,6 +14,7 @@ bot.on("callback_query:data", async (ctx) => {
     const msgId = ctx.callbackQuery.message?.message_id;
     const telegramPostUrl = `https://t.me/${chatName}/${msgId}`
     console.log(`Job: ${jobId}, referrer: ${referrerUsername} (${referrerId}), url: ${telegramPostUrl}`)
+    await ctx.reply(`Share the below link to share this job\n${telegramPostUrl}`, { parse_mode: 'HTML'})
     await ctx.answerCallbackQuery({
         text: `Share the below link to share this job\n${telegramPostUrl}`, // generate referral url
         show_alert: false,
