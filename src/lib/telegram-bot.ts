@@ -6,11 +6,17 @@ console.log(`bot token: ${botToken}`)
 const bot = new Bot(botToken);
 
 bot.on("callback_query:data", async (ctx) => {
-    console.log(`Processing referral for ${ctx.callbackQuery.data} from ${JSON.stringify(ctx.callbackQuery.from)}\nMore Context: ${JSON.stringify(ctx)}`);
-    const url = 'https://test.com'
+    console.log(`Processing referral for ${ctx.callbackQuery.data} from ${JSON.stringify(ctx.callbackQuery.from)}\nMore Context: ${JSON.stringify(ctx.chat)}`);
+    const jobId = ctx.callbackQuery.data.replace('job=', '');
+    const referrerId = ctx.callbackQuery.from.id;
+    const referrerUsername = ctx.callbackQuery.from.username;
+    const chatName = ctx.callbackQuery.message?.chat.username;
+    const msgId = ctx.callbackQuery.message?.message_id;
+    const telegramPostUrl = `https://t.me/${chatName}/${msgId}`
+    console.log(`Job: ${jobId}, referrer: ${referrerUsername} (${referrerId}), url: ${telegramPostUrl}`)
     await ctx.answerCallbackQuery({
-        text: `Share the below link to share this job\n${url}`, // generate referral url
-        show_alert: true,
+        text: `Share the below link to share this job\n${telegramPostUrl}`, // generate referral url
+        show_alert: false,
     }); // remove loading animation
 });
 
