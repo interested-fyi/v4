@@ -15,24 +15,27 @@ export default function AdminDashboardJobs() {
   const { data, error } = useQuery({
     queryKey: ["scrape-jobs"],
     queryFn: async () => {
-      const accessToken = await getAccessToken();
-      console.log("🚀 ~ queryFn: ~ accessToken:", accessToken);
-      const response = await fetch("/api/companies/scrape-jobs", {
-        method: "POST",
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application",
-        },
-        body: JSON.stringify({
-          url: url,
-          company_id: companyId,
-        }),
-      });
+      try {
+        const accessToken = await getAccessToken();
+        const response = await fetch("/api/companies/scrape-jobs", {
+          method: "POST",
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application",
+          },
+          body: JSON.stringify({
+            url: url,
+            company_id: companyId,
+          }),
+        });
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      } catch (error) {
+        throw new Error("An error occurred while fetching data");
       }
-      return response.json();
     },
   });
 
@@ -73,7 +76,11 @@ export default function AdminDashboardJobs() {
         {data.job_postings.length >= 0 ? (
           <>
             {companyId ? (
-              <ApprovalButtonGroup companyId={parseInt(companyId)} jobs={data.job_postings} url={url}/>
+              <ApprovalButtonGroup
+                companyId={parseInt(companyId)}
+                jobs={data.job_postings}
+                url={url}
+              />
             ) : null}
             {data.job_postings.map((job: JobPosting, index: number) => (
               <JobPostingCard key={job.id} job={job} />
