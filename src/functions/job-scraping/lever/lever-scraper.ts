@@ -12,37 +12,36 @@ export default async function leverScraper(url: string, company_id?: number) {
     const jobPostings: JobPosting[] = [];
 
     if (url) {
-      // Uncomment for development
-      // Choose the correct puppeteer setup
-      //   if (process.env.NODE_ENV === "development") {
-      //     console.log(`using development puppeteer`);
-      //     browser = await puppeteerDev.launch();
-      //   } else {
-      //     console.log(`using production puppeteer`);
-      //     browser = await puppeteer.launch({
-      //       args: chromium.args,
-      //       defaultViewport: chromium.defaultViewport,
-      //       executablePath: await chromium.executablePath(),
-      //       headless: true,
-      //       ignoreHTTPSErrors: true,
-      //     });
-      //   }
+      //   Uncomment for development
+      //   Choose the correct puppeteer setup
+      if (process.env.NODE_ENV !== "development") {
+        console.log(`using development puppeteer`);
+        browser = await puppeteerDev.launch();
+      } else {
+        console.log(`using production puppeteer`);
+        browser = await puppeteer.launch({
+          args: chromium.args,
+          defaultViewport: chromium.defaultViewport,
+          executablePath: await chromium.executablePath(),
+          headless: true,
+          ignoreHTTPSErrors: true,
+        });
+      }
 
       // comment for development
-      browser = await puppeteer.launch({
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
-        headless: true,
-        ignoreHTTPSErrors: true,
-      });
+      //   browser = await puppeteer.launch({
+      //     args: chromium.args,
+      //     defaultViewport: chromium.defaultViewport,
+      //     executablePath: await chromium.executablePath(),
+      //     headless: true,
+      //     ignoreHTTPSErrors: true,
+      //   });
       const page = await browser.newPage();
       await page.goto(url, { waitUntil: "networkidle2", timeout: 300000 });
       await page.waitForSelector("body", { timeout: 300000 });
 
       const content = await page.content();
       const $ = cheerio.load(content);
-
       const extractJobs = () => {
         $(".postings-group").each((_, postingGroup) => {
           const department = $(postingGroup)
@@ -76,14 +75,13 @@ export default async function leverScraper(url: string, company_id?: number) {
             });
         });
       };
-
       // Call the job extraction function
       extractJobs();
     }
 
     return jobPostings;
   } catch (e) {
-    console.log(`Error Scraping from the custom board: ${e}`);
+    console.log(`Error Scraping from the lever job board: ${e}`);
     return null;
   } finally {
     if (browser) {
