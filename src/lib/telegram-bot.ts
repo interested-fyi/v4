@@ -38,15 +38,17 @@ bot.on("callback_query:data", async (ctx) => {
     console.log(`Job: ${jobId}, referrer: ${referrerUsername} (${referrerId}), url: ${telegramPostUrl}`)
     console.log(`Sender Chat: ${JSON.stringify(ctx.senderChat)} / ${JSON.stringify(ctx.callbackQuery.message?.sender_chat)}`)
     // await ctx.reply(`Share the below link to share this job\n${telegramPostUrl}`, { parse_mode: 'HTML'});
+    const chatUrl = `https://t.me/interested_fyi_dev_bot?start=job:${jobId}_tgUrl:${encodeURIComponent(telegramPostUrl)}`;
+    console.log(`Chat URL: ${chatUrl}`);
     try {
         await ctx.api.sendMessage(referrerId, `Copy this link to refer a friend to this job:\n\n${telegramPostUrl}`);
         await ctx.answerCallbackQuery({
-            url: `https://t.me/interested_fyi_dev_bot?start=job:${jobId}_tgUrl:${encodeURIComponent(telegramPostUrl)}`
+            url: chatUrl
         });
     } catch (e) { 
         await ctx.answerCallbackQuery({
             text: `Join our bot to receive referral links and earn!`,
-            url: `https://t.me/interested_fyi_dev_bot?start=job:${jobId}::tgUrl:${encodeURIComponent(telegramPostUrl)}`
+            url: chatUrl
         });
     }
     // await ctx.answerCallbackQuery({
