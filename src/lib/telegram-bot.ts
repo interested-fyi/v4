@@ -41,7 +41,7 @@ bot.on("callback_query:data", async (ctx) => {
     try {
         await ctx.api.sendMessage(referrerId, `Copy this link to refer a friend to this job:\n\n${telegramPostUrl}`);
         await ctx.answerCallbackQuery({
-            url: `https://t.me/interested_fyi_dev_bot`
+            url: `https://t.me/interested_fyi_dev_bot?start=job:${jobId}::tgUrl:${telegramPostUrl}`
         });
     } catch (e) { 
         await ctx.answerCallbackQuery({
