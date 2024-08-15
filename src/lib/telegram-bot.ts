@@ -7,7 +7,21 @@ const bot = new Bot(botToken);
 
 bot.command('start', async (ctx) => {
     console.log(ctx.match);
-    await ctx.reply(ctx.match)
+    const regex = /job:(?<jobId>[^:]+)::tgUrl:(?<telegramUrl>.+)/;
+
+    const match = ctx.match.match(regex);
+
+    if (match && match.groups) {
+        const jobId = match.groups.jobId;
+        const telegramUrl = match.groups.telegramUrl;
+
+        console.log("Job ID:", jobId);
+        console.log("Telegram URL:", telegramUrl);
+        await ctx.reply(telegramUrl)
+    } else {
+        console.log("No match found");
+        await ctx.reply(`Welcome to Interested.FYI!`)
+    }
 })
 
 bot.on("callback_query:data", async (ctx) => {
@@ -19,10 +33,11 @@ bot.on("callback_query:data", async (ctx) => {
     const msgId = ctx.callbackQuery.message?.message_id;
     const telegramPostUrl = `https://t.me/${chatName}/${msgId}`
     console.log(`Job: ${jobId}, referrer: ${referrerUsername} (${referrerId}), url: ${telegramPostUrl}`)
+    console.log(`Sender Chat: ${JSON.stringify(ctx.senderChat)} / ${JSON.stringify(ctx.callbackQuery.message?.sender_chat)}`)
     // await ctx.reply(`Share the below link to share this job\n${telegramPostUrl}`, { parse_mode: 'HTML'});
     await ctx.answerCallbackQuery({
         text: `Join our bot to receive referral links and earn!`,
-        url: `https://t.me/interested_fyi_dev_bot?start=job-${jobId}&tgUrl=${telegramPostUrl}`
+        url: `https://t.me/interested_fyi_dev_bot?start=job:${jobId}::tgUrl:${telegramPostUrl}`
     })
     // await ctx.answerCallbackQuery({
     //     text: `Share the below link to share this job\n${telegramPostUrl}`, // generate referral url
