@@ -7,7 +7,7 @@ const bot = new Bot(botToken);
 
 bot.command('start', async (ctx) => {
     console.log(`Match: ${ctx.match}`);
-    const regex = /job:([^:]+)::tgUrl:(.+)/;
+    const regex = /job:([^:]+)_tgUrl:(.+)/;
 
     const match = ctx.match.match(regex);
 
@@ -41,7 +41,7 @@ bot.on("callback_query:data", async (ctx) => {
     try {
         await ctx.api.sendMessage(referrerId, `Copy this link to refer a friend to this job:\n\n${telegramPostUrl}`);
         await ctx.answerCallbackQuery({
-            url: `https://t.me/interested_fyi_dev_bot?start=job:${jobId}::tgUrl:${encodeURIComponent(telegramPostUrl)}`
+            url: `https://t.me/interested_fyi_dev_bot?start=job:${jobId}_tgUrl:${encodeURIComponent(telegramPostUrl)}`
         });
     } catch (e) { 
         await ctx.answerCallbackQuery({
