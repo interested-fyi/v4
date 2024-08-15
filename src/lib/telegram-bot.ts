@@ -17,7 +17,7 @@ bot.on("callback_query:data", async (ctx) => {
     // await ctx.reply(`Share the below link to share this job\n${telegramPostUrl}`, { parse_mode: 'HTML'});
     await ctx.answerCallbackQuery({
         text: `Join our bot to receive referral links and earn!`,
-        url: 'https://t.me/interested_fyi_dev_bot?start=\u003dhelp'
+        url: 'https://t.me/interested_fyi_dev_bot?start=help'
     })
     // await ctx.answerCallbackQuery({
     //     text: `Share the below link to share this job\n${telegramPostUrl}`, // generate referral url
