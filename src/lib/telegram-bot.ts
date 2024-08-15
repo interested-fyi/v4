@@ -7,13 +7,13 @@ const bot = new Bot(botToken);
 
 bot.command('start', async (ctx) => {
     console.log(ctx.match);
-    const regex = /job:(?<jobId>[^:]+)::tgUrl:(?<telegramUrl>.+)/;
+    const regex = /job:([^:]+)::tgUrl:(.+)/;
 
     const match = ctx.match.match(regex);
 
     if (match && match.groups) {
-        const jobId = match.groups.jobId;
-        const telegramUrl = match.groups.telegramUrl;
+        const jobId = match[1];
+    const telegramUrl = match[2];
 
         console.log("Job ID:", jobId);
         console.log("Telegram URL:", telegramUrl);
