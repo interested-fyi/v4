@@ -11,9 +11,11 @@ bot.command('start', async (ctx) => {
 
     const match = ctx.match.match(regex);
 
+    console.log(`DM Chat ID: ${JSON.stringify(ctx.chat)}`)
     if (match && match.groups) {
-        const jobId = match[1];
-        const telegramUrl = match[2];
+        console.log(`Match: ${match}`)
+        const jobId = match[0];
+        const telegramUrl = match[1];
 
         console.log("Job ID:", jobId);
         console.log("Telegram URL:", telegramUrl);
