@@ -13,7 +13,7 @@ bot.command('start', async (ctx) => {
 
     if (match && match.groups) {
         const jobId = match[1];
-    const telegramUrl = match[2];
+        const telegramUrl = match[2];
 
         console.log("Job ID:", jobId);
         console.log("Telegram URL:", telegramUrl);
