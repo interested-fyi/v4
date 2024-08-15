@@ -6,12 +6,13 @@ console.log(`bot token: ${botToken}`)
 const bot = new Bot(botToken);
 
 bot.command('start', async (ctx) => {
-    console.log(ctx.match);
+    console.log(`Match: ${ctx.match}`);
     const regex = /job:([^:]+)::tgUrl:(.+)/;
 
     const match = ctx.match.match(regex);
 
     console.log(`DM Chat ID: ${JSON.stringify(ctx.chat)}`)
+    console.log(`Match Regex: ${match}`)
     if (match && match.groups) {
         console.log(`Match: ${match}`)
         const jobId = match[0];
