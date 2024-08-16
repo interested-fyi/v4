@@ -14,28 +14,28 @@ export default async function leverScraper(url: string, company_id?: number) {
     if (url) {
       //   Uncomment for development
       //   Choose the correct puppeteer setup
-      if (process.env.NODE_ENV !== "development") {
-        console.log(`using development puppeteer`);
-        browser = await puppeteerDev.launch();
-      } else {
-        console.log(`using production puppeteer`);
-        browser = await puppeteer.launch({
-          args: chromium.args,
-          defaultViewport: chromium.defaultViewport,
-          executablePath: await chromium.executablePath(),
-          headless: true,
-          ignoreHTTPSErrors: true,
-        });
-      }
+      //   if (process.env.NODE_ENV === "development") {
+      //     console.log(`using development puppeteer`);
+      //     browser = await puppeteerDev.launch();
+      //   } else {
+      //     console.log(`using production puppeteer`);
+      //     browser = await puppeteer.launch({
+      //       args: chromium.args,
+      //       defaultViewport: chromium.defaultViewport,
+      //       executablePath: await chromium.executablePath(),
+      //       headless: true,
+      //       ignoreHTTPSErrors: true,
+      //     });
+      //   }
 
       // comment for development
-      //   browser = await puppeteer.launch({
-      //     args: chromium.args,
-      //     defaultViewport: chromium.defaultViewport,
-      //     executablePath: await chromium.executablePath(),
-      //     headless: true,
-      //     ignoreHTTPSErrors: true,
-      //   });
+      browser = await puppeteer.launch({
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: true,
+        ignoreHTTPSErrors: true,
+      });
       const page = await browser.newPage();
       await page.goto(url, { waitUntil: "networkidle2", timeout: 300000 });
       await page.waitForSelector("body", { timeout: 300000 });
