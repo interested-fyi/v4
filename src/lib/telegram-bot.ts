@@ -35,7 +35,7 @@ bot.on("callback_query:data", async (ctx) => {
     const chatName = ctx.callbackQuery.message?.chat.username;
     const msgId = ctx.callbackQuery.message?.message_id;
     const telegramPostUrl = `https://t.me/${chatName}/${msgId}`
-    const referralUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/referral/telegram?userId=${referrerId}&jobId=${jobId}&chatName=${chatName}&msgId=${msgId}`
+    const referralUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/referral/telegram?userId=${referrerId}&jobId=${jobId}&chatName=${chatName}&msgId=${msgId}`
     console.log(`Job: ${jobId}, referrer: ${referrerUsername} (${referrerId}), url: ${telegramPostUrl}`)
     console.log(`Sender Chat: ${JSON.stringify(ctx.senderChat)} / ${JSON.stringify(ctx.callbackQuery.message?.sender_chat)}`)
     // await ctx.reply(`Share the below link to share this job\n${telegramPostUrl}`, { parse_mode: 'HTML'});
