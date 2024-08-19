@@ -12,46 +12,82 @@ import { JobPostingList } from "@/components/JobPostingList";
 export default function ExplorePage() {
   const [activeButton, setActiveButton] = useState("companies");
   const { getAccessToken } = usePrivy();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["companies"],
+  // Fetch companies with pagination
+  const { data: companiesData, isLoading: isLoadingCompanies } = useQuery({
+    queryKey: ["companies", page, limit],
     queryFn: async () => {
       const accessToken = await getAccessToken();
-      const res = await fetch("/api/companies/get-approved-companies", {
-        method: "GET",
-        cache: 'no-store',
-        headers: {
-          "Content-type": "application/json",
-          authorization: `Bearer ${accessToken}`,
-        },
-      },);
+      const res = await fetch(
+        `/api/companies/get-approved-companies?page=${page}&limit=${limit}`,
+        {
+          method: "GET",
+          cache: "no-store",
+          headers: {
+            "Content-type": "application/json",
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
       return (await res.json()) as {
         success: boolean;
         companies: CompanyResponse[];
+        totalCompanies: number;
+        currentPage: number;
+        totalPages: number;
       };
     },
   });
 
-  const { data: jobs } = useQuery({
-    queryKey: ["jobs"],
+  // Fetch job postings with pagination
+  const { data: jobs, isLoading: isLoadingJobs } = useQuery({
+    queryKey: ["jobs", page, limit],
     queryFn: async () => {
       const accessToken = await getAccessToken();
-      const res = await fetch("/api/jobs/get-all-jobs", {
-        method: "GET",
-        headers: {
-          "Content-type": "application/json",
-          authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const res = await fetch(
+        `/api/jobs/get-all-jobs?page=${page}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json",
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
       return (await res.json()) as {
         success: boolean;
         jobs: JobPosting[];
+        totalJobs: number;
+        currentPage: number;
+        totalPages: number;
       };
     },
   });
 
   const handleButtonClick = (button: string) => {
     setActiveButton(button);
+  };
+
+  const handleNextPage = () => {
+    const totalPages =
+      activeButton === "companies"
+        ? companiesData?.totalPages
+        : jobs?.totalPages;
+    if (page < (totalPages ?? 1)) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (page > 1) {
+      setPage((prevPage) => prevPage - 1);
+    }
+  };
+
+  const handlePageSelect = (selectedPage: number) => {
+    setPage(selectedPage);
   };
 
   return (
@@ -74,25 +110,127 @@ export default function ExplorePage() {
         </div>
       </div>
       {activeButton === "companies" ? (
-        <section className='grid grid-cols-1 gap-6 p-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:p-6'>
-          {isLoading ? (
-            <div className='text-center'>
-              <p>Loading...</p>
-            </div>
-          ) : (
-            data?.companies?.map((company: CompanyResponse) => (
-              <Link
-                className='w-full'
-                href={`/company-details/${company.id}`}
-                key={company.id}
+        <>
+          {/* a selector for changing how many companies to show per page */}
+          <div className='flex justify-end items-center gap-4 mt-8 px-8'>
+            <span>Companies per page:</span>
+            <select
+              value={limit}
+              onChange={(e) => setLimit(Number(e.target.value))}
+              className='border p-1 rounded'
+            >
+              {[10, 20, 50].map((limit) => (
+                <option key={limit} value={limit}>
+                  {limit}
+                </option>
+              ))}
+            </select>
+          </div>
+          <section className='grid grid-cols-1 gap-6 p-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:p-6'>
+            {isLoadingCompanies ? (
+              <div className='text-center'>
+                <p>Loading...</p>
+              </div>
+            ) : (
+              companiesData?.companies?.map((company: CompanyResponse) => (
+                <Link
+                  className='w-full'
+                  href={`/company-details/${company.id}`}
+                  key={company.id}
+                >
+                  <CompanyCard company={company} />
+                </Link>
+              ))
+            )}
+          </section>
+          <div className='flex justify-between items-center mt-4 max-w-96 pb-8 mx-auto'>
+            <Button
+              onClick={handlePreviousPage}
+              disabled={page === 1}
+              variant='outline'
+            >
+              Previous
+            </Button>
+            <span>
+              Page{" "}
+              <select
+                value={page}
+                onChange={(e) => handlePageSelect(Number(e.target.value))}
+                className='border p-1 rounded'
               >
-                <CompanyCard company={company} />
-              </Link>
-            ))
-          )}
-        </section>
+                {Array.from(
+                  { length: companiesData?.totalPages ?? 1 },
+                  (_, i) => i + 1
+                ).map((pageNum) => (
+                  <option key={pageNum} value={pageNum}>
+                    {pageNum}
+                  </option>
+                ))}
+              </select>{" "}
+              of {companiesData?.totalPages ?? 1}
+            </span>
+            <Button
+              onClick={handleNextPage}
+              disabled={page === (companiesData?.totalPages ?? 1)}
+              variant='outline'
+            >
+              Next
+            </Button>
+          </div>
+        </>
       ) : (
-        <JobPostingList jobs={jobs?.jobs ?? []} />
+        <>
+          {/* a selector for changing how many jobs to show per page */}
+          <div className='flex justify-end items-center gap-4 mt-8 px-8'>
+            <span>Jobs per page:</span>
+            <select
+              value={limit}
+              onChange={(e) => setLimit(Number(e.target.value))}
+              className='border p-1 rounded'
+            >
+              {[10, 20, 50].map((limit) => (
+                <option key={limit} value={limit}>
+                  {limit}
+                </option>
+              ))}
+            </select>
+          </div>
+          <JobPostingList jobs={jobs?.jobs ?? []} />
+          <div className='flex justify-between items-center mt-4 max-w-96 pb-8 mx-auto'>
+            <Button
+              onClick={handlePreviousPage}
+              disabled={page === 1}
+              variant='outline'
+            >
+              Previous
+            </Button>
+            <span>
+              Page{" "}
+              <select
+                value={page}
+                onChange={(e) => handlePageSelect(Number(e.target.value))}
+                className='border p-1 rounded'
+              >
+                {Array.from(
+                  { length: jobs?.totalPages ?? 1 },
+                  (_, i) => i + 1
+                ).map((pageNum) => (
+                  <option key={pageNum} value={pageNum}>
+                    {pageNum}
+                  </option>
+                ))}
+              </select>{" "}
+              of {jobs?.totalPages ?? 1}
+            </span>
+            <Button
+              onClick={handleNextPage}
+              disabled={page === (jobs?.totalPages ?? 1)}
+              variant='outline'
+            >
+              Next
+            </Button>
+          </div>
+        </>
       )}
     </>
   );

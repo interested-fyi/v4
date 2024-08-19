@@ -4,19 +4,13 @@ import React, { useState } from "react";
 import CandidateSignUpForm from "../forms/CandidateSignUpForm";
 import CompanySignUpForm from "../forms/CompanySignUpForm";
 import { Button } from "../ui/button";
-import { usePrivy } from "@privy-io/react-auth";
 import { Separator } from "../ui/separator";
 export function SignupForms() {
   const [formType, setFormType] = useState<"candidate" | "company" | null>(
     null
   );
-  const { login, authenticated } = usePrivy();
 
   const handleClick = (value: "candidate" | "company" | null) => {
-    if (!authenticated && value === "company") {
-      login();
-      return;
-    }
     setFormType(value);
 
     const formSection = document.getElementById("formSection");
@@ -63,7 +57,7 @@ export function SignupForms() {
               <CandidateSignUpForm />
             </div>
           )}
-          {authenticated && formType === "company" && (
+          {formType === "company" && (
             <div>
               <CompanySignUpForm />
             </div>
