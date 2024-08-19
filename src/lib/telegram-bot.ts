@@ -1,4 +1,5 @@
 import { Bot } from "grammy";
+import supabase from "./supabase";
 const dotenv = require('dotenv').config();
 
 const botToken = process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test" ? process.env.TELEGRAM_DEV_BOT_KEY ?? '': process.env.TELEGRAM_BOT_KEY ?? '';
@@ -38,6 +39,26 @@ bot.on("callback_query:data", async (ctx) => {
     const referralUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/referral/telegram?userId=${referrerId}&jobId=${jobId}&chatName=${chatName}&msgId=${msgId}`
     console.log(`Job: ${jobId}, referrer: ${referrerUsername} (${referrerId}), url: ${telegramPostUrl}`)
     console.log(`Sender Chat: ${JSON.stringify(ctx.senderChat)} / ${JSON.stringify(ctx.callbackQuery.message?.sender_chat)}`)
+    const { error: updateUserError } = await supabase.from('telegram_users').upsert({
+        telegram_user_id: referrerId,
+        username: referrerUsername,
+        first_name: ctx.callbackQuery.from.first_name,
+        last_name: ctx.callbackQuery.from.last_name
+    }, { onConflict: 'telegram_user_id' });
+    if (updateUserError) {
+        console.error(`Error updating or adding telegram user: ${updateUserError}`);
+    }
+
+    const { error: logLinkGenError } = await supabase.from('referral_link_generated').insert({
+        telegram_user_id: referrerId,
+        job_id: jobId,
+        url: referralUrl,
+        source: 'telegram'
+    })
+    if (logLinkGenError) {
+        console.error(`Error logging referral link generation: ${logLinkGenError}`);
+    }
+
     // await ctx.reply(`Share the below link to share this job\n${telegramPostUrl}`, { parse_mode: 'HTML'});
     const chatUrl = `https://t.me/interested_fyi_dev_bot?start=job:${jobId}_chatName:${chatName}_msgId:${msgId}`;
     console.log(`Chat URL: ${chatUrl}`);

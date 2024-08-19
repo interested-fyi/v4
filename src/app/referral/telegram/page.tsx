@@ -16,6 +16,7 @@ const TelegramReferralPageContent = () => {
   useEffect(() => {
     console.log(`User Id: ${userId} / jobId: ${jobId} / post: ${chatName} (${msgId})`);
     if (userId && jobId && chatName && msgId) {
+      const telegramPostUrl = `https://t.me/${chatName}/${msgId}`
       const logReferralClick = async () => {
         try {
           await fetch('/api/referrals/telegram', {
@@ -26,8 +27,7 @@ const TelegramReferralPageContent = () => {
             body: JSON.stringify({
               userId,
               jobId,
-              chatName,
-              msgId,
+              telegramPostUrl
             }),
           });
         } catch (error) {
@@ -38,7 +38,6 @@ const TelegramReferralPageContent = () => {
       logReferralClick();
 
       // Redirect to the provided URL after logging
-      const telegramPostUrl = `https://t.me/${chatName}/${msgId}`
       router.replace(telegramPostUrl);
     }
   }, [userId, jobId, chatName, msgId, router]);
