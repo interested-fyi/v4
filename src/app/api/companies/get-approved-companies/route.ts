@@ -21,16 +21,25 @@ export interface CompanyResponse {
 
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
-    // Get approved companies and count of jobs for each company
+    // Extract page and limit from query parameters
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "20", 10);
+
+    // Calculate the starting point for pagination
+    const offset = (page - 1) * limit;
+
+    // Get approved companies with pagination and count of jobs for each company
     const { data: companyData, error: companyError } = await supabase
       .from("companies")
       .select(
         `
-                *,
-                job_postings ( id )
-            `
+          *,
+          job_postings ( id )
+        `
       )
-      .eq("approved", true);
+      .eq("approved", true)
+      .range(offset, offset + limit - 1); // Apply pagination using range
 
     if (companyError) {
       throw new Error(`Error fetching company data: ${companyError}`);
@@ -53,8 +62,26 @@ export async function GET(req: NextRequest, res: NextResponse) {
       })
     );
 
+    // Get the total number of approved companies
+    const { count: totalCompanies, error: countError } = await supabase
+      .from("companies")
+      .select("*", { count: "exact", head: true })
+      .eq("approved", true);
+
+    if (countError) {
+      throw new Error(`Error fetching companies count: ${countError}`);
+    }
+
+    const totalPages = Math.ceil((totalCompanies || 0) / limit);
+
     return NextResponse.json(
-      { success: true, companies: companiesWithJobCount },
+      {
+        success: true,
+        companies: companiesWithJobCount,
+        totalCompanies,
+        currentPage: page,
+        totalPages,
+      },
       { status: 200 }
     );
   } catch (e) {
