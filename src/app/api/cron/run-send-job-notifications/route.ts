@@ -42,13 +42,21 @@ export async function GET(req: NextRequest) {
 
             if (recentPostsCount[companyId] < 5) {
                 console.log(`Posting job for company: ${companyId}, ${job.jod_posting_id}`);
+                const content = `<strong>Position: </strong>${job.title}<br />
+                <strong>Location: </strong>${job.location}<br />
+                <strong>Compensation: </strong>${job.compensation}<br /><br />
+                ${job.summary}`
                 const postPromise = fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/telegram/send-job-to-channel`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${process.env.CRON_SECRET}`
                     },
-                    body: JSON.stringify({ job: job })
+                    body: JSON.stringify({ job: {
+                        summary: content,
+                        job_posting_id: job.job_posting_id,
+                        posting_url: job.posting_url
+                    }})
                 })
                 .then(async (response) => {
                     if (response.ok) {
