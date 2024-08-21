@@ -11,9 +11,6 @@ const UnauthedNav = ({ login }: UnauthedNavProps) => {
       <Link href={"/explore"}>
         <Button variant={"secondary"}>Explore Jobs</Button>
       </Link>
-      <Button variant={"secondary"} onClick={login}>
-        Login
-      </Button>
     </>
   );
 };

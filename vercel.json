@@ -1,0 +1,12 @@
+{
+    "crons": [
+      {
+        "path": "/api/cron/companies/run-listings-scraper",
+        "schedule": "10 * * * *"
+      },
+      {
+        "path": "/api/cron/companies/run-details-scraper",
+        "schedule": "*/10 * * * *"
+      }
+    ]
+  }

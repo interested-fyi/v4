@@ -19,7 +19,10 @@ export const ShareJobDetails: React.FC<ShareJobDetailsProps> = ({
   const pathName = usePathname();
 
   const pathNameURLEncoded = encodeURIComponent(
-    "https://interested.fyi" + pathName + "?referral=" + user?.farcaster?.fid
+    "https://interested.fyi" +
+      pathName +
+      "?referral=" +
+      user?.telegram?.telegramUserId
   );
   const shareText =
     "i+found+this+job+on+%40interestedFYI+and+wanted+to+share+it!+Nominate+me+or+apply+for+the+role+if+you+think+you+would+be+a+good+fit!";
@@ -95,7 +98,7 @@ export const ShareJobDetails: React.FC<ShareJobDetailsProps> = ({
           </div>
           <div className='flex gap-4 items-center'>
             <Link
-              href={`mailto:?subject=Check out this job on Interested.fyi&body=I found this job on Interested.fyi and wanted to share it! Nominate me or apply for the role if you think you would be a good fit!%0D%0A%0D%0Ahttp://localhost:3000${pathName}?referral=${user?.farcaster?.fid}`}
+              href={`mailto:?subject=Check out this job on Interested.fyi&body=I found this job on Interested.fyi and wanted to share it! Nominate me or apply for the role if you think you would be a good fit!%0D%0A%0D%0Ahttp://localhost:3000${pathName}?referral=${user?.telegram?.telegramUserId}`}
             >
               <ShareButton
                 className='w-8 h-6  justify-center'
@@ -121,7 +124,7 @@ export const ShareJobDetails: React.FC<ShareJobDetailsProps> = ({
               icon={<LinkIcon stroke='#444444' />}
               onClick={() => {
                 navigator.clipboard.writeText(
-                  `http://localhost:3000${pathName}?referral=${user?.farcaster?.fid}`
+                  `http://localhost:3000${pathName}?referral=${user?.telegram?.telegramUserId}`
                 );
               }}
             />

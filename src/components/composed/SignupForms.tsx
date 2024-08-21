@@ -4,19 +4,13 @@ import React, { useState } from "react";
 import CandidateSignUpForm from "../forms/CandidateSignUpForm";
 import CompanySignUpForm from "../forms/CompanySignUpForm";
 import { Button } from "../ui/button";
-import { usePrivy } from "@privy-io/react-auth";
 import { Separator } from "../ui/separator";
 export function SignupForms() {
   const [formType, setFormType] = useState<"candidate" | "company" | null>(
     null
   );
-  const { login, authenticated } = usePrivy();
 
   const handleClick = (value: "candidate" | "company" | null) => {
-    if (!authenticated) {
-      login();
-      return;
-    }
     setFormType(value);
 
     const formSection = document.getElementById("formSection");
@@ -55,21 +49,21 @@ export function SignupForms() {
         >
           Refer
         </Button> */}
-        {authenticated ? (
-          <section className='flex flex-col gap-12 relative z-50'>
-            {formType !== null ? <Separator /> : null}
-            {formType === "candidate" && (
-              <div>
-                <CandidateSignUpForm />
-              </div>
-            )}
-            {formType === "company" && (
-              <div>
-                <CompanySignUpForm />
-              </div>
-            )}
-          </section>
-        ) : null}
+
+        <section className='flex flex-col gap-12 relative z-50'>
+          {formType !== null ? <Separator /> : null}
+          {formType === "candidate" && (
+            <div>
+              <CandidateSignUpForm />
+            </div>
+          )}
+          {formType === "company" && (
+            <div>
+              <CompanySignUpForm />
+            </div>
+          )}
+        </section>
+
         <div id='formSection' className='h-0 w-0' />
       </div>
     </>

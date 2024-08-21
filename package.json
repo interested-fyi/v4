@@ -2,8 +2,9 @@
   "name": "web-new",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --experimental-https -H 0.0.0.0",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -19,11 +20,13 @@
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-dropdown-menu": "^2.1.1",
     "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-select": "^2.1.1",
     "@radix-ui/react-separator": "^1.1.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-switch": "^1.1.0",
     "@radix-ui/react-toast": "^1.2.1",
     "@reduxjs/toolkit": "^2.2.6",
+    "@sparticuz/chromium": "^126.0.0",
     "@standard-crypto/farcaster-js": "^7.4.0",
     "@supabase/supabase-js": "^2.44.2",
     "@tanstack/react-query": "^5.50.1",
@@ -43,8 +46,10 @@
     "ldrs": "^1.0.2",
     "lucide-react": "^0.400.0",
     "next": "14.2.4",
+    "openai": "^4.52.7",
     "posthog-js": "^1.146.0",
     "puppeteer": "^22.12.1",
+    "puppeteer-core": "10.1.0",
     "react": "^18",
     "react-dom": "^18",
     "react-redux": "^9.1.2",
@@ -67,6 +72,7 @@
     "tailwindcss": "^3.4.1",
     "ts-jest": "^29.2.0",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5"
   }
 }

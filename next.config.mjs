@@ -11,6 +11,20 @@ const nextConfig = {
       },
     ],
   },
+  webpack: (config, { isServer }) => {
+    config.module.rules.push({
+      test: /\.py$/,
+      loader: 'ignore-loader'
+    });
+
+    return config;
+  },
+  experimental: {
+    serverComponentsExternalPackages: [
+      'puppeteer-core',
+      '@sparticuz/chromium'
+    ]
+  }
 };
 
 export default nextConfig;

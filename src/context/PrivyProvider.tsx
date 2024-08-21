@@ -11,6 +11,7 @@ const PrivyProviderWrapper = ({ children }: { children: React.ReactNode }) => {
         embeddedWallets: {
           createOnLogin: "users-without-wallets", // defaults to 'off'
         },
+        loginMethods: ['telegram']
       }}
     >
       {children}

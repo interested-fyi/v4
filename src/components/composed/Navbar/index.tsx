@@ -12,7 +12,7 @@ const Navbar = () => {
           <Image
             width={165}
             height={28}
-            src='/main-logo.png'
+            src='/images/main-logo.png'
             alt='Interested Logo'
           />
         </AspectRatio>
