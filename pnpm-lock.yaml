@@ -101,6 +101,9 @@ importers:
       frog:
         specifier: ^0.16.1
         version: 0.16.1(@types/node@20.16.1)(bufferutil@4.0.8)(hono@4.5.7)(typescript@5.5.4)(utf-8-validate@5.0.10)(zod@3.23.8)
+      grammy:
+        specifier: ^1.28.0
+        version: 1.28.0(encoding@0.1.13)
       jest:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@20.16.1)(ts-node@10.9.2(@types/node@20.16.1)(typescript@5.5.4))
@@ -674,6 +677,9 @@ packages:
 
   '@floating-ui/utils@0.2.7':
     resolution: {integrity: sha512-X8R8Oj771YRl/w+c1HqAC1szL8zWQRwFvgDwT129k9ACdBoud/+/rX9V0qiMl6LWUdP9voC2nDVZYPMQQsb6eA==}
+
+  '@grammyjs/types@3.12.0':
+    resolution: {integrity: sha512-ttC8mFeE+52XwpuXzWarvj5CXWRL2PfHSf1X3WDBC7EzQUqrbPLjJTMnm2ikSOqyTwVseJhtujZ+v42A6NbZmQ==}
 
   '@headlessui/react@1.7.19':
     resolution: {integrity: sha512-Ll+8q3OlMJfJbAKM/+/Y2q6PPYbryqNTXDbryx7SXLIDamkF6iQFbriYHga0dY44PvDhvvBWCx1Xj4U5+G4hOw==}
@@ -3378,6 +3384,10 @@ packages:
 
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
+
+  grammy@1.28.0:
+    resolution: {integrity: sha512-TwCj5IHlK0I1fhfIGPIhMP61L5mmub7NMMswrpsqZSjtzo7iDDwVIz1dvsKj8FhX046AfAM/Lt99nW8FzIEKgQ==}
+    engines: {node: ^12.20.0 || >=14.13.1}
 
   graphemer@1.4.0:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
@@ -6606,6 +6616,8 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
 
   '@floating-ui/utils@0.2.7': {}
+
+  '@grammyjs/types@3.12.0': {}
 
   '@headlessui/react@1.7.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
@@ -10144,6 +10156,16 @@ snapshots:
       get-intrinsic: 1.2.4
 
   graceful-fs@4.2.11: {}
+
+  grammy@1.28.0(encoding@0.1.13):
+    dependencies:
+      '@grammyjs/types': 3.12.0
+      abort-controller: 3.0.0
+      debug: 4.3.5(supports-color@5.5.0)
+      node-fetch: 2.7.0(encoding@0.1.13)
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
 
   graphemer@1.4.0: {}
 
