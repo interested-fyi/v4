@@ -9,6 +9,7 @@ const bot = new Bot(botToken);
 bot.command('start', async (ctx) => {
     try {
         const startParam = ctx.match; // This is the base64 encoded string
+        console.log(`Start Param: ${startParam}`)
         const decodedParams = JSON.parse(Buffer.from(startParam, 'base64').toString('utf8'));
 
         const { jobId, chatName, msgId } = decodedParams;
