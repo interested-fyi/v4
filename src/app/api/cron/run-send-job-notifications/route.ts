@@ -41,11 +41,11 @@ export async function GET(req: NextRequest) {
             }
 
             if (recentPostsCount[companyId] < 5) {
-                console.log(`Posting job for company: ${companyId}, ${job.jod_posting_id}`);
-                const content = `<strong>Position: </strong>${job.title}<br />
-                <strong>Location: </strong>${job.location}<br />
-                <strong>Compensation: </strong>${job.compensation}<br /><br />
-                ${job.summary}`
+                console.log(`Posting job for company: ${companyId}, ${job.job_posting_id}`);
+                const content = `<b>${job.company_name}</b>\n<b>Position: </b>${job.title}\n<b>Location: </b>${job.location}\n<b>Compensation: </b>${job.compensation}\n\n${job.summary}`
+
+                recentPostsCount[companyId]++;  // Increment after a successful post
+
                 const postPromise = fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/telegram/send-job-to-channel`, {
                     method: 'POST',
                     headers: {
@@ -68,7 +68,7 @@ export async function GET(req: NextRequest) {
                                 msg_url: responseData.url,  // Replace with actual URL returned by the Telegram API
                                 msg_id: responseData.message_id,
                                 msg_channel: process.env.TELEGRAM_CHANNEL_NAME,  // Replace with the actual Telegram channel name
-                                msg_content: `${job.title}: ${job.summary}`,
+                                msg_content: content,
                             });
 
                         if (error) {
@@ -76,7 +76,6 @@ export async function GET(req: NextRequest) {
                             throw error;
                         } else {
                             console.log(`Job ${job.job_posting_id} successfully posted to Telegram.`);
-                            recentPostsCount[companyId]++;  // Increment after a successful post
                             return { job_posting_id: job.job_posting_id, status: 'fulfilled' };
                         }
                     } else {
