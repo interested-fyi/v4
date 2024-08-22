@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
         const { job } = await req.json();
         console.log(`sending telegram message: ${job.job_posting_id} (${job.posting_url})`);
         const { message_id } = await sendTelegramMessage(
-            process.env.TELEGRAM_CHANNEL_NAME ?? '', 
+            process.env.TELEGRAM_CHANNEL_ID ?? '', 
             job.summary, 
             'HTML',
             new InlineKeyboard().text('Refer a Friend', `job=${job.job_posting_id}`).url('Apply Now', jobUrlBuilder(job.posting_url))
