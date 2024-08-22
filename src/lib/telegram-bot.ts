@@ -46,7 +46,7 @@ bot.on("callback_query:data", async (ctx) => {
         last_name: ctx.callbackQuery.from.last_name
     }, { onConflict: 'telegram_user_id' });
     if (updateUserError) {
-        console.error(`Error updating or adding telegram user: ${updateUserError}`);
+        console.error(`Error updating or adding telegram user: ${JSON.stringify(updateUserError)}`);
     }
 
     const { error: logLinkGenError } = await supabase.from('referral_link_generated').insert({
