@@ -23,7 +23,6 @@ export async function GET(req: NextRequest) {
         for (const job of jobs) {
             try {
                 // Initiate scrape job details request without awaiting
-                console.log(`fetching job details for: ${job.role_title} at ${job.company_id}`);
                 fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/companies/scrape-job-details`, {
                     method: 'POST',
                     headers: {
