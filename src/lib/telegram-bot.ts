@@ -7,24 +7,21 @@ console.log(`bot token: ${botToken}`)
 const bot = new Bot(botToken);
 
 bot.command('start', async (ctx) => {
-    console.log(`Match: ${ctx.match}`);
-    const regex = /job:([^:]+)_tgUrl:(.+)/;
+    try {
+        const startParam = ctx.match; // This is the base64 encoded string
+        const decodedParams = JSON.parse(Buffer.from(startParam, 'base64').toString('utf8'));
 
-    const match = ctx.match.match(regex);
-
-    console.log(`DM Chat ID: ${JSON.stringify(ctx.chat)}`)
-    console.log(`Match Regex: ${match}`)
-    if (match && match.groups) {
-        console.log(`Match: ${match}`)
-        const jobId = match[0];
-        const telegramUrl = match[1];
+        const { jobId, chatName, msgId } = decodedParams;
 
         console.log("Job ID:", jobId);
-        console.log("Telegram URL:", telegramUrl);
-        await ctx.reply(`Copy this link to refer a friend to this job:\n\n${telegramUrl}`)
-    } else {
-        console.log("No match found");
-        await ctx.reply(`Welcome to Interested.FYI!`)
+        console.log("Chat Name:", chatName);
+        console.log("Message ID:", msgId);
+
+        const telegramUrl = `https://t.me/${chatName}/${msgId}`;
+        await ctx.reply(`Copy this link to refer a friend to this job:\n\n${telegramUrl}`);
+    } catch (error) {
+        console.error("Error decoding start param:", error);
+        await ctx.reply(`Welcome to Interested.FYI!`);
     }
 })
 
@@ -60,7 +57,13 @@ bot.on("callback_query:data", async (ctx) => {
     }
 
     // await ctx.reply(`Share the below link to share this job\n${telegramPostUrl}`, { parse_mode: 'HTML'});
-    const chatUrl = `https://t.me/interested_fyi_dev_bot?start=job:${jobId}_chatName:${chatName}_msgId:${msgId}`;
+    const params = {
+        jobId: jobId,
+        chatName: chatName,
+        msgId: msgId,
+    }
+    const startParam = Buffer.from(JSON.stringify(params)).toString('base64');
+    const chatUrl = `https://t.me/interested_fyi_bot?start=${startParam}`;
     console.log(`Chat URL: ${chatUrl}`);
     try {
         await ctx.api.sendMessage(referrerId, `Copy this link to refer a friend to this job:\n\n${referralUrl}`);
