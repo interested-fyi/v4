@@ -38,13 +38,11 @@ export async function GET(req: NextRequest, res: NextResponse) {
     }
 
     // Return the job data
-    console.log("🚀 ~ GET ~ job.companies[0]:", job.companies);
     return NextResponse.json(
       {
         success: true,
         job: {
           ...job,
-          company_name: job.companies.company_name, // Include the company name from the relation
         },
       },
       { status: 200 }
