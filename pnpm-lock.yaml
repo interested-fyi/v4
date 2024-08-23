@@ -10161,7 +10161,7 @@ snapshots:
     dependencies:
       '@grammyjs/types': 3.12.0
       abort-controller: 3.0.0
-      debug: 4.3.5(supports-color@5.5.0)
+      debug: 4.3.6(supports-color@5.5.0)
       node-fetch: 2.7.0(encoding@0.1.13)
     transitivePeerDependencies:
       - encoding
