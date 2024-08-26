@@ -80,6 +80,7 @@ export default async function greenhouseScraper(url: string, company_id?: number
                 $('div.job-posts').each((_, jobPostSection) => {
                     const department = $(jobPostSection).find('h3.section-header').text().trim();
 
+                    console.log(`job post section: ${jobPostSection}`);
                     $(jobPostSection).find('tr.job-post').each((_, jobPost) => {
                         const role = $(jobPost).find('td.cell > a > p.body.body--medium').text().trim();
                         const location = $(jobPost).find('td.cell > a > p.body.body__secondary.body--metadata').text().trim();
@@ -88,6 +89,7 @@ export default async function greenhouseScraper(url: string, company_id?: number
                             jobUrl = `${baseUrl}${jobUrl}`;
                         }
 
+                        console.log(`adding job posting: ${role} (${jobUrl})`)
                         jobPostings.push({
                             department: department,
                             role_title: role,
