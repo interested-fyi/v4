@@ -51,7 +51,9 @@ export default async function greenhouseScraper(url: string, company_id?: number
                 const department = section.find('h3').text().trim() || parentDepartment;
                 const subDepartment = section.find('h4').text().trim() || parentSubDepartment;
     
-                section.find('.opening').each((_, opening) => {
+                const openings = section.find('.opening').toArray();
+
+                for (const opening of openings) {
                     const role = $(opening).find('a').text().trim();
                     const location = $(opening).find('.location').text().trim();
                     let url = $(opening).find('a').attr('href') ?? '';
@@ -74,7 +76,7 @@ export default async function greenhouseScraper(url: string, company_id?: number
                     } else {
                         console.log(`Skipping duplicate scraped job: ${url}`)
                     }
-                });
+                };
     
                 // Recursively handle child sections
                 section.find('section.child').each((_, childSection) => {
@@ -86,7 +88,9 @@ export default async function greenhouseScraper(url: string, company_id?: number
             const extractJobsV2 = () => {
                 $('div.job-posts').each((_, jobPostSection) => {
                     const department = $(jobPostSection).find('h3.section-header').text().trim();
-                    $(jobPostSection).find('tr.job-post').each((_, jobPost) => {
+                    
+                    const jobPosts = $(jobPostSection).find('tr.job-post').toArray();
+                    for (const jobPost of jobPosts) {
                         const role = $(jobPost).find('td.cell > a > p.body.body--medium').text().trim();
                         const location = $(jobPost).find('td.cell > a > p.body.body__secondary.body--metadata').text().trim();
                         let jobUrl = $(jobPost).find('td.cell > a').attr('href') ?? '';
@@ -107,7 +111,7 @@ export default async function greenhouseScraper(url: string, company_id?: number
                         } else {
                             console.log(`Skipping duplicate scraped job: ${url}`)
                         }
-                    });
+                    };
                 });
             };
     
