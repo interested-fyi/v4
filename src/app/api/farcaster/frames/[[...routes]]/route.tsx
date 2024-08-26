@@ -10,7 +10,6 @@ import { neynar as neynarMiddle } from "frog/middlewares";
 const app = new Frog({
   assetsPath: "/",
   basePath: "/api/farcaster/frames",
-  // Supply a Hub to enable frame verification.
   hub: neynar({ apiKey: process.env.NEYNAR_API_KEY || "" }),
   title: "Interested FYI - Job Posting",
 });
@@ -21,7 +20,6 @@ const neynarMiddleware = neynarMiddle({
 });
 // Uncomment to use Edge Runtime
 // export const runtime = 'edge'
-
 app.frame("/jobs/:id", neynarMiddleware, async (c) => {
   const { id } = c.req.param();
   const text = c.var.cast?.text;
@@ -32,119 +30,94 @@ app.frame("/jobs/:id", neynarMiddleware, async (c) => {
   ).then((res) => res.json());
 
   const pageUrl = `${process.env.NEXT_PUBLIC_HOST}/referral/telegram?fid=${c.var.interactor?.fid}&jobId=${id}&chatName=${chatName}&msgId=${msgId}`;
+  const jobPosting = `
+Galaxy Digital Services
+Position: Equity Research Associate
+Location: New York, NY
+Compensation: $150,000 - $175,000
+
+Galaxy Digital Services is seeking an Equity Research Associate to join their Asset Management team. The ideal candidate will have a minimum of three years of experience in equity research related to energy and global power investments, along with demonstrated skills in analysis and financial modeling. Responsibilities include working closely with the portfolio manager, conducting due diligence on public companies, and collaborating with the investment team on portfolio construction. This is a great opportunity for self-starters who thrive in a dynamic environment focused on the crypto market.
+  `;
+
+  const companyRegex = /^([\s\S]+?)\s*Position:/;
+  const positionRegex = /Position:\s*(.+)/;
+  const locationRegex = /Location:\s*(.+)/;
+  const compensationRegex = /Compensation:\s*(.+)/;
+  const descriptionRegex = /Compensation:\s*.+\n+([\s\S]*)/;
+
+  const companyMatch = jobPosting.match(companyRegex);
+  const positionMatch = jobPosting.match(positionRegex);
+  const locationMatch = jobPosting.match(locationRegex);
+  const compensationMatch = jobPosting.match(compensationRegex);
+  const descriptionMatch = jobPosting.match(descriptionRegex);
+
+  const company = companyMatch ? companyMatch[1].trim() : null;
+  const position = positionMatch ? positionMatch[1].trim() : null;
+  const location = locationMatch ? locationMatch[1].trim() : null;
+  const compensation = compensationMatch ? compensationMatch[1].trim() : null;
+  const description = descriptionMatch ? descriptionMatch[1].trim() : null;
 
   return c.res({
     image: (
       <div
         style={{
-          alignItems: "flex-start",
-          background: "linear-gradient(to right, #2640EB 97%, #E8FC6C 3%)",
-          backgroundSize: "100% 100%",
           display: "flex",
           flexDirection: "column",
-          flexWrap: "nowrap",
-          height: "100%",
           justifyContent: "center",
-          textAlign: "center",
+          alignItems: "flex-start",
+          padding: "20px",
+          background: "linear-gradient(to right, #2640EB 97%, #E8FC6C 3%)",
+          borderRadius: "8px",
+          textAlign: "left",
           width: "100%",
+          height: "100%",
+
           margin: "0 auto",
-          padding: "0 40px",
         }}
       >
+        <h2
+          style={{
+            color: "white",
+            fontSize: "32px",
+            margin: "0 0 10px",
+          }}
+        >
+          {position} - {company}
+        </h2>
+
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            margin: "0 auto",
-            gap: 20,
+            background: "white",
+            borderRadius: "8px",
+            padding: "15px",
+            width: "100%",
+            textAlign: "left",
+            fontSize: "24px",
+            color: "black",
           }}
         >
-          <p
-            style={{
-              color: "white",
-              fontSize: 40,
-              fontStyle: "normal",
-              letterSpacing: "-0.025em",
-              lineHeight: 1.4,
-              margin: 0,
-              padding: 0,
-              flexFlow: "wrap",
-            }}
-          >
-            <span>{jobData.job.role_title}</span> -{" "}
-            <span> {jobData.job.companies.company_name}</span>
-          </p>
-          <div
-            style={{
-              borderRadius: 10,
-              background: "white",
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-              width: "90%",
-              height: 300,
-              gap: 20,
-              padding: "0 64px",
-            }}
-          >
-            <p
-              style={{
-                color: "black",
-                fontSize: 26,
-                fontStyle: "normal",
-                letterSpacing: "-0.025em",
-                lineHeight: 1.4,
-                whiteSpace: "pre-wrap",
-                textAlign: "left",
-              }}
-            >
-              {text}
-            </p>
-            <p
-              style={{
-                color: "black",
-                fontSize: 26,
-                fontStyle: "normal",
-                letterSpacing: "-0.025em",
-                lineHeight: 1.4,
-                whiteSpace: "pre-wrap",
-                textAlign: "left",
-              }}
-            >
-              Location: {jobData.job.location}
-            </p>
+          <p>{description}</p>
+          <div style={{ display: "flex", justifyContent: "space-around" }}>
+            <p>{compensation}</p>
+            <p>{location}</p>
           </div>
-          {/* add a badge with 'interestedFYI' in it */}
-          <div
-            style={{
-              borderRadius: 10,
-              background: "white",
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-              width: "40%",
-              margin: "24px 0",
-              height: 72,
-              padding: "0 20px",
-            }}
-          >
-            <p
-              style={{
-                color: "black",
-                fontSize: 26,
-                fontStyle: "bold",
-                letterSpacing: "-0.025em",
-                lineHeight: 1.4,
-                whiteSpace: "pre-wrap",
-                textAlign: "left",
-                padding: "16px",
-              }}
-            >
-              Interested FYI
-            </p>
-          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            marginTop: "15px",
+            background: "white",
+            borderRadius: "8px",
+            padding: "10px 20px",
+            color: "black",
+            fontSize: "18px",
+            fontWeight: "bold",
+          }}
+        >
+          Interested FYI
         </div>
       </div>
     ),
@@ -161,7 +134,6 @@ devtools(app, { serveStatic });
 
 export const GET = handle(app);
 export const POST = handle(app);
-
 // NOTE: That if you are using the devtools and enable Edge Runtime, you will need to copy the devtools
 // static assets to the public folder. You can do this by adding a script to your package.json:
 // ```json
