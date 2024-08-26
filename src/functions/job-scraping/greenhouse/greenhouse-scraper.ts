@@ -73,6 +73,8 @@ export default async function greenhouseScraper(url: string, company_id?: number
                             type: 'greenhouse',
                             company_id: company_id                        
                         });
+
+                        processedUrls.add(url);
                     } else {
                         console.log(`Skipping duplicate scraped job: ${url}`)
                     }
@@ -108,6 +110,8 @@ export default async function greenhouseScraper(url: string, company_id?: number
                                 type: 'greenhouse',
                                 company_id: company_id
                             });
+
+                            processedUrls.add(jobUrl)
                         } else {
                             console.log(`Skipping duplicate scraped job: ${url}`)
                         }
