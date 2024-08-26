@@ -73,6 +73,7 @@ export default async function greenhouseScraper(url: string, company_id?: number
     
                 // Recursively handle child sections
                 section.find('section.child').each((_, childSection) => {
+                    console.log(`running subsection jobs`)
                     extractJobsRegular($(childSection), department, subDepartment);
                 });
             }
@@ -106,6 +107,7 @@ export default async function greenhouseScraper(url: string, company_id?: number
                 extractJobsV2();
             } else {
                 $('section.level-0').each((_, section) => {
+                    console.log(`extracting for: ${section}`)
                     extractJobsRegular($(section), '');
                 });
             }
