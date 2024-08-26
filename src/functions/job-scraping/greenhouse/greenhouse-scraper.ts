@@ -12,6 +12,7 @@ export default async function greenhouseScraper(url: string, company_id?: number
     try {
         const { boardUrl, accountName } = await getBoardUrl(url);
         const jobPostings: JobPosting[] = [];
+        const processedUrls = new Set();
 
         if (boardUrl) {
             // Uncomment for development
@@ -59,16 +60,20 @@ export default async function greenhouseScraper(url: string, company_id?: number
                     }
 
                     console.log(`adding job posting: ${role} (${url})`)
-                    jobPostings.push({
-                        department: department,
-                        sub_department: subDepartment,
-                        role_title: role,
-                        location: location,
-                        posting_url: url,
-                        active: true,
-                        type: 'greenhouse',
-                        company_id: company_id                        
-                    });
+                    if(!processedUrls.has(url)) {
+                        jobPostings.push({
+                            department: department,
+                            sub_department: subDepartment,
+                            role_title: role,
+                            location: location,
+                            posting_url: url,
+                            active: true,
+                            type: 'greenhouse',
+                            company_id: company_id                        
+                        });
+                    } else {
+                        console.log(`Skipping duplicate scraped job: ${url}`)
+                    }
                 });
     
                 // Recursively handle child sections
@@ -89,15 +94,19 @@ export default async function greenhouseScraper(url: string, company_id?: number
                             jobUrl = `${baseUrl}${jobUrl}`;
                         }
 
-                        jobPostings.push({
-                            department: department,
-                            role_title: role,
-                            location: location,
-                            posting_url: jobUrl,
-                            active: true,
-                            type: 'greenhouse',
-                            company_id: company_id
-                        });
+                        if (!processedUrls.has(jobUrl)) {
+                            jobPostings.push({
+                                department: department,
+                                role_title: role,
+                                location: location,
+                                posting_url: jobUrl,
+                                active: true,
+                                type: 'greenhouse',
+                                company_id: company_id
+                            });
+                        } else {
+                            console.log(`Skipping duplicate scraped job: ${url}`)
+                        }
                     });
                 });
             };
