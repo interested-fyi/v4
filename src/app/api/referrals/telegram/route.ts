@@ -1,28 +1,51 @@
-import { NextResponse } from 'next/server';
-import supabase from '@/lib/supabase';
+import { NextResponse } from "next/server";
+import supabase from "@/lib/supabase";
 
 export async function POST(req: Request) {
-  const { userId, jobId, telegramPostUrl } = await req.json();
+  const { userId, fid, jobId, telegramPostUrl } = await req.json();
 
   try {
-    // save link click to supabase
-    console.log(`Link clicked: user ${userId}, job ${jobId} - ${telegramPostUrl}`);
+    if (userId) {
+      // save link click to supabase
+      console.log(
+        `Link clicked: user ${userId}, job ${jobId} - ${telegramPostUrl}`
+      );
 
-    // log click in referral_link_clicks table for user, source and jobId
-    const { error } = await supabase.from('referral_link_click').insert({
+      // log click in referral_link_clicks table for user, source and jobId
+      const { error } = await supabase.from("referral_link_click").insert({
         job_id: jobId,
         telegram_user_id: userId,
         url: telegramPostUrl,
-        source: 'telegram'
-    });
+        source: "telegram",
+      });
 
-    if (error) {
-        throw new Error('Error logging link click');
+      if (error) {
+        throw new Error("Error logging link click");
+      }
+
+      return NextResponse.json({ success: true });
+    } else if (fid) {
+      // save link click to supabase
+      console.log(
+        `Link clicked: fid ${fid}, job ${jobId} - ${telegramPostUrl}`
+      );
+
+      // log click in referral_link_clicks table for user, source and jobId
+      // const { error } = await supabase.from("referral_link_click").insert({
+      //   job_id: jobId,
+      //   farcaster_user_id: fid,
+      //   url: telegramPostUrl,
+      //   source: "farcaster",
+      // });
+
+      // if (error) {
+      //   throw new Error("Error logging link click");
+      // }
+
+      return NextResponse.json({ success: true });
     }
-
-    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error logging referral:', error);
+    console.error("Error logging referral:", error);
     return NextResponse.json({ success: false, error: error }, { status: 500 });
   }
 }

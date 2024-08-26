@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
         text: job.summary,
         embeds: [
           {
-            url: `${process.env.NEXT_PUBLIC_HOST}/api/farcaster/frames/jobs/${job.job_posting_id}?telegramURL=interestedfyi/33}`,
+            url: `${process.env.NEXT_PUBLIC_HOST}/api/farcaster/frames/jobs/${job.job_posting_id}?chatName=${process.env.TELEGRAM_CHANNEL_NAME}&msgId=${message_id}}`,
           },
         ],
       }),
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
 
     fetch(frameURL, options)
       .then((res) => res.json())
-      .then((json) => console.log(json))
+      .then((json) => console.log("🚀 ~ POST ~ json:", json))
       .catch((err) => console.error("error:" + err));
 
     return NextResponse.json(
