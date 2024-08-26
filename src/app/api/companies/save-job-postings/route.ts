@@ -27,9 +27,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
         });
 
         if (newPostings && newPostings.length > 0) {
-            for (const posting of job_postings) {
-                console.log(`Saving Posting: ${JSON.stringify(posting)}`)
-            }
             const { data: saveData, error: saveError } = await supabase.from('job_postings').upsert(newPostings, { onConflict: 'posting_url' }).select();
 
             if (saveError) throw new Error(`Error saving new job postings to database: ${JSON.stringify(saveError)}`);
