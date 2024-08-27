@@ -1,5 +1,6 @@
 import jobUrlBuilder from "@/functions/general/job-url-builder";
 import sendTelegramMessage from "@/functions/telegram/send-message";
+import { NeynarAPIClient } from "@neynar/nodejs-sdk";
 import { InlineKeyboard } from "grammy";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -10,6 +11,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json("Unauthorized", { status: 401 });
   }
   const frameURL = "https://api.neynar.com/v2/farcaster/cast";
+  if (!process.env.NEYNAR_API_KEY) {
+    throw new Error("Make sure you set NEYNAR_API_KEY in your .env file");
+  }
+
+  const neynarClient = new NeynarAPIClient(process.env.NEYNAR_API_KEY);
 
   try {
     const { job } = await req.json();
@@ -26,27 +32,16 @@ export async function POST(req: NextRequest) {
     );
 
     // send cast containing frame to farcaster
-    const options = {
-      method: "POST",
-      headers: {
-        accept: "application/json",
-        api_key: process.env.NEYNAR_API_KEY ?? "",
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        text: job.summary,
-        embeds: [
-          {
-            url: `${process.env.NEXT_PUBLIC_HOST}/api/farcaster/frames/jobs/${job.job_posting_id}?chatName=${process.env.TELEGRAM_CHANNEL_NAME}&msgId=${message_id}}`,
-          },
-        ],
-      }),
-    };
 
-    fetch(frameURL, options)
-      .then((res) => res.json())
-      .then((json) => console.log("🚀 ~ POST ~ json:", json))
-      .catch((err) => console.error("error:" + err));
+    const signerUUID = "1234";
+
+    const response = await neynarClient.publishCast(signerUUID, job.summary, {
+      embeds: [
+        {
+          url: `${process.env.NEXT_PUBLIC_HOST}/api/farcaster/frames/jobs/${job.job_posting_id}?chatName=${process.env.TELEGRAM_CHANNEL_NAME}&msgId=${message_id}}`,
+        },
+      ],
+    });
 
     return NextResponse.json(
       {

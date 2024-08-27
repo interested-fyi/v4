@@ -12,6 +12,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@neynar/nodejs-sdk": "^1.48.0",
     "@privy-io/react-auth": "^1.74.0",
     "@privy-io/server-auth": "^1.9.1",
     "@radix-ui/react-alert-dialog": "^1.1.1",
@@ -61,7 +62,8 @@
     "tailwindcss-animate": "^1.0.7",
     "ts-jest": "^29.2.2",
     "ts-node": "^10.9.2",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "viem": "^2.20.0"
   },
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^5.50.1",

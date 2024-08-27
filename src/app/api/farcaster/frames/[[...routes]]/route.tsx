@@ -30,14 +30,7 @@ app.frame("/jobs/:id", neynarMiddleware, async (c) => {
   ).then((res) => res.json());
 
   const pageUrl = `${process.env.NEXT_PUBLIC_HOST}/referral/telegram?fid=${c.var.interactor?.fid}&jobId=${id}&chatName=${chatName}&msgId=${msgId}`;
-  const jobPosting = `
-Galaxy Digital Services
-Position: Equity Research Associate
-Location: New York, NY
-Compensation: $150,000 - $175,000
-
-Galaxy Digital Services is seeking an Equity Research Associate to join their Asset Management team. The ideal candidate will have a minimum of three years of experience in equity research related to energy and global power investments, along with demonstrated skills in analysis and financial modeling. Responsibilities include working closely with the portfolio manager, conducting due diligence on public companies, and collaborating with the investment team on portfolio construction. This is a great opportunity for self-starters who thrive in a dynamic environment focused on the crypto market.
-  `;
+  const jobPosting = text ?? "";
 
   const companyRegex = /^([\s\S]+?)\s*Position:/;
   const positionRegex = /Position:\s*(.+)/;
@@ -122,9 +115,11 @@ Galaxy Digital Services is seeking an Equity Research Associate to join their As
       </div>
     ),
     intents: [
+      // eslint-disable-next-line react/jsx-key
       <Button.Link href={jobUrlBuilder(jobData.job.posting_url)}>
         Apply Now
       </Button.Link>,
+      // eslint-disable-next-line react/jsx-key
       <Button.Redirect location={pageUrl}>Follow on Telegram</Button.Redirect>,
     ],
   });
