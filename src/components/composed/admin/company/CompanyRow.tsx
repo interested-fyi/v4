@@ -19,7 +19,7 @@ export function CompanyRow({ index, company }: CompanyRowProps) {
     setIsLoading(true);
     try {
       const accessToken = await getAccessToken();
-      const result = await fetch(`/api/companies/deny`, {
+      const result = await fetch(`/api/companies/revoke`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
