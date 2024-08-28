@@ -11,6 +11,7 @@ const privyClient = new PrivyClient(
 
 export async function GET(req: NextRequest, res: NextResponse) {
   const authToken = req.headers.get("Authorization")?.replace("Bearer ", "");
+  console.log(`Auth Token: ${authToken}`)
   try {
     const verificationClaim = await privyClient.verifyAuthToken(authToken!);
 
@@ -46,6 +47,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
       { status: 200 }
     );
   } catch (e) {
+    console.log(`Error Fetching Companies: ${e}`)
     return NextResponse.json(`Error Fetching Companies: ${e}`, { status: 401 });
   }
 }
