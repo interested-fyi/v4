@@ -16,6 +16,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     const verificationClaim = await privyClient.verifyAuthToken(authToken!);
 
     // get user and check if is admin
+    console.log(`Verification Claim: ${verificationClaim.userId}`);
     const { data: userData, error: userError } = await supabase
       .from("users")
       .select()
@@ -29,6 +30,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     }
 
     const user = userData?.[0];
+    console.log(`User: ${JSON.stringify(userData)}`)
     if (!user.is_admin) {
       throw new Error("User is not an admin");
     }
