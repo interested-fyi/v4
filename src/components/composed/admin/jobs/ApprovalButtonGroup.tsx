@@ -57,6 +57,7 @@ export function ApprovalButtonGroup({
           companyId: companyId,
           jobs: jobs,
           approved: false,
+          denied: true,
         }),
       });
       if (result.ok) {

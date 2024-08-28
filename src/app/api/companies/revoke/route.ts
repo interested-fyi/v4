@@ -42,14 +42,19 @@ async function handleRequest(req: NextRequest, res: NextResponse) {
     try {
         let { companyId } = await req.json();
         
-        // 
         const { data: company, error: companyError } = await supabase.from('companies').update({ approved: false }).eq('id', companyId).select();
 
         if (companyError) {
             throw new Error('Error revoking company approval');
         }
 
-        return NextResponse.json({ success: true, company: company }, { status: 200 })
+        const { data: jobPostings, error: jobPostingError } = await supabase.from('job_postings').update({ active: false }).eq('company_id', companyId).select();
+
+        if (jobPostingError) {
+            throw new Error('Error marking job postings as inactive');
+        }
+
+        return NextResponse.json({ success: true, company: company, jobs_affected: jobPostings.length }, { status: 200 })
     } catch (e) {
         return NextResponse.json(`Error scraping jobs: ${e}`, { status: 500 });
     }
