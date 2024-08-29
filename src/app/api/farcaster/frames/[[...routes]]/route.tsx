@@ -11,24 +11,24 @@ import { neynar as neynarMiddle } from "frog/middlewares";
 const app = new Frog({
   assetsPath: "/",
   basePath: "/api/farcaster/frames",
+  browserLocation: `${process.env.NEXT_PUBLIC_BASE_URL}/referral/farcaster`,
   hub: neynar({ apiKey: process.env.NEYNAR_API_KEY || "" }),
   title: "Interested FYI - Job Posting",
 });
 
 const neynarMiddleware = neynarMiddle({
   apiKey: process.env.NEYNAR_API_KEY || "",
-  features: ["interactor"],
+  features: ["interactor", "cast"],
 });
 // Uncomment to use Edge Runtime
 // export const runtime = 'edge'
 app.frame("/jobs/:id", neynarMiddleware, async (c) => {
   const { id } = c.req.param();
+
   const { chatName, msgId } = c.req.query();
   const jobData = await fetch(
-    `${process.env.NEXT_PUBLIC_HOST}/api/jobs/get-job-by-id/${id}`
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/jobs/get-job-by-id/${id}`
   ).then((res) => res.json());
-
-  const pageUrl = `${process.env.NEXT_PUBLIC_HOST}/referral/telegram?fid=${c.var.interactor?.fid}&jobId=${id}&chatName=${chatName}&msgId=${msgId}`;
 
   return c.res({
     image: (
@@ -160,10 +160,53 @@ app.frame("/jobs/:id", neynarMiddleware, async (c) => {
         Apply Now
       </Button.Link>,
       // eslint-disable-next-line react/jsx-key
-      <Button.Redirect location={pageUrl}>Follow on Telegram</Button.Redirect>,
+      <Button.Redirect
+        location={`${process.env.NEXT_PUBLIC_BASE_URL}/referral/farcaster?fid=${c.var.interactor?.fid}&userName=${c.var.interactor?.username}&castHash=${c.var.cast?.hash}&jobId=${id}`}
+      >
+        Refer a friend
+      </Button.Redirect>,
     ],
   });
 });
+
+// app.frame("/referral", neynarMiddleware, async (c) => {
+//   const query = c.buttonValue;
+//   const pageUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/referral/farcaster?${query}`;
+
+//   return c.res({
+//     image: (
+//       <a
+//         href={pageUrl}
+//         style={{
+//           display: "flex",
+//           flexDirection: "column",
+//           width: "100%",
+//           height: "100%",
+//           padding: "28px",
+//           background: "blue",
+//         }}
+//       >
+//         <div
+//           style={{
+//             border: "1px solid blue",
+//             padding: "28px",
+//             paddingTop: "16px",
+//             display: "flex",
+//             background: "white",
+//             justifyContent: "center",
+//             alignContent: "center",
+//             alignItems: "center",
+//             flexDirection: "row",
+//             height: "100%",
+//             borderRadius: "8px",
+//           }}
+//         >
+//           <h1>Click to open your referral link</h1>
+//         </div>
+//       </a>
+//     ),
+//   });
+// });
 
 devtools(app, { serveStatic });
 
