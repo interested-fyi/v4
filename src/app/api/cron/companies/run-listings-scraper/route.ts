@@ -51,7 +51,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
                     });
 
                     const saveData = await saveResponse.json();
-                    console.log(`Save Response: ${JSON.stringify(saveResponse)}`);
 
                     if(!saveResponse.ok) {
                         throw new Error(saveData.message || "Error saving new job postings")
