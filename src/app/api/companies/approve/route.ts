@@ -34,7 +34,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         return handleRequest(req, res);
     } catch (e) {
-        console.log(`ERROR APPROVING: ${e}`)
         return NextResponse.json(`Error: ${e}`, { status: 500 });
     }
 }
@@ -49,7 +48,6 @@ async function handleRequest(req: NextRequest, res: NextResponse) {
         }
         
         // save jobs
-        console.log(`Jobs (${companyId}): ${JSON.stringify(jobs)}`)
         const saveResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/companies/save-job-postings`, {
             method: 'POST',
             headers: {

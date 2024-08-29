@@ -7,7 +7,6 @@ import User from "@/types/user";
 import Company from "@/types/company";
 
 export default function CompanySignUpForm() {
-  const { authenticated, login, user, getAccessToken } = usePrivy();
   const [companyName, setCompanyName] = useState("");
   const [careersPageUrl, setCareersPageUrl] = useState("");
   const [email, setEmail] = useState("");
@@ -32,10 +31,6 @@ export default function CompanySignUpForm() {
   };
 
   async function submitForm() {
-    if (!authenticated) {
-      login();
-      return;
-    }
     setLoading(true);
     setUrlError("");
     setEmailError("");
@@ -51,35 +46,17 @@ export default function CompanySignUpForm() {
       return;
     }
 
-    console.log(`Telegram User: ${JSON.stringify(user?.telegram?.username)}`);
     try {
-      const accessToken = await getAccessToken();
       const response = await fetch("/api/create-company", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
-          user: {
-            created_at: user?.createdAt,
-            privy_did: user?.id,
-            telegram_user: {
-              privy_did: user?.id,
-              telegram_user_id: user?.telegram?.telegramUserId,
-              username: user?.telegram?.username,
-              photo_url: user?.telegram?.photoUrl,
-              first_name: user?.telegram?.firstName,
-              last_name: user?.telegram?.lastName,
-            },
-            email: user?.email,
-            username: user?.telegram?.username,
-          } as User,
           company: {
             company_name: companyName,
             careers_page_url: careersPageUrl,
             creator_email: email,
-            creator_privy_did: user?.id,
           } as Company,
         }),
       });

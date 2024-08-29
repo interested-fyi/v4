@@ -46,6 +46,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
       { status: 200 }
     );
   } catch (e) {
+    console.log(`Error Fetching Companies: ${e}`)
     return NextResponse.json(`Error Fetching Companies: ${e}`, { status: 401 });
   }
 }
