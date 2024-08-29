@@ -7,6 +7,7 @@ import { handle } from "frog/next";
 import { serveStatic } from "frog/serve-static";
 import jobUrlBuilder from "@/functions/general/job-url-builder";
 import { neynar as neynarMiddle } from "frog/middlewares";
+
 const app = new Frog({
   assetsPath: "/",
   basePath: "/api/farcaster/frames",
@@ -22,33 +23,12 @@ const neynarMiddleware = neynarMiddle({
 // export const runtime = 'edge'
 app.frame("/jobs/:id", neynarMiddleware, async (c) => {
   const { id } = c.req.param();
-  const text = c.var.cast?.text;
   const { chatName, msgId } = c.req.query();
-
   const jobData = await fetch(
     `${process.env.NEXT_PUBLIC_HOST}/api/jobs/get-job-by-id/${id}`
   ).then((res) => res.json());
 
   const pageUrl = `${process.env.NEXT_PUBLIC_HOST}/referral/telegram?fid=${c.var.interactor?.fid}&jobId=${id}&chatName=${chatName}&msgId=${msgId}`;
-  const jobPosting = text ?? "";
-
-  const companyRegex = /^([\s\S]+?)\s*Position:/;
-  const positionRegex = /Position:\s*(.+)/;
-  const locationRegex = /Location:\s*(.+)/;
-  const compensationRegex = /Compensation:\s*(.+)/;
-  const descriptionRegex = /Compensation:\s*.+\n+([\s\S]*)/;
-
-  const companyMatch = jobPosting.match(companyRegex);
-  const positionMatch = jobPosting.match(positionRegex);
-  const locationMatch = jobPosting.match(locationRegex);
-  const compensationMatch = jobPosting.match(compensationRegex);
-  const descriptionMatch = jobPosting.match(descriptionRegex);
-
-  const company = companyMatch ? companyMatch[1].trim() : null;
-  const position = positionMatch ? positionMatch[1].trim() : null;
-  const location = locationMatch ? locationMatch[1].trim() : null;
-  const compensation = compensationMatch ? compensationMatch[1].trim() : null;
-  const description = descriptionMatch ? descriptionMatch[1].trim() : null;
 
   return c.res({
     image: (
@@ -56,62 +36,122 @@ app.frame("/jobs/:id", neynarMiddleware, async (c) => {
         style={{
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "flex-start",
-          padding: "20px",
-          background: "linear-gradient(to right, #2640EB 97%, #E8FC6C 3%)",
-          borderRadius: "8px",
-          textAlign: "left",
           width: "100%",
           height: "100%",
-
-          margin: "0 auto",
+          padding: "28px",
+          background: "blue",
         }}
       >
-        <h2
-          style={{
-            color: "white",
-            fontSize: "32px",
-            margin: "0 0 10px",
-          }}
+        <div
+          style={{ display: "flex", width: "100%", justifyContent: "center" }}
         >
-          {position} - {company}
-        </h2>
-
+          <h1
+            style={{
+              fontSize: "48px",
+              margin: "0 0 20px 0",
+              textAlign: "center",
+              color: "white",
+            }}
+          >
+            We&apos;ve been looking for{" "}
+            <span
+              style={{
+                color: "yellow",
+                marginLeft: "12px",
+                fontWeight: "bold",
+              }}
+            >
+              {" "}
+              you!
+            </span>
+          </h1>
+        </div>
         <div
           style={{
+            border: "1px solid blue",
+            padding: "28px",
             display: "flex",
+            background: "white",
             flexDirection: "column",
-            background: "white",
-            borderRadius: "8px",
-            padding: "15px",
+            borderBottom: "0",
+            margin: "auto",
             width: "100%",
-            textAlign: "left",
-            fontSize: "24px",
-            color: "black",
           }}
         >
-          <p>{description}</p>
-          <div style={{ display: "flex", justifyContent: "space-around" }}>
-            <p>{compensation}</p>
-            <p>{location}</p>
-          </div>
+          <h1
+            style={{
+              margin: "0",
+              textTransform: "capitalize",
+              fontSize: "48px",
+            }}
+          >
+            {jobData.job.role_title}
+          </h1>
+          <h1
+            style={{
+              margin: "0",
+              textTransform: "capitalize",
+              fontSize: "32px",
+            }}
+          >
+            {jobData.job.companies.company_name}
+          </h1>
         </div>
 
         <div
           style={{
+            border: "1px solid blue",
+            padding: "28px",
+            paddingTop: "16px",
             display: "flex",
-            marginTop: "15px",
             background: "white",
-            borderRadius: "8px",
-            padding: "10px 20px",
-            color: "black",
-            fontSize: "18px",
-            fontWeight: "bold",
+            justifyContent: "space-between",
+            flexDirection: "row",
+            height: "100px",
           }}
         >
-          Interested FYI
+          <div
+            style={{
+              display: "flex",
+              background: "white",
+              flexDirection: "column",
+            }}
+          >
+            <p style={{ margin: "0", color: "blue", fontSize: "20px" }}>
+              LOCATION
+            </p>
+            <p>{jobData.job.location}</p>
+          </div>
+          {jobData.job.job_postings_details && (
+            <div
+              style={{
+                display: "flex",
+                background: "white",
+                flexDirection: "column",
+              }}
+            >
+              <p style={{ margin: "0", color: "blue", fontSize: "20px" }}>
+                COMPENSATION
+              </p>
+              <p>{jobData.job.job_postings_details?.compensation}</p>
+            </div>
+          )}
         </div>
+        {jobData.job.job_postings_details && (
+          <div
+            style={{
+              display: "flex",
+              background: "white",
+              border: "1px solid blue",
+              borderTop: "0",
+              padding: "28px",
+              paddingTop: "16px",
+              fontSize: "20px",
+            }}
+          >
+            <p>{jobData.job.job_postings_details?.summary}</p>
+          </div>
+        )}
       </div>
     ),
     intents: [
