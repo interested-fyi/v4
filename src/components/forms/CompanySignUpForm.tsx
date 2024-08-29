@@ -51,7 +51,6 @@ export default function CompanySignUpForm() {
       return;
     }
 
-    console.log(`Telegram User: ${JSON.stringify(user?.telegram?.username)}`);
     try {
       const accessToken = await getAccessToken();
       const response = await fetch("/api/create-company", {

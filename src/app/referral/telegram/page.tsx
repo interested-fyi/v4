@@ -14,7 +14,6 @@ const TelegramReferralPageContent = () => {
   const msgId = searchParams.get('msgId');
 
   useEffect(() => {
-    console.log(`User Id: ${userId} / jobId: ${jobId} / post: ${chatName} (${msgId})`);
     if (userId && jobId && chatName && msgId) {
       const telegramPostUrl = `https://t.me/${chatName}/${msgId}`
       const logReferralClick = async () => {
