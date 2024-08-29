@@ -19,16 +19,17 @@ export async function GET(req: NextRequest, res: NextResponse) {
       .from("job_postings")
       .select(
         `
-          id,
-          company_id,
-          role_title,
-          location,
-          posting_url,
-          department,
-          created_at,
-          active,
-          companies (company_name)
-        `
+        id,
+        company_id,
+        role_title,
+        location,
+        posting_url,
+        department,
+        created_at,
+        active,
+        companies (company_name),
+        job_postings_details (summary, compensation)
+      `
       )
       .eq("id", jobId)
       .single(); // Fetches a single record
