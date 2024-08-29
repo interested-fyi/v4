@@ -31,7 +31,8 @@ export function CompanyRow({ index, company }: CompanyRowProps) {
         }),
       });
       if (result.ok) {
-        console.log("Company denied");
+        console.log("Company revoked");
+        window.location.reload();
       }
     } catch (e) {
       console.error(e);
