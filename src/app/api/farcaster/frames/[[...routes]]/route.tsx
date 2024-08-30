@@ -21,11 +21,10 @@ const neynarMiddleware = neynarMiddle({
   features: ["interactor", "cast"],
 });
 // Uncomment to use Edge Runtime
-// export const runtime = 'edge'
+export const runtime = "edge";
 app.frame("/jobs/:id", neynarMiddleware, async (c) => {
   const { id } = c.req.param();
 
-  const { chatName, msgId } = c.req.query();
   const jobData = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/jobs/get-job-by-id/${id}`
   ).then((res) => res.json());
@@ -168,45 +167,6 @@ app.frame("/jobs/:id", neynarMiddleware, async (c) => {
     ],
   });
 });
-
-// app.frame("/referral", neynarMiddleware, async (c) => {
-//   const query = c.buttonValue;
-//   const pageUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/referral/farcaster?${query}`;
-
-//   return c.res({
-//     image: (
-//       <a
-//         href={pageUrl}
-//         style={{
-//           display: "flex",
-//           flexDirection: "column",
-//           width: "100%",
-//           height: "100%",
-//           padding: "28px",
-//           background: "blue",
-//         }}
-//       >
-//         <div
-//           style={{
-//             border: "1px solid blue",
-//             padding: "28px",
-//             paddingTop: "16px",
-//             display: "flex",
-//             background: "white",
-//             justifyContent: "center",
-//             alignContent: "center",
-//             alignItems: "center",
-//             flexDirection: "row",
-//             height: "100%",
-//             borderRadius: "8px",
-//           }}
-//         >
-//           <h1>Click to open your referral link</h1>
-//         </div>
-//       </a>
-//     ),
-//   });
-// });
 
 devtools(app, { serveStatic });
 
