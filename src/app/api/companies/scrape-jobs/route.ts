@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import greenhouseScraper from "@/functions/job-scraping/greenhouse/greenhouse-scraper";
 import supabase from "@/lib/supabase";
 import { AuthTokenClaims, PrivyClient } from "@privy-io/server-auth";
 import User from "@/types/user";
+import leverScraper from "@/functions/job-scraping/lever/lever-scraper";
 
 const privyClient = new PrivyClient(
   process.env.NEXT_PUBLIC_PRIVY_APP_ID!,
@@ -12,7 +14,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const authToken = req.headers.get("Authorization")?.replace("Bearer ", "");
 
   if (authToken === process.env.CRON_SECRET) {
-    return handleRequest(req);
+    return handleRequest(req, res);
   }
 
   try {
@@ -45,39 +47,29 @@ export async function POST(req: NextRequest, res: NextResponse) {
       return NextResponse.json("User is not an admin", { status: 403 });
     }
 
-    return handleRequest(req);
+    return handleRequest(req, res);
   } catch (e) {
     return NextResponse.json(`Error: ${e}`, { status: 500 });
   }
 }
 
-async function handleRequest(req: NextRequest) {
+async function handleRequest(req: NextRequest, res: NextResponse) {
   try {
     const { url, company_id } = await req.json();
     let jobPostings;
-
+    // scrape company url
     if (url.includes("greenhouse")) {
-      const { default: greenhouseScraper } = await import(
-        "@/functions/job-scraping/greenhouse/greenhouse-scraper"
-      );
       jobPostings = await greenhouseScraper(url, company_id);
     } else if (url.includes("lever")) {
-      const { default: leverScraper } = await import(
-        "@/functions/job-scraping/lever/lever-scraper"
-      );
+      // scrape lever url
       jobPostings = await leverScraper(url, company_id);
-    } else {
-      return NextResponse.json({ error: "Unsupported URL" }, { status: 400 });
     }
 
     return NextResponse.json(
       { success: true, job_postings: jobPostings },
       { status: 200 }
     );
-  } catch (e: any) {
-    return NextResponse.json(
-      { error: `Error scraping jobs: ${e.message}` },
-      { status: 500 }
-    );
+  } catch (e) {
+    return NextResponse.json(`Error scraping jobs: ${e}`, { status: 500 });
   }
 }
