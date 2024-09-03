@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
 
             if (recentPostsCount[companyId] < 5) {
                 console.log(`Posting job for company: ${companyId}, ${job.job_posting_id}`);
-                const content = `<b>${job.company_name}</b>\n<b>Position: </b>${job.title}\n<b>Location: </b>${job.location}\n<b>Compensation: </b>${job.compensation}\n\n${job.summary}`
+                const content = `<b>${job.company_name}</b>\n<b>Position: </b>${job.title}\n<b>Location: </b>${job.location}${job.compensation && job.compensation !== 'null' ? `\n<b>Compensation: </b>${job.compensation}` : ''}\n\n${job.summary}`
 
                 recentPostsCount[companyId]++;  // Increment after a successful post
 

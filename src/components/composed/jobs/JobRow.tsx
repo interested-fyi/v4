@@ -16,20 +16,24 @@ export function JobRow({ index, job }: JobRowProps) {
   return (
     <TableRow key={index} className='py-3 items-center font-body'>
       <TableCell className='font-medium'>
-        <div className='flex flex-col gap-1'>
-          <span className='text-[#2640EB] text-base font-semibold '>
-            {job.role_title}
-          </span>
-          <span className='text-muted-foreground'>{job.location}</span>
-        </div>
+        <Link href={jobUrlBuilder(job.posting_url)} target='_blank'>
+          <div className='flex flex-col gap-1'>
+            <span className='text-[#2640EB] text-base font-semibold '>
+              {job.role_title}
+            </span>
+            <span className='text-muted-foreground'>{job.location}</span>
+          </div>
+        </Link>
       </TableCell>
       <TableCell>
-        <div className='flex justify-center flex-col items-start gap-2'>
-          <div className='flex items-center gap-2 font-semibold'>
-            <p>{job.department}</p>
+        <Link href={jobUrlBuilder(job.posting_url)} target='_blank'>
+          <div className='flex justify-center flex-col items-start gap-2'>
+            <div className='flex items-center gap-2 font-semibold'>
+              <p>{job.department}</p>
+            </div>
+            <p>{job.sub_department}</p>
           </div>
-          <p>{job.sub_department}</p>
-        </div>
+        </Link>
       </TableCell>
       {/* <TableCell>
         <div className='flex md:flex-row flex-col gap-2'>
@@ -67,11 +71,11 @@ export function JobRow({ index, job }: JobRowProps) {
         </div>
       </TableCell> */}
 
-      <TableCell className='text-right float-end pr-0'>
+      {/* <TableCell className='text-right float-end pr-0'>
         <Link href={jobUrlBuilder(job.posting_url)} target="_blank">
           <InterestedButton />
         </Link>
-      </TableCell>
+      </TableCell> */}
     </TableRow>
   );
 }

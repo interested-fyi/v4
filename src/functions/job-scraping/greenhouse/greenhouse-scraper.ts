@@ -10,22 +10,20 @@ export default async function greenhouseScraper(
   url: string,
   company_id?: number
 ) {
-  let browser:
-    | Browser
-    // | DevBrowser
-    | undefined;
+  let browser: Browser | undefined;
 
   try {
     const { boardUrl, accountName } = await getBoardUrl(url);
     const jobPostings: JobPosting[] = [];
+    const processedUrls = new Set();
 
     if (boardUrl) {
       // Uncomment for development
       // if (process.env.NODE_ENV === 'development') {
-      //     console.log(`using development puppeteer`)
+      //     console.log(`using development puppeteer`);
       //     browser = await puppeteerDev.launch();
       // } else {
-      //     console.log(`using production puppeteer`)
+      //     console.log(`using production puppeteer`);
       //     browser = await puppeteer.launch({
       //         args: chromium.args,
       //         defaultViewport: chromium.defaultViewport,
@@ -59,11 +57,14 @@ export default async function greenhouseScraper(
         parentDepartment: string,
         parentSubDepartment?: string
       ) => {
-        const department = section.find("h3").text().trim() || parentDepartment;
+        const department =
+          section.find("h3").text().trim() || parentDepartment;
         const subDepartment =
           section.find("h4").text().trim() || parentSubDepartment;
 
-        section.find(".opening").each((_, opening) => {
+        const openings = section.find(".opening").toArray();
+
+        for (const opening of openings) {
           const role = $(opening).find("a").text().trim();
           const location = $(opening).find(".location").text().trim();
           let url = $(opening).find("a").attr("href") ?? "";
@@ -71,17 +72,23 @@ export default async function greenhouseScraper(
             url = `${baseUrl}${url}`;
           }
 
-          jobPostings.push({
-            department: department,
-            sub_department: subDepartment,
-            role_title: role,
-            location: location,
-            posting_url: url,
-            active: true,
-            type: "greenhouse",
-            company_id: company_id,
-          });
-        });
+          if (!processedUrls.has(url)) {
+            jobPostings.push({
+              department: department,
+              sub_department: subDepartment,
+              role_title: role,
+              location: location,
+              posting_url: url,
+              active: true,
+              type: "greenhouse",
+              company_id: company_id,
+            });
+
+            processedUrls.add(url);
+          } else {
+            console.log(`Skipping duplicate scraped job: ${url}`);
+          }
+        }
 
         // Recursively handle child sections
         section.find("section.child").each((_, childSection) => {
@@ -96,22 +103,22 @@ export default async function greenhouseScraper(
             .text()
             .trim();
 
-          $(jobPostSection)
-            .find("tr.job-post")
-            .each((_, jobPost) => {
-              const role = $(jobPost)
-                .find("td.cell > a > p.body.body--medium")
-                .text()
-                .trim();
-              const location = $(jobPost)
-                .find("td.cell > a > p.body.body__secondary.body--metadata")
-                .text()
-                .trim();
-              let jobUrl = $(jobPost).find("td.cell > a").attr("href") ?? "";
-              if (!jobUrl.startsWith("http")) {
-                jobUrl = `${baseUrl}${jobUrl}`;
-              }
+          const jobPosts = $(jobPostSection).find("tr.job-post").toArray();
+          for (const jobPost of jobPosts) {
+            const role = $(jobPost)
+              .find("td.cell > a > p.body.body--medium")
+              .text()
+              .trim();
+            const location = $(jobPost)
+              .find("td.cell > a > p.body.body__secondary.body--metadata")
+              .text()
+              .trim();
+            let jobUrl = $(jobPost).find("td.cell > a").attr("href") ?? "";
+            if (!jobUrl.startsWith("http")) {
+              jobUrl = `${baseUrl}${jobUrl}`;
+            }
 
+            if (!processedUrls.has(jobUrl)) {
               jobPostings.push({
                 department: department,
                 role_title: role,
@@ -121,7 +128,12 @@ export default async function greenhouseScraper(
                 type: "greenhouse",
                 company_id: company_id,
               });
-            });
+
+              processedUrls.add(jobUrl);
+            } else {
+              console.log(`Skipping duplicate scraped job: ${jobUrl}`);
+            }
+          }
         });
       };
 

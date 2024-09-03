@@ -19,7 +19,7 @@ export function CompanyRow({ index, company }: CompanyRowProps) {
     setIsLoading(true);
     try {
       const accessToken = await getAccessToken();
-      const result = await fetch(`/api/companies/deny`, {
+      const result = await fetch(`/api/companies/revoke`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -31,7 +31,8 @@ export function CompanyRow({ index, company }: CompanyRowProps) {
         }),
       });
       if (result.ok) {
-        console.log("Company denied");
+        console.log("Company revoked");
+        window.location.reload();
       }
     } catch (e) {
       console.error(e);

@@ -1,3 +1,4 @@
+import { NavButtons } from "./NavButtons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,9 +27,7 @@ const AuthedNav = ({ user, logout }: AuthedNavProps) => {
       <Button size={"icon"} variant={"ghost"}>
         <Image src='/view-grid.png' alt='apps' width={32} height={32} />
       </Button> */}
-      <Link href={"/explore"}>
-        <Button variant={"secondary"}>Explore Jobs</Button>
-      </Link>
+      <NavButtons />
       <AvatarMenu
         avatar={
           <Avatar className='h-8 w-8'>
