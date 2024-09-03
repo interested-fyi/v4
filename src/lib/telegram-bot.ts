@@ -44,6 +44,7 @@ bot.on("callback_query:data", async (ctx) => {
         await ctx.editMessageReplyMarkup({
             reply_markup: new InlineKeyboard().text('Copy Link', `job=${jobId}`).url('Apply Now', jobUrlBuilder(job.posting_url))
         })
+        return;
     }
     const jobId = ctx.callbackQuery.data.replace('job=', '');
     const referrerId = ctx.callbackQuery.from.id;
@@ -52,7 +53,7 @@ bot.on("callback_query:data", async (ctx) => {
     const msgId = ctx.callbackQuery.message?.message_id;
     const telegramPostUrl = `https://t.me/${chatName}/${msgId}`
     const referralUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/referral/telegram?userId=${referrerId}&jobId=${jobId}&chatName=${chatName}&msgId=${msgId}`
-    const copyLinkUrl = `TEST`
+    const copyLinkUrl = `https://interested.fyi`
     console.log(`Job: ${jobId}, referrer: ${referrerUsername} (${referrerId}), url: ${telegramPostUrl}`)
 
     // pull out to endpoint for when copy link button is clicked? check how farcaster implementation handles this
@@ -78,7 +79,7 @@ bot.on("callback_query:data", async (ctx) => {
         console.error(`Error logging referral link generation: ${logLinkGenError}`);
     }
 
-    ctx.editMessageReplyMarkup({
+    await ctx.editMessageReplyMarkup({
         reply_markup: new InlineKeyboard().url('Copy Link', `${copyLinkUrl}`).text('Back', `back=${jobId}`)
     })
 
