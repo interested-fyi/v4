@@ -9,7 +9,7 @@ import JobPosting from "@/types/job-posting";
 import { JobPostingList } from "@/components/JobPostingList";
 import { CompanyResponse } from "@/app/api/companies/get-approved-companies/route";
 
-export default function Explore() {
+export default function ExplorePage() {
   const [activeButton, setActiveButton] = useState("companies");
   const { getAccessToken } = usePrivy();
   const [page, setPage] = useState(1);
