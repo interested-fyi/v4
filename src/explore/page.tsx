@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { usePrivy } from "@privy-io/react-auth";
-import { CompanyResponse } from "../api/companies/get-approved-companies/route";
 import JobPosting from "@/types/job-posting";
 import { JobPostingList } from "@/components/JobPostingList";
+import { CompanyResponse } from "@/app/api/companies/get-approved-companies/route";
 
-export default function ExplorePage() {
+export default function Explore() {
   const [activeButton, setActiveButton] = useState("companies");
   const { getAccessToken } = usePrivy();
   const [page, setPage] = useState(1);

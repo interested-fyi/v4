@@ -1,10 +1,3 @@
-'use client'
-import CandidateSignUpForm from '@/components/forms/CandidateSignUpForm';
-import clsx from 'clsx';
-import { PrivyProvider, usePrivy } from '@privy-io/react-auth';
-import { useState } from "react";
-import CompanySignUpForm from '@/components/forms/CompanySignUpForm';
-import NavBar from '@/components/navigation/NavBar';
 import { SignupForms } from "./../components/composed/SignupForms";
 import Image from "next/image";
 

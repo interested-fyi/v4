@@ -46,8 +46,9 @@ export async function GET(req: NextRequest, res: NextResponse) {
     }
 
     // Calculate the count of jobs for each company
-    const companiesWithJobCount: CompanyResponse[] = companyData.map(
-      (company) => ({
+    const companiesWithJobCount: CompanyResponse[] = companyData
+      .filter((company) => company.job_postings.length > 0)
+      .map((company) => ({
         approved: company.approved,
         name: company.company_name,
         id: company.id,
@@ -59,8 +60,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         createdAt: company.created_at,
         jobPostings: company.job_postings,
         jobCount: company.job_postings.length,
-      })
-    );
+      }));
 
     // Get the total number of approved companies
     const { count: totalCompanies, error: countError } = await supabase
