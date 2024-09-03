@@ -1,10 +1,10 @@
 "use client";
 import clsx from "clsx";
 import React, { useState } from "react";
-import CandidateSignUpForm from "../forms/CandidateSignUpForm";
 import CompanySignUpForm from "../forms/CompanySignUpForm";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
+import Explore from "./explore";
 export function SignupForms() {
   const [formType, setFormType] = useState<"candidate" | "company" | null>(
     null
@@ -53,8 +53,8 @@ export function SignupForms() {
         <section className='flex flex-col gap-12 relative z-50'>
           {formType !== null ? <Separator /> : null}
           {formType === "candidate" && (
-            <div>
-              <CandidateSignUpForm />
+            <div className='bg-white min-h-full'>
+              <Explore />
             </div>
           )}
           {formType === "company" && (
