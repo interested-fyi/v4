@@ -1,12 +1,15 @@
 import chromium from "@sparticuz/chromium";
 import puppeteer, { Browser } from "puppeteer-core";
-import puppeteerDev, { Browser as DevBrowser } from "puppeteer";
+// import puppeteerDev, { Browser as DevBrowser } from "puppeteer";
 import * as cheerio from "cheerio";
 
 import JobPosting from "@/types/job-posting";
 
 export default async function leverScraper(url: string, company_id?: number) {
-  let browser: Browser | DevBrowser | undefined;
+  let browser:
+    | Browser
+    //  DevBrowser |
+    | undefined;
 
   try {
     const jobPostings: JobPosting[] = [];
