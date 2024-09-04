@@ -1,9 +1,7 @@
-import { usePrivy } from "@privy-io/react-auth";
 import { useEffect, useState } from "react";
 import { hourglass } from "ldrs";
 import { Button } from "../ui/button";
 import { useToast } from "../ui/use-toast";
-import User from "@/types/user";
 import Company from "@/types/company";
 
 export default function CompanySignUpForm() {
@@ -13,6 +11,10 @@ export default function CompanySignUpForm() {
   const [urlError, setUrlError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [telegramEasier, setTelegramEasier] = useState(false);
+  const [telegramHandle, setTelegramHandle] = useState("");
+  const [recruitingHelp, setRecruitingHelp] = useState(false);
+  const [hostBounty, setHostBounty] = useState(false);
 
   const { toast } = useToast();
 
@@ -57,6 +59,9 @@ export default function CompanySignUpForm() {
             company_name: companyName,
             careers_page_url: careersPageUrl,
             creator_email: email,
+            recruiting_help: recruitingHelp,
+            host_bounty: hostBounty,
+            telegram_handle: telegramHandle,
           } as Company,
         }),
       });
@@ -121,6 +126,48 @@ export default function CompanySignUpForm() {
         />
         {emailError !== "" && (
           <p className='text-red-700 font-bold'>{emailError}</p>
+        )}
+      </div>
+      <p className='text-white text-xl font-bold'>Additional Options</p>
+      <div className='flex flex-col gap-4'>
+        <div className='flex gap-4 items-center'>
+          <input
+            type='checkbox'
+            id='recruiting-help'
+            className='mr-2'
+            onChange={(e) => setRecruitingHelp(e.target.checked)}
+          />
+          <label htmlFor='recruiting-help'>Need Recruiting Help</label>
+        </div>
+        <div className='flex gap-4 items-center'>
+          <input
+            type='checkbox'
+            id='host-bounty'
+            className='mr-2'
+            onChange={(e) => setHostBounty(e.target.checked)}
+          />
+          <label htmlFor='host-bounty'>
+            Want to Host a Bounty for Your Community
+          </label>
+        </div>
+        <div className='flex gap-4 items-center'>
+          <input
+            type='checkbox'
+            id='telegram-easier'
+            className='mr-2'
+            onChange={(e) => setTelegramEasier(e.target.checked)}
+          />
+          <label htmlFor='telegram-easier'>Is Telegram Easier</label>
+        </div>
+        {telegramEasier && (
+          <div className='flex flex-col gap-2 items-start'>
+            <p className='text-white text-xl font-bold'>Telegram Handle</p>
+            <input
+              type='text'
+              className='text-xl rounded-xl border-2 border-black px-2 py-1'
+              onChange={(e) => setTelegramHandle(e.target.value)}
+            />
+          </div>
         )}
       </div>
       <Button
