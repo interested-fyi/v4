@@ -12,8 +12,8 @@ export default function CompanySignUpForm() {
   const [emailError, setEmailError] = useState("");
   const [loading, setLoading] = useState(false);
   const [telegramEasier, setTelegramEasier] = useState(false);
-  const [telegramHandle, setTelegramHandle] = useState("");
   const [recruitingHelp, setRecruitingHelp] = useState(false);
+  const [telegramHandle, setTelegramHandle] = useState("");
   const [hostBounty, setHostBounty] = useState(false);
 
   const { toast } = useToast();
