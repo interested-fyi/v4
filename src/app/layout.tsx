@@ -9,6 +9,7 @@ import PrivyProviderWrapper from "@/context/PrivyProvider";
 import QueryProvider from "@/context/QueryProvider";
 import dynamic from "next/dynamic";
 import { PHProvider } from "@/context/PostHogProvider";
+import { Footer } from "@/components/footer";
 
 const PostHogPageView = dynamic(() => import("../components/PostHogPageView"), {
   ssr: false,
@@ -40,7 +41,11 @@ export default function RootLayout({
     <html lang='en'>
       <PHProvider>
         <body
-          className={cn("antialiased", fontHeading.variable, fontBody.variable)}
+          className={cn(
+            "antialiased ",
+            fontHeading.variable,
+            fontBody.variable
+          )}
         >
           <PrivyProviderWrapper>
             <QueryProvider>
@@ -48,6 +53,7 @@ export default function RootLayout({
               <PostHogPageView />
               {children}
               <Toaster />
+              <Footer />
             </QueryProvider>
           </PrivyProviderWrapper>
         </body>

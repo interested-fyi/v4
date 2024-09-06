@@ -2,20 +2,18 @@ import { NextResponse } from "next/server";
 import supabase from "@/lib/supabase";
 
 export async function POST(req: Request) {
-  const { userId, fid, jobId, telegramPostUrl } = await req.json();
+  const { fid, castHash, jobId, url } = await req.json();
 
   try {
     // save link click to supabase
-    console.log(
-      `Link clicked: user ${userId}, job ${jobId} - ${telegramPostUrl}`
-    );
+    console.log(`Link clicked: user ${fid}, job ${castHash} - ${jobId}`);
 
-    // log click in referral_link_clicks table for user, source and jobId
+    //   log click in referral_link_clicks table for user, source and castHash
     const { error } = await supabase.from("referral_link_click").insert({
       job_id: jobId,
-      telegram_user_id: userId,
-      url: telegramPostUrl,
-      source: "telegram",
+      farcaster_fid: fid,
+      url,
+      source: "farcaster",
     });
 
     if (error) {
