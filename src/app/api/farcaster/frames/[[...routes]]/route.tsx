@@ -23,7 +23,9 @@ const neynarMiddleware = neynarMiddle({
 // Uncomment to use Edge Runtime
 // export const runtime = 'edge'
 app.frame("/jobs/:id", neynarMiddleware, async (c) => {
+  console.log("🚀 ~ app.frame ~ c:", c);
   const { id } = c.req.param();
+  console.log("🚀 ~ app.frame ~ id:", id);
 
   const { chatName, msgId } = c.req.query();
   const jobData = await fetch(

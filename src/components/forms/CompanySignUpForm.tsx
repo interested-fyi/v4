@@ -1,10 +1,10 @@
-import { usePrivy } from "@privy-io/react-auth";
 import { useEffect, useState } from "react";
 import { hourglass } from "ldrs";
 import { Button } from "../ui/button";
 import { useToast } from "../ui/use-toast";
-import User from "@/types/user";
 import Company from "@/types/company";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 
 export default function CompanySignUpForm() {
   const [companyName, setCompanyName] = useState("");
@@ -13,6 +13,11 @@ export default function CompanySignUpForm() {
   const [urlError, setUrlError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [telegramEasier, setTelegramEasier] = useState(false);
+  const [recruitingHelp, setRecruitingHelp] = useState(false);
+  const [hostBounty, setHostBounty] = useState(false);
+  const [telegramError, setTelegramError] = useState("");
+  const [telegramHandle, setTelegramHandle] = useState("");
 
   const { toast } = useToast();
 
@@ -30,10 +35,18 @@ export default function CompanySignUpForm() {
     }
   };
 
+  const validateTelegram = (handle: string) => {
+    if ((!handle || handle.length === 0) && telegramEasier) {
+      return false;
+    }
+    return true;
+  };
+
   async function submitForm() {
     setLoading(true);
     setUrlError("");
     setEmailError("");
+    setTelegramError("");
 
     if (!validateUrl(careersPageUrl)) {
       setUrlError("Invalid URL");
@@ -42,6 +55,12 @@ export default function CompanySignUpForm() {
     }
     if (!validateEmail(email)) {
       setEmailError("Invalid Email Address");
+      setLoading(false);
+      return;
+    }
+
+    if (!validateTelegram(telegramHandle)) {
+      setTelegramError("Invalid telegram handle");
       setLoading(false);
       return;
     }
@@ -57,6 +76,9 @@ export default function CompanySignUpForm() {
             company_name: companyName,
             careers_page_url: careersPageUrl,
             creator_email: email,
+            recruiting_help: recruitingHelp,
+            host_bounty: hostBounty,
+            telegram_handle: telegramHandle,
           } as Company,
         }),
       });
@@ -91,18 +113,18 @@ export default function CompanySignUpForm() {
   return (
     <div className='flex flex-col justify-center items-start gap-8 bg-[#919CF480] p-8 rounded-xl font-body'>
       <div className='flex flex-col gap-2 items-start'>
-        <p className='text-white text-xl font-bold'>Company Name</p>
-        <input
+        <Label className='text-white text-xl font-bold'>Company Name</Label>
+        <Input
           type='text'
           className='text-xl rounded-xl border-2 border-black px-2 py-1'
           onChange={(e) => setCompanyName(e.target.value)}
         />
       </div>
       <div className='flex flex-col gap-2 items-start'>
-        <p className='text-white text-xl font-bold'>
+        <Label className='text-white text-xl font-bold'>
           Company Careers Page (url)
-        </p>
-        <input
+        </Label>
+        <Input
           type='url'
           placeholder='https://'
           className='text-xl rounded-xl border-2 border-black px-2 py-1'
@@ -113,14 +135,73 @@ export default function CompanySignUpForm() {
         )}
       </div>
       <div className='flex flex-col gap-2 items-start'>
-        <p className='text-white text-xl font-bold'>Your Email</p>
-        <input
+        <Label className='text-white text-xl font-bold'>Your Email</Label>
+        <Input
           type='email'
           className='text-xl rounded-xl border-2 border-black px-2 py-1'
           onChange={(e) => setEmail(e.target.value)}
         />
         {emailError !== "" && (
           <p className='text-red-700 font-bold'>{emailError}</p>
+        )}
+      </div>
+      <div className='flex flex-col gap-2'>
+        <Label className='text-white text-xl font-bold'>
+          Additional Options
+        </Label>
+        <div className='flex gap-4 items-start align-baseline'>
+          <Input
+            type='checkbox'
+            id='recruiting-help'
+            className='mr-2 w-4'
+            onChange={(e) => setRecruitingHelp(e.target.checked)}
+          />
+          <Label
+            className='place-self-center text-sm'
+            htmlFor='recruiting-help'
+          >
+            Need Recruiting Help?
+          </Label>
+        </div>
+        <div className='flex gap-4 items-start align-baseline'>
+          <Input
+            type='checkbox'
+            id='host-bounty'
+            className='mr-2 w-4'
+            onChange={(e) => setHostBounty(e.target.checked)}
+          />
+          <Label className='place-self-center text-sm' htmlFor='host-bounty'>
+            Want to Host a Bounty for Your Community?
+          </Label>
+        </div>
+        <div className='flex gap-4 items-start align-baseline'>
+          <Input
+            type='checkbox'
+            id='telegram-easier'
+            className='mr-2 w-4'
+            onChange={(e) => setTelegramEasier(e.target.checked)}
+          />
+          <Label
+            className='place-self-center text-sm'
+            htmlFor='telegram-easier'
+          >
+            Is Telegram Easier?
+          </Label>
+        </div>
+        {telegramEasier && (
+          <div className='flex flex-col gap-2 items-start'>
+            <Label className='text-white text-xl font-bold'>
+              Telegram Handle
+            </Label>
+            <Input
+              type='text'
+              className='text-xl rounded-xl border-2 border-black px-2 py-1'
+              onChange={(e) => setTelegramHandle(e.target.value)}
+            />
+            {telegramError !== "" && (
+              <p className='text-red-700 font-bold'>{telegramError}</p>
+            )}
+          </div>
         )}
       </div>
       <Button

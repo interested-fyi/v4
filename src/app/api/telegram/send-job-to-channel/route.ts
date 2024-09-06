@@ -35,8 +35,9 @@ export async function POST(req: NextRequest) {
     const signerUUID = process.env.SIGNER_UUID ?? "";
     const url = "https://api.neynar.com/v2/farcaster/cast";
 
-    const frameURL = `${process.env.NEXT_PUBLIC_HOST}/api/farcaster/frames/jobs/${job.job_posting_id}?chatName=${process.env.TELEGRAM_CHANNEL_NAME}&msgId=${message_id}`;
+    const frameURL = `${process.env.NEXT_PUBLIC_BASE_URL}/api/farcaster/frames/jobs/${job.job_posting_id}?chatName=${process.env.TELEGRAM_CHANNEL_NAME}&msgId=${message_id}`;
 
+    console.log("🚀 ~ POST ~ frameURL:", frameURL);
     const options = {
       method: "POST",
       headers: {
