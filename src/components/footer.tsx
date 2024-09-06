@@ -8,7 +8,7 @@ export function Footer() {
       <div className='container mx-auto px-4'>
         <div className='flex justify-center space-x-6 text-sm'>
           <Link
-            href='/terms'
+            href='/tos'
             className='hover:underline transition-colors duration-200 ease-in-out'
           >
             Terms of Service
