@@ -27,9 +27,13 @@ app.frame("/jobs/:id", neynarMiddleware, async (c) => {
   const { id } = c.req.param();
   console.log("🚀 ~ app.frame ~ id:", id);
 
-  const { chatName, msgId } = c.req.query();
   const jobData = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/jobs/get-job-by-id/${id}`
+  ).then((res) => res.json());
+  console.log("🚀 ~ app.frame ~ jobData:", jobData);
+
+  const jobDetails = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/jobs/get-job-details/${id}`
   ).then((res) => res.json());
 
   return c.res({
@@ -124,7 +128,7 @@ app.frame("/jobs/:id", neynarMiddleware, async (c) => {
             </p>
             <p>{jobData.job.location}</p>
           </div>
-          {jobData.job.job_postings_details && (
+          {jobDetails && (
             <div
               style={{
                 display: "flex",
@@ -135,11 +139,11 @@ app.frame("/jobs/:id", neynarMiddleware, async (c) => {
               <p style={{ margin: "0", color: "blue", fontSize: "20px" }}>
                 COMPENSATION
               </p>
-              <p>{jobData.job.job_postings_details?.compensation}</p>
+              <p>{jobDetails?.job?.compensation}</p>
             </div>
           )}
         </div>
-        {jobData.job.job_postings_details && (
+        {jobDetails && (
           <div
             style={{
               display: "flex",
@@ -151,7 +155,7 @@ app.frame("/jobs/:id", neynarMiddleware, async (c) => {
               fontSize: "20px",
             }}
           >
-            <p>{jobData.job.job_postings_details?.summary}</p>
+            <p>{jobDetails?.job?.summary}</p>
           </div>
         )}
       </div>

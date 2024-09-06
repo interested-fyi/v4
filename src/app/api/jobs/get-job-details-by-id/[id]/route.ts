@@ -16,21 +16,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
     // Fetch the job posting by its ID
     const { data: job, error: jobError } = await supabase
-      .from("job_postings")
-      .select(
-        `
-        id,
-        company_id,
-        role_title,
-        location,
-        posting_url,
-        department,
-        created_at,
-        active,
-        companies (company_name),
-        job_postings_details (summary, compensation)
-      `
-      )
+      .from("job_postings_details")
+      .select(`summary, compensation`)
       .eq("id", jobId)
       .order("created_at", { ascending: false })
       .single(); // Fetches a single record
