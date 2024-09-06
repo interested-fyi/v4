@@ -35,6 +35,7 @@ app.frame("/jobs/:id", neynarMiddleware, async (c) => {
   const jobDetails = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/jobs/get-job-details/${id}`
   ).then((res) => res.json());
+  console.log("🚀 ~ app.frame ~ jobDetails:", jobDetails);
 
   return c.res({
     image: (
