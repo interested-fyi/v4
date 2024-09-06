@@ -139,7 +139,7 @@ app.frame("/jobs/:id", neynarMiddleware, async (c) => {
               <p style={{ margin: "0", color: "blue", fontSize: "20px" }}>
                 COMPENSATION
               </p>
-              <p>{jobDetails?.compensation}</p>
+              <p>{jobDetails?.job?.compensation}</p>
             </div>
           )}
         </div>
@@ -155,7 +155,7 @@ app.frame("/jobs/:id", neynarMiddleware, async (c) => {
               fontSize: "20px",
             }}
           >
-            <p>{jobDetails?.summary}</p>
+            <p>{jobDetails?.job?.summary}</p>
           </div>
         )}
       </div>
