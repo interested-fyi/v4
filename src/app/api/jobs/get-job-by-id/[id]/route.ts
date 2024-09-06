@@ -32,6 +32,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
       `
       )
       .eq("id", jobId)
+      .order("created_at", { ascending: false })
       .single(); // Fetches a single record
 
     if (jobError) {
