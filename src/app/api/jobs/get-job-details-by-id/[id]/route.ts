@@ -20,6 +20,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
       .select(`summary, compensation`)
       .eq("job_posting_id", jobId)
       .order("created_at", { ascending: false })
+      .limit(1)
       .single(); // Fetches a single record
 
     if (jobError) {
