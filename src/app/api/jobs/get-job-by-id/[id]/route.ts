@@ -51,7 +51,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     );
   } catch (e: any) {
     return NextResponse.json(`Error Fetching Job: ${e.message}`, {
-      status: 401,
+      status: 500,
     });
   }
 }
