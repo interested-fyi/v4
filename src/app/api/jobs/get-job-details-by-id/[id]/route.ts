@@ -18,7 +18,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     const { data: job, error: jobError } = await supabase
       .from("job_postings_details")
       .select(`summary, compensation`)
-      .eq("id", jobId)
+      .eq("job_posting_id", jobId)
       .order("created_at", { ascending: false })
       .single(); // Fetches a single record
 
