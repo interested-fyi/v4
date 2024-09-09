@@ -22,7 +22,7 @@ bot.command('start', async (ctx) => {
         await ctx.reply(`Copy this link to refer a friend to this job:\n\n${telegramUrl}`);
     } catch (error) {
         console.error("Error decoding start param:", error);
-        await ctx.reply(`Welcome to Interested.FYI!`);
+        await ctx.reply(`Welcome to Interested.fyi\n\nFor those starting our bot for the first time, you’ll need to go back to the @interestedfyi channel where you left off to generate your first referral code. After, all referral links generated will be sent here directly.\n\nThanks for giving us a try. If you need any help reach out to @chipagosfinest.\n\nCheers all`);
     }
 })
 
