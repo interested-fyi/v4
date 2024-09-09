@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
             url: frameURL,
           },
         ],
+        channel_id: "jobs",
       }),
     };
     const response = await fetch(url, options);
