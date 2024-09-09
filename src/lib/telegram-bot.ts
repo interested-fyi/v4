@@ -3,7 +3,6 @@ import supabase from "./supabase";
 const dotenv = require('dotenv').config();
 
 const botToken = process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test" ? process.env.TELEGRAM_DEV_BOT_KEY ?? '': process.env.TELEGRAM_BOT_KEY ?? '';
-console.log(`bot token: ${botToken}`)
 const bot = new Bot(botToken);
 
 bot.command('start', async (ctx) => {
@@ -13,10 +12,6 @@ bot.command('start', async (ctx) => {
         const decodedParams = JSON.parse(Buffer.from(startParam, 'base64').toString('utf8'));
 
         const { jobId, chatName, msgId } = decodedParams;
-
-        console.log("Job ID:", jobId);
-        console.log("Chat Name:", chatName);
-        console.log("Message ID:", msgId);
 
         const telegramUrl = `https://t.me/${chatName}/${msgId}`;
         await ctx.reply(`Copy this link to refer a friend to this job:\n\n${telegramUrl}`);
@@ -35,8 +30,6 @@ bot.on("callback_query:data", async (ctx) => {
     const msgId = ctx.callbackQuery.message?.message_id;
     const telegramPostUrl = `https://t.me/${chatName}/${msgId}`
     const referralUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/referral/telegram?userId=${referrerId}&jobId=${jobId}&chatName=${chatName}&msgId=${msgId}`
-    console.log(`Job: ${jobId}, referrer: ${referrerUsername} (${referrerId}), url: ${telegramPostUrl}`)
-    console.log(`Sender Chat: ${JSON.stringify(ctx.senderChat)} / ${JSON.stringify(ctx.callbackQuery.message?.sender_chat)}`)
     const { error: updateUserError } = await supabase.from('telegram_users').upsert({
         telegram_user_id: referrerId,
         username: referrerUsername,
@@ -65,7 +58,6 @@ bot.on("callback_query:data", async (ctx) => {
     }
     const startParam = Buffer.from(JSON.stringify(params)).toString('base64');
     const chatUrl = `https://t.me/interested_fyi_bot?start=${startParam}`;
-    console.log(`Chat URL: ${chatUrl}`);
     try {
         await ctx.api.sendMessage(referrerId, `Copy this link to refer a friend to this job:\n\n${referralUrl}`);
         await ctx.answerCallbackQuery({

@@ -41,7 +41,6 @@ export async function GET(req: NextRequest) {
             }
 
             if (recentPostsCount[companyId] < 5) {
-                console.log(`Posting job for company: ${companyId}, ${job.job_posting_id}`);
                 const content = `<b>${job.company_name}</b>\n<b>Position: </b>${job.title}\n<b>Location: </b>${job.location}${job.compensation && job.compensation !== 'null' ? `\n<b>Compensation: </b>${job.compensation}` : ''}\n\n${job.summary}\n\n- start our bot to make referring your peeps easier | <a href="https://t.me/interested_fyi_bot">start bot</a>\n- need help hiring or posting your jobs? | DM @chipagosfinest\n\n<a href="https://t.me/chipagosfinest">Help</a> | <a href="https://t.me/interestedfyi">Telegram</a> | <a href="https://warpcast.com/interestedfyi">Farcaster</a>`
 
                 recentPostsCount[companyId]++;  // Increment after a successful post
