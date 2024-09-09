@@ -30,7 +30,7 @@ const FarcasterReferralPageContent = () => {
             },
             body: JSON.stringify({
               fid,
-              job_id: jobId,
+              jobId,
               castHash,
             }),
           });
