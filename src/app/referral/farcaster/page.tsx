@@ -29,7 +29,7 @@ const FarcasterReferralPageContent = () => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              farcaster_fid: fid,
+              fid,
               job_id: jobId,
               castHash,
             }),
