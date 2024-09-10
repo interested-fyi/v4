@@ -5,11 +5,6 @@ export function NavButtons() {
   return (
     <div className='flex md:flex-row flex-row gap-4 '>
       <div className='flex gap-4'>
-        <Link href={"/explore"}>
-          <Button className='w-20 text-xs md:text-sm' variant={"secondary"}>
-            Explore
-          </Button>
-        </Link>
         <Link href={"https://warpcast.com/interestedfyi"} target='_blank'>
           <Button className='w-20 text-xs md:text-sm' variant={"secondary"}>
             Farcaster
