@@ -8,7 +8,7 @@ const privyClient = new PrivyClient(
 );
 
 export async function POST(req: NextRequest) {
-  const { privy_did, email, name, subject } = await req.json();
+  const { privy_did, name, photo_source, available } = await req.json();
   const accessToken = req.headers.get("Authorization")?.replace("Bearer ", "");
 
   // verify authenticate user sent request
@@ -27,26 +27,16 @@ export async function POST(req: NextRequest) {
     .from("users")
     .upsert([{
         privy_did: privyDid,
-        email: email,
+        name: name,
+        photo_source: photo_source,
+        available: available
     }], { onConflict: 'privy_did' })
     .select().single();
 
   if (error) throw error;
 
-  const { data: googleData, error: googleError } = await supabase
-    .from("google_users")
-    .upsert([{
-        privy_did: privyDid,
-        email: email,
-        name: name,
-        subject: subject
-    }], { onConflict: 'privy_did' })
-    .select().single();
-
-  if (googleError) throw googleError;
-
   return NextResponse.json(
-    { user: data, google_user: googleData },
+    { user_profile: data,},
     { status: 200 }
   );
 }
