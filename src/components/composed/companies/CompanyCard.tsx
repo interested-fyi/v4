@@ -18,16 +18,15 @@ export function CompanyCard({ company }: CompanyCardProps) {
       >
         <span className='sr-only'>View company</span>
       </Link>
-      <CardContent className='p-6 space-y-4'>
+      <CardContent className='p-6 flex-row flex justify-between items-center'>
         <CardTitle className='text-lg font-semibold'>{company.name}</CardTitle>
-        <CardFooter className='px-0 pb-0 justify-end'>
-          <Badge
-            className='rounded-[8px] border-[#919CF4] font-body text-[#2640EB] place-self-end'
-            variant={"outline"}
-          >
-            {company.jobCount} jobs available
-          </Badge>
-        </CardFooter>
+
+        <Badge
+          className='rounded-[8px] border-[#919CF4] font-body text-[#2640EB]'
+          variant={"outline"}
+        >
+          {company.jobCount} jobs available
+        </Badge>
       </CardContent>
     </Card>
   );
