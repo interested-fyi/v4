@@ -11,7 +11,11 @@ interface UnauthedNavProps {
 const UnauthedNav = ({ login }: UnauthedNavProps) => {
   return (
     <div className='flex gap-4'>
-      <Button variant={"secondary"} onClick={login}>
+      <Button
+        className='w-16 h-8 px-4 text-xs md:text-sm bg-[#919CF459]'
+        variant={"secondary"}
+        onClick={login}
+      >
         Login
       </Button>
       <NavButtons />

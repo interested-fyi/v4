@@ -92,17 +92,8 @@ export default function Explore() {
 
   return (
     <>
-      <div className='flex flex-col px-4 md:px-28 h-64 max-h-full items-start md:items-center justify-center md:justify-between w-full bg-[#919CF4] border border-r-0 border-l-0 border-[#2640EB]'>
+      <div className='flex flex-col px-4 md:px-28 h-fit py-6 max-h-full items-start md:items-center justify-center md:justify-between w-full bg-[#e1effe] '>
         <div className='flex flex-col w-full m-auto gap-8 items-start'>
-          <div className='flex flex-col gap-2'>
-            <h1 className='text-white font-heading text-4xl font-bold'>
-              FIND WHAT INTERESTS YOU.
-            </h1>
-            <p className='text-[#111928] font-body font-[600] w-[290px] max-w-full'>
-              Explore companies and organizations hiring across the web3
-              ecosystem.
-            </p>
-          </div>
           <Selector
             activeButton={activeButton}
             handleButtonClick={handleButtonClick}
@@ -112,7 +103,7 @@ export default function Explore() {
       {activeButton === "companies" ? (
         <>
           {/* a selector for changing how many companies to show per page */}
-          <div className='flex justify-end items-center gap-4 mt-8 px-8'>
+          <div className='flex justify-end items-center gap-4 px-8'>
             <span>Companies per page:</span>
             <select
               value={limit}
@@ -181,7 +172,7 @@ export default function Explore() {
       ) : (
         <>
           {/* a selector for changing how many jobs to show per page */}
-          <div className='flex justify-end items-center gap-4 mt-8 px-8'>
+          <div className='flex justify-end items-center gap-4 px-8'>
             <span>Jobs per page:</span>
             <select
               value={limit}
@@ -242,13 +233,13 @@ interface SelectorProps {
 }
 function Selector({ activeButton, handleButtonClick }: SelectorProps) {
   return (
-    <div className='flex gap-4 relative'>
+    <div className='flex gap-4 relative mx-auto'>
       <Button
         size='lg'
-        className={`w-40 md:w-52 max-w-full rounded-[8px] font-heading font-bold uppercase justify-start ${
+        className={`w-40 md:w-52 max-w-full rounded-[8px] font-heading uppercase justify-start ${
           activeButton === "companies"
-            ? "bg-[#2640EB] hover:bg-blue-600 hover:text-white text-white"
-            : "border-[#D3D8FB] border-2 bg-[#fff] text-[#919CF4]"
+            ? "bg-[#2640EB] hover:bg-blue-600 hover:text-[#e7fb6c] text-[#e7fb6c] font-bold"
+            : "border-[#D3D8FB] border-2 bg-[#fff] text-[#919CF4] font-normal"
         }`}
         onClick={() => handleButtonClick("companies")}
       >
@@ -293,10 +284,10 @@ function Selector({ activeButton, handleButtonClick }: SelectorProps) {
       </Button>
       <Button
         size='lg'
-        className={`w-40 md:w-52 rounded-[8px] font-heading font-bold uppercase justify-start ${
+        className={`w-40 md:w-52 rounded-[8px] font-heading uppercase justify-start ${
           activeButton === "jobs"
-            ? "bg-[#2640EB] text-white hover:bg-blue-600 hover:text-white"
-            : "border-[#D3D8FB] border-2 bg-[#fff] text-[#919CF4]"
+            ? "bg-[#2640EB] text-[#e7fb6c] hover:bg-blue-600 hover:text-[#e7fb6c] font-bold"
+            : "border-[#D3D8FB] border-2 bg-[#fff] text-[#919CF4] font-normal"
         }`}
         onClick={() => handleButtonClick("jobs")}
       >
