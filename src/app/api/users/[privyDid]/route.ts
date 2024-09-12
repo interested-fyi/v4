@@ -3,11 +3,12 @@ import supabase from "@/lib/supabase";
 
 export async function GET(req: NextRequest, { params }: { params: { privyDid: string } }) {
     const { privyDid } = params;
+    console.log(privyDid);
     const { data, error } = await supabase
         .from('user_profile_combined')
         .select('*')
         .eq('privy_did', `did:privy:${privyDid}`)
-        .single();
+        .maybeSingle();
 
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
