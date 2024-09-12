@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { SignupForms } from "./../components/composed/SignupForms";
+"use client";
 import Image from "next/image";
 import { PostAJob } from "@/components/PostAJobDialog";
 import Explore from "@/components/composed/explore";
+import AuthDialog from "@/components/composed/dialog/AuthDialog";
 
 export default function Home() {
   return (
@@ -48,6 +48,7 @@ export default function Home() {
       </section>
       <section className='w-full bg-[#e1effe]'>
         <Explore />
+        {/* <AuthDialog isOpen={true} onClose={() => {}} /> */}
       </section>
     </main>
   );
