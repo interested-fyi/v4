@@ -5,9 +5,11 @@ import Explore from "@/components/composed/explore";
 import AuthDialog from "@/components/composed/dialog/AuthDialog";
 import { usePrivy } from "@privy-io/react-auth";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 export default function Home() {
   const { user } = usePrivy();
+  const [dialogClosed, setDialogClosed] = useState(false);
   // Fetch companies with pagination
   const { data: userProfileData, isLoading: userProfileLoading } = useQuery({
     enabled: !!user,
@@ -73,7 +75,9 @@ export default function Home() {
       </section>
       <section className='w-full bg-[#e1effe]'>
         <Explore />
-        {<AuthDialog isOpen={!!user && !userProfileData} onClose={() => {}} />}
+        {<AuthDialog isOpen={!dialogClosed && (!!user && !userProfileData)} onClose={() => {
+          setDialogClosed(true);
+        }} />}
       </section>
     </main>
   );
