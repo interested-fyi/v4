@@ -48,7 +48,7 @@ export default function Home() {
       </section>
       <section className='w-full bg-[#e1effe]'>
         <Explore />
-        <AuthDialog isOpen={true} onClose={() => {}} />
+        {/* <AuthDialog isOpen={true} onClose={() => {}} /> */}
       </section>
     </main>
   );
