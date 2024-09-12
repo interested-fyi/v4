@@ -3,8 +3,33 @@ import Image from "next/image";
 import { PostAJob } from "@/components/PostAJobDialog";
 import Explore from "@/components/composed/explore";
 import AuthDialog from "@/components/composed/dialog/AuthDialog";
+import { usePrivy } from "@privy-io/react-auth";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Home() {
+  const { user } = usePrivy();
+  // Fetch companies with pagination
+  const { data: userProfileData, isLoading: userProfileLoading } = useQuery({
+    enabled: !!user,
+    queryKey: ["user", user?.id.replace("did:privy:", "")],
+    queryFn: async () => {
+      const res = await fetch(
+        `/api/users/${user?.id.replace("did:privy:", "")}`,
+        {
+          method: "GET",
+          cache: "no-store",
+          headers: {
+            "Content-type": "application/json",
+          },
+        }
+      );
+      return (await res.json()) as {
+        success: boolean;
+        profile: any;
+      };
+    },
+  });
+
   return (
     <main className='flex  min-h-screen flex-col gap-0 items-center justify-start '>
       <section className='w-full max-w-full bg-[#2640EB] py-24 sm:p-8 p-2 md:p-24'>
@@ -48,7 +73,7 @@ export default function Home() {
       </section>
       <section className='w-full bg-[#e1effe]'>
         <Explore />
-        {/* <AuthDialog isOpen={true} onClose={() => {}} /> */}
+        {<AuthDialog isOpen={!!user && !userProfileData} onClose={() => {}} />}
       </section>
     </main>
   );
