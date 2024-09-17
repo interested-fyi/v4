@@ -19,7 +19,7 @@ import warpcast from "/public/svg/warpcast.svg";
 import Telegram from "/public/svg/telegram.svg";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
-import { ProfileConnections } from "../profile/connections";
+import { ProfileConnections } from "../profile/ProfileConnections";
 
 type Profile = {
   name: PROFILE_TYPE;
