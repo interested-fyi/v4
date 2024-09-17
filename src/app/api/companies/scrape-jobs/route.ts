@@ -4,6 +4,7 @@ import supabase from "@/lib/supabase";
 import { AuthTokenClaims, PrivyClient } from "@privy-io/server-auth";
 import User from "@/types/user";
 import leverScraper from "@/functions/job-scraping/lever/lever-scraper";
+import ashbyScraper from "@/functions/job-scraping/ashby/ashby-scraper";
 
 const privyClient = new PrivyClient(
   process.env.NEXT_PUBLIC_PRIVY_APP_ID!,
@@ -63,6 +64,8 @@ async function handleRequest(req: NextRequest, res: NextResponse) {
     } else if (url.includes("lever")) {
       // scrape lever url
       jobPostings = await leverScraper(url, company_id);
+    } else if (url.includes("ashby")) {
+      jobPostings = await ashbyScraper(url, company_id);
     }
 
     return NextResponse.json(

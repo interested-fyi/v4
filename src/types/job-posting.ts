@@ -10,4 +10,5 @@ export default interface JobPosting {
   location: string;
   posting_url: string;
   active?: boolean;
+  data?: any;
 }
