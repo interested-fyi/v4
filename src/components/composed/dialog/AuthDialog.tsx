@@ -13,23 +13,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { usePrivy } from "@privy-io/react-auth";
 import { useState } from "react";
-
-import { X, Github, Linkedin, Twitter, LoaderIcon } from "lucide-react";
-import warpcast from "/public/svg/warpcast.svg";
-import Telegram from "/public/svg/telegram.svg";
+import { LoaderIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { ProfileConnections } from "../profile/ProfileConnections";
-
-type Profile = {
-  name: PROFILE_TYPE;
-  icon:
-    | typeof Github
-    | typeof Linkedin
-    | typeof warpcast
-    | typeof Telegram
-    | typeof X;
-};
 
 enum PROFILE_TYPE {
   GITHUB = "github",
