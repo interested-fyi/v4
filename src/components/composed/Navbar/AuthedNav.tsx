@@ -31,7 +31,7 @@ const AuthedNav = ({ user, logout }: AuthedNavProps) => {
       <AvatarMenu
         avatar={
           <Avatar className='h-8 w-8'>
-            <AvatarImage src={user?.telegram?.photoUrl ?? "object-cover"} />
+            <AvatarImage src={user?.telegram?.photoUrl ?? undefined} />
             <AvatarFallback>
               {user?.telegram?.username?.slice(0, 2)}
             </AvatarFallback>
