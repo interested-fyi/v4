@@ -2,7 +2,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import Image from "next/image";
 
 export default function NavBar() {
-  const { ready, authenticated, login, user, logout } = usePrivy();
+  const { user, logout } = usePrivy();
 
   return (
     <div className='flex items-center w-[100vw]'>

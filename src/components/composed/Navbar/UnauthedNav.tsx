@@ -13,7 +13,7 @@ const UnauthedNav = ({ login }: UnauthedNavProps) => {
   const pathName = usePathname();
   return (
     <div className='flex gap-4'>
-      {pathName.includes("admin/") ? (
+      {
         <Button
           className='w-16 h-8 px-4 text-xs md:text-sm bg-[#919CF459]'
           variant={"secondary"}
@@ -21,7 +21,7 @@ const UnauthedNav = ({ login }: UnauthedNavProps) => {
         >
           Login
         </Button>
-      ) : null}
+      }
       <NavButtons />
     </div>
   );
