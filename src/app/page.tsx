@@ -41,7 +41,7 @@ export default function Home() {
       </section>
       <section className='w-full bg-[#e1effe]'>
         <Explore />
-        {<AuthDialog />}
+        {/* <AuthDialog /> */}
       </section>
     </main>
   );
