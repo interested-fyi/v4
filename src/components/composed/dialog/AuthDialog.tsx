@@ -115,28 +115,30 @@ export default function AuthDialog() {
                       Select your photo
                     </DialogTitle>
                     <div className='flex flex-1'>
-                      {user?.linkedAccounts?.map((linkedAccount: any) => {
-                        const image = linkedAccount.profilePictureUrl;
-                        if (!image) return;
-                        return (
-                          <div className='flex flex-col gap-2'>
-                            <Image
-                              width={10}
-                              height={10}
-                              className='w-10 h-10 m-auto rounded-full justify-center items-center'
-                              src={image ?? ""}
-                              alt={linkedAccount.username}
-                            />
-                            <Button
-                              key={linkedAccount}
-                              className='w-full bg-[#2640eb]'
-                              onClick={() => handleSelectPhoto(image)}
-                            >
-                              Select
-                            </Button>
-                          </div>
-                        );
-                      })}
+                      {user?.linkedAccounts?.map(
+                        (linkedAccount: any, idx: number) => {
+                          const image = linkedAccount.profilePictureUrl;
+                          if (!image) return;
+                          return (
+                            <div className='flex flex-col gap-2' key={idx}>
+                              <Image
+                                width={10}
+                                height={10}
+                                className='w-10 h-10 m-auto rounded-full justify-center items-center'
+                                src={image ?? ""}
+                                alt={linkedAccount.username}
+                              />
+                              <Button
+                                key={linkedAccount}
+                                className='w-full bg-[#2640eb]'
+                                onClick={() => handleSelectPhoto(image)}
+                              >
+                                Select
+                              </Button>
+                            </div>
+                          );
+                        }
+                      )}
                     </div>
                   </DialogHeader>
                 </DialogContent>
