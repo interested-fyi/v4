@@ -1,9 +1,37 @@
+"use client";
 import Image from "next/image";
 import { PostAJob } from "@/components/PostAJobDialog";
 import Explore from "@/components/composed/explore";
 import AuthDialog from "@/components/composed/dialog/AuthDialog";
+import { usePrivy } from "@privy-io/react-auth";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 export default function Home() {
+  const { user } = usePrivy();
+  const [dialogClosed, setDialogClosed] = useState(false);
+  // Fetch companies with pagination
+  const { data: userProfileData, isLoading: userProfileLoading } = useQuery({
+    enabled: !!user,
+    queryKey: ["user", user?.id.replace("did:privy:", "")],
+    queryFn: async () => {
+      const res = await fetch(
+        `/api/users/${user?.id.replace("did:privy:", "")}`,
+        {
+          method: "GET",
+          cache: "no-store",
+          headers: {
+            "Content-type": "application/json",
+          },
+        }
+      );
+      return (await res.json()) as {
+        success: boolean;
+        profile: any;
+      };
+    },
+  });
+
   return (
     <main className='flex  min-h-screen flex-col gap-0 items-center justify-start '>
       <section className='w-full max-w-full bg-[#2640EB] py-24 sm:p-8 p-2 md:p-24'>
@@ -23,6 +51,12 @@ export default function Home() {
               </p>
               <PostAJob />
             </div>
+            {/* <p className='text-[16px]  font-body text-[#ffffff] max-w-[548px]'>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat.
+            </p> */}
           </div>
 
           <div className='absolute right-0 md:right-10 top-0 h-full w-[50vw] z-[0] hidden lg:flex place-items-center'>
@@ -41,7 +75,16 @@ export default function Home() {
       </section>
       <section className='w-full bg-[#e1effe]'>
         <Explore />
-        {/* <AuthDialog /> */}
+        {
+          <AuthDialog
+            isOpen={
+              !dialogClosed && !!user && !userProfileData && !userProfileLoading
+            }
+            onClose={() => {
+              setDialogClosed(true);
+            }}
+          />
+        }
       </section>
     </main>
   );
