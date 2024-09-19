@@ -488,7 +488,7 @@ export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
         </SelectContent>
       </Select>
       <Button
-        className='ml-2 bg-[#2640eb]'
+        className='ml-4 bg-[#2640eb]'
         onClick={() =>
           handleLink(
             selectedProfile?.name.toLocaleLowerCase() ?? "",
