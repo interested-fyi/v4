@@ -26,18 +26,18 @@ export default function AuthDialog({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const [open, setOpen] = useState(true);
   const [tempPhotoUrl, setTempPhotoUrl] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
     email: "",
     bio: "",
+    bestProfile: "",
     calendar: "",
     fee: "",
     bookingDescription: "",
   });
   const [step, setStep] = useState(0);
-  const [activeButton, setActiveButton] = useState<"yes" | "no">("yes");
+  const [activeButton, setActiveButton] = useState<boolean>(true);
 
   const { user, getAccessToken } = usePrivy();
 
@@ -50,7 +50,7 @@ export default function AuthDialog({
     queryKey: ["user", user?.id],
     queryFn: async () => {
       const accessToken = await getAccessToken();
-      const res = await fetch(`/api/users/profiles/${user?.id}`, {
+      const res = await fetch(`/api/users/${user?.id}`, {
         method: "GET",
         cache: "no-store",
         headers: {
@@ -66,8 +66,16 @@ export default function AuthDialog({
   });
 
   const handleSelectPhoto = async (photoUrl: string) => {
+    setTempPhotoUrl(photoUrl);
+  };
+
+  const handleButtonClick = (button: boolean) => {
+    setActiveButton(button);
+  };
+
+  const handleSubmitForm = async () => {
     const accessToken = await getAccessToken();
-    const res = await fetch(`/api/users/profiles/update-photo/${user?.id}`, {
+    const res = await fetch(`/api/users/save-user-profile`, {
       method: "POST",
       cache: "no-store",
       headers: {
@@ -75,21 +83,21 @@ export default function AuthDialog({
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({
-        photoSource: photoUrl,
-        privyDid: user?.id,
+        name: form.name,
+        photo_source: tempPhotoUrl,
+        available: activeButton,
+        preferred_profile: form.bestProfile,
+        bio: form.bio,
+        calendly_link: form.calendar,
+        unlock_calendar_fee: form.fee,
+        booking_description: form.bookingDescription,
+        privy_did: user?.id,
       }),
     });
-    if (res.ok) {
-      setTempPhotoUrl(photoUrl);
-    }
-  };
-
-  const handleButtonClick = (button: "yes" | "no") => {
-    setActiveButton(button);
-  };
-
-  const handleSubmitForm = async () => {
-    //  TODO: Implement form submission
+    return (await res.json()) as {
+      success: boolean;
+      profile: any;
+    };
   };
 
   return (
@@ -220,6 +228,9 @@ export default function AuthDialog({
               <ProfileConnections
                 setTempPhotoUrl={setTempPhotoUrl}
                 userProfileData={userProfileData}
+                onSetBestProfile={(bestProfile) =>
+                  setForm({ ...form, bestProfile: bestProfile })
+                }
               />
 
               <Button
@@ -249,11 +260,11 @@ export default function AuthDialog({
                 <Button
                   size='lg'
                   className={`w-40 md:w-[180px] max-w-full rounded-[8px] font-heading font-bold uppercase justify-center text-center ${
-                    activeButton === "yes"
+                    activeButton === true
                       ? "bg-[#2640EB] hover:bg-blue-600 hover:text-white text-yellow-200"
                       : "border-[#D3D8FB] border-2 bg-[#fff] text-[#919CF4]"
                   }`}
-                  onClick={() => handleButtonClick("yes")}
+                  onClick={() => handleButtonClick(true)}
                 >
                   YES!
                 </Button>
@@ -261,9 +272,9 @@ export default function AuthDialog({
                 <Button
                   size='icon'
                   onClick={() =>
-                    activeButton === "no"
-                      ? handleButtonClick("yes")
-                      : handleButtonClick("no")
+                    activeButton === false
+                      ? handleButtonClick(true)
+                      : handleButtonClick(false)
                   }
                   className='bg-transparent hover:bg-transparent active:scale-95 transition-all duration-100 absolute right-[45%]'
                 >
@@ -304,11 +315,11 @@ export default function AuthDialog({
                 <Button
                   size='lg'
                   className={`w-40 md:w-[180px] rounded-[8px] font-heading font-bold uppercase justify-center ${
-                    activeButton === "no"
+                    activeButton === false
                       ? "bg-[#2640EB] text-white hover:bg-blue-600 hover:text-white"
                       : "border-[#D3D8FB] border-2 bg-[#fff] text-[#919CF4]"
                   }`}
-                  onClick={() => handleButtonClick("no")}
+                  onClick={() => handleButtonClick(false)}
                 >
                   MAYBE LATER
                 </Button>
@@ -377,7 +388,7 @@ export default function AuthDialog({
           <Button
             className='w-full text-sm font-body font-medium leading-[21px] mt-4 bg-[#2640eb]'
             disabled={!form.name || !form.bio || !form.email}
-            onClick={() => setStep(1)}
+            onClick={() => handleSubmitForm()}
           >
             Save and continue to Interested
           </Button>

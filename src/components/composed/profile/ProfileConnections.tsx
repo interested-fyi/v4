@@ -33,10 +33,14 @@ const profiles = [
 
 export const ProfileConnections = ({
   setTempPhotoUrl,
+  onSetBestProfile,
+  onSetProfile,
   userProfileData,
 }: {
   setTempPhotoUrl: (photo_url: string) => void;
   userProfileData: { success: boolean; profile: any } | undefined;
+  onSetBestProfile?: (profile: string) => void;
+  onSetProfile?: (profile: string) => void;
 }) => {
   const [bestProfile, setBestProfile] = useState<string | null>(null);
   const [additionalProfile, setAdditionalProfile] = useState<string | null>(
@@ -256,7 +260,7 @@ export const ProfileConnections = ({
 
   const updateUserProfileData = async (userProfileData: string | null) => {
     const accessToken = await getAccessToken();
-    const res = await fetch(`/api/users/profiles/${user?.id}`, {
+    const res = await fetch(`/api/users/${user?.id}`, {
       method: "POST",
       cache: "no-store",
       headers: {
@@ -271,30 +275,16 @@ export const ProfileConnections = ({
   };
 
   const handleSelectPhoto = async (photoUrl: string) => {
-    const accessToken = await getAccessToken();
-    const res = await fetch(`/api/users/profiles/update-photo/${user?.id}`, {
-      method: "POST",
-      cache: "no-store",
-      headers: {
-        "Content-type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({
-        photoSource: photoUrl,
-        privyDid: user?.id,
-      }),
-    });
-    if (res.ok) {
-      setTempPhotoUrl(photoUrl);
-    }
+    setTempPhotoUrl(photoUrl);
   };
 
   useEffect(() => {
     if (userProfileData) {
-      setBestProfile(
-        profiles.find((p) => p === userProfileData.profile.preferred_profile) ||
-          null
-      );
+      const profile = userProfileData?.profile?.preferred_profile;
+      setBestProfile(profile);
+      if (onSetBestProfile) {
+        onSetBestProfile(profile);
+      }
     }
   }, [userProfileData]);
 
@@ -320,13 +310,10 @@ export const ProfileConnections = ({
     if (selectedProfile) {
       if (isBestProfile) {
         setBestProfile(selectedProfile);
-        try {
-          updateUserProfileData(selectedProfile);
-        } catch (e) {
-          console.log(e);
-        }
+        onSetBestProfile && onSetBestProfile(selectedProfile);
       } else {
         setAdditionalProfile(selectedProfile);
+        onSetProfile && onSetProfile(selectedProfile);
       }
       setSelectedProfile(null);
     }
