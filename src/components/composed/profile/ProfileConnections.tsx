@@ -11,19 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { X, Github, Linkedin, Twitter } from "lucide-react";
-import warpcast from "/public/svg/warpcast.svg";
-import Telegram from "/public/svg/telegram.svg";
 
-type Profile = {
-  name: PROFILE_TYPE;
-  icon:
-    | typeof Github
-    | typeof Linkedin
-    | typeof warpcast
-    | typeof Telegram
-    | typeof Twitter;
-};
+import { X } from "lucide-react";
+import Image from "next/image";
 
 enum PROFILE_TYPE {
   GITHUB = "github",
@@ -33,12 +23,12 @@ enum PROFILE_TYPE {
   FARCASTER = "farcaster",
 }
 
-const profiles: Profile[] = [
-  { name: PROFILE_TYPE.GITHUB, icon: Github },
-  { name: PROFILE_TYPE.LINKEDIN, icon: Linkedin },
-  { name: PROFILE_TYPE.FARCASTER, icon: warpcast },
-  { name: PROFILE_TYPE.TELEGRAM, icon: Telegram },
-  { name: PROFILE_TYPE.TWITTER, icon: Twitter },
+const profiles = [
+  PROFILE_TYPE.GITHUB,
+  PROFILE_TYPE.LINKEDIN,
+  PROFILE_TYPE.FARCASTER,
+  PROFILE_TYPE.TELEGRAM,
+  PROFILE_TYPE.TWITTER,
 ];
 
 export const ProfileConnections = ({
@@ -48,11 +38,11 @@ export const ProfileConnections = ({
   setTempPhotoUrl: (photo_url: string) => void;
   userProfileData: { success: boolean; profile: any } | undefined;
 }) => {
-  const [bestProfile, setBestProfile] = useState<Profile | null>(null);
-  const [additionalProfile, setAdditionalProfile] = useState<Profile | null>(
+  const [bestProfile, setBestProfile] = useState<string | null>(null);
+  const [additionalProfile, setAdditionalProfile] = useState<string | null>(
     null
   );
-  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<string | null>(null);
   const [addProfile, setAddProfile] = useState(false);
 
   const {
@@ -264,9 +254,7 @@ export const ProfileConnections = ({
       },
     });
 
-  const updateUserProfileData = async (
-    userProfileData: PROFILE_TYPE | null
-  ) => {
+  const updateUserProfileData = async (userProfileData: string | null) => {
     const accessToken = await getAccessToken();
     const res = await fetch(`/api/users/profiles/${user?.id}`, {
       method: "POST",
@@ -304,9 +292,8 @@ export const ProfileConnections = ({
   useEffect(() => {
     if (userProfileData) {
       setBestProfile(
-        profiles.find(
-          (p) => p.name === userProfileData.profile.preferred_profile
-        ) || null
+        profiles.find((p) => p === userProfileData.profile.preferred_profile) ||
+          null
       );
     }
   }, [userProfileData]);
@@ -334,7 +321,7 @@ export const ProfileConnections = ({
       if (isBestProfile) {
         setBestProfile(selectedProfile);
         try {
-          updateUserProfileData(selectedProfile.name);
+          updateUserProfileData(selectedProfile);
         } catch (e) {
           console.log(e);
         }
@@ -406,7 +393,7 @@ export const ProfileConnections = ({
             if (accountName === "wallet") return;
 
             const profileData = profiles.find(
-              (p) => p.name === linkedAccount.type.replace("_oauth", "")
+              (p) => p === linkedAccount.type.replace("_oauth", "")
             );
 
             if (
@@ -455,9 +442,9 @@ export const ProfileConnections = ({
 };
 
 interface LinkAccountSelectProps {
-  profiles: Profile[];
-  selectedProfile: Profile | null;
-  setSelectedProfile: (profile: Profile | null) => void;
+  profiles: string[];
+  selectedProfile: string | null;
+  setSelectedProfile: (profile: string | null) => void;
   handleLink: (linkMethod: string, isBestProfile: boolean) => void;
   isBestProfile: boolean;
 }
@@ -473,7 +460,7 @@ export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
     <div className='flex items-center mt-2  rounded-lg text-black'>
       <Select
         onValueChange={(value) =>
-          setSelectedProfile(profiles.find((p) => p.name === value) || null)
+          setSelectedProfile(profiles.find((p) => p === value) || null)
         }
       >
         <SelectTrigger className='w-full bg-white'>
@@ -481,8 +468,8 @@ export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
         </SelectTrigger>
         <SelectContent>
           {profiles.map((profile) => (
-            <SelectItem key={profile.name} value={profile.name}>
-              {profile.name}
+            <SelectItem key={profile} value={profile}>
+              <span>{profile}</span>
             </SelectItem>
           ))}
         </SelectContent>
@@ -490,10 +477,7 @@ export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
       <Button
         className='ml-4 bg-[#2640eb]'
         onClick={() =>
-          handleLink(
-            selectedProfile?.name.toLocaleLowerCase() ?? "",
-            isBestProfile
-          )
+          handleLink(selectedProfile?.toLocaleLowerCase() ?? "", isBestProfile)
         }
       >
         Link
@@ -503,9 +487,9 @@ export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
 };
 
 interface UnlinkAccountButtonProps {
-  profile: Profile;
+  profile: string | null;
   handleUnlink: (linkMethod: string) => void;
-  setProfile: (profile: Profile | null) => void;
+  setProfile: (profile: string | null) => void;
 }
 
 export const UnlinkAccountButton: React.FC<UnlinkAccountButtonProps> = ({
@@ -516,14 +500,13 @@ export const UnlinkAccountButton: React.FC<UnlinkAccountButtonProps> = ({
   if (!profile) return null;
   return (
     <div className='flex items-center mt-2 bg-white rounded-lg text-black px-5 pr-2'>
-      {profile.icon ? <profile.icon className='mr-2' /> : null}
-      <span className='flex-grow'>{profile.name}</span>
+      <span className='flex-grow'>{profile}</span>
       <Button
         variant='ghost'
         size='icon'
         onClick={() => {
           setProfile(null);
-          handleUnlink(profile.name.toLowerCase());
+          handleUnlink(profile.toLowerCase());
         }}
       >
         <X className='h-4 w-4' />
