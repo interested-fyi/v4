@@ -47,6 +47,7 @@ const AuthedNav = ({ user, logout, getAccessToken }: AuthedNavProps) => {
       <Button size={"icon"} variant={"ghost"}>
         <Image src='/view-grid.png' alt='apps' width={32} height={32} />
       </Button> */}
+      <NavButtons />
       <AvatarMenu
         avatar={
           <Avatar className='h-8 w-8'>
@@ -58,7 +59,6 @@ const AuthedNav = ({ user, logout, getAccessToken }: AuthedNavProps) => {
         }
         logout={logout}
       />
-      <NavButtons />
     </div>
   );
 };
