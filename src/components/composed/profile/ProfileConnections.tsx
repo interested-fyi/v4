@@ -513,9 +513,10 @@ export const UnlinkAccountButton: React.FC<UnlinkAccountButtonProps> = ({
   handleUnlink,
   setProfile,
 }) => {
+  if (!profile) return null;
   return (
     <div className='flex items-center mt-2 bg-white rounded-lg text-black px-5 pr-2'>
-      <profile.icon className='mr-2' />
+      {profile.icon ? <profile.icon className='mr-2' /> : null}
       <span className='flex-grow'>{profile.name}</span>
       <Button
         variant='ghost'
