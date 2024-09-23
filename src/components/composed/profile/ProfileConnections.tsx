@@ -388,7 +388,7 @@ export const ProfileConnections = ({
               profileData
             ) {
               return (
-                <div key={linkedAccount}>
+                <div key={linkedAccount.type}>
                   <UnlinkAccountButton
                     profile={profileData}
                     handleUnlink={handleUnlink}

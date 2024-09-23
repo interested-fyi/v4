@@ -18,6 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { ProfileConnections } from "../profile/ProfileConnections";
 import { Textarea } from "@/components/ui/textarea";
+import { UserCombinedProfile } from "@/types/return_types";
 
 export default function AuthDialog({
   isOpen,
@@ -47,23 +48,40 @@ export default function AuthDialog({
     error: userProfileError,
   } = useQuery({
     enabled: !!user,
-    queryKey: ["user", user?.id],
+    queryKey: ["user", user?.id?.replace("did:privy:", "")],
     queryFn: async () => {
       const accessToken = await getAccessToken();
-      const res = await fetch(`/api/users/${user?.id}`, {
-        method: "GET",
-        cache: "no-store",
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const res = await fetch(
+        `/api/users/${user?.id?.replace("did:privy:", "")}`,
+        {
+          method: "GET",
+          cache: "no-store",
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
       return (await res.json()) as {
         success: boolean;
-        profile: any;
+        profile: UserCombinedProfile;
       };
     },
   });
+
+  // useEffect(() => {
+  //   if (userProfileData) {
+  //     setForm({
+  //       name: userProfileData.profile?.name ?? "",
+  //       email: userProfileData.profile?.email ?? "",
+  //       bio: userProfileData.profile?.bio ?? "",
+  //       bestProfile: userProfileData.profile?.preferred_profile ?? "",
+  //       calendar: userProfileData.profile?.calendly_link ?? "",
+  //       fee: userProfileData.profile?.unlock_calendar_fee ?? "",
+  //       bookingDescription: userProfileData.profile?.booking_description ?? "",
+  //     });
+  //   }
+  // }, [userProfileData]);
 
   const handleSelectPhoto = async (photoUrl: string) => {
     setTempPhotoUrl(photoUrl);
@@ -125,7 +143,11 @@ export default function AuthDialog({
               <div className='flex flex-col items-center gap-0 mb-0'>
                 <Avatar className='w-24 h-24 border-blue-700 border-2'>
                   <AvatarImage
-                    src={tempPhotoUrl ?? userProfileData?.profile.photo_source}
+                    src={
+                      tempPhotoUrl ??
+                      userProfileData?.profile?.photo_source ??
+                      ""
+                    }
                   />
                   <AvatarFallback>CL</AvatarFallback>
                 </Avatar>

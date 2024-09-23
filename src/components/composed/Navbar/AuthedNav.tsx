@@ -20,19 +20,20 @@ interface AuthedNavProps {
 }
 
 const AuthedNav = ({ user, logout, getAccessToken }: AuthedNavProps) => {
-  const { data, error, isLoading } = useQuery({
+  const { data } = useQuery({
     enabled: !!user,
-    queryKey: ["user", user?.id],
+    queryKey: ["user", user?.id.replace("did:privy:", "")],
     queryFn: async () => {
-      const accessToken = await getAccessToken();
-      const res = await fetch(`/api/users/profiles/${user?.id}`, {
-        method: "GET",
-        cache: "no-store",
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const res = await fetch(
+        `/api/users/${user?.id.replace("did:privy:", "")}`,
+        {
+          method: "GET",
+          cache: "no-store",
+          headers: {
+            "Content-type": "application/json",
+          },
+        }
+      );
       return (await res.json()) as {
         success: boolean;
         profile: any;
@@ -50,7 +51,7 @@ const AuthedNav = ({ user, logout, getAccessToken }: AuthedNavProps) => {
       <AvatarMenu
         avatar={
           <Avatar className='h-8 w-8'>
-            <AvatarImage src={data?.profile.photo_source ?? undefined} />
+            <AvatarImage src={data?.profile?.photo_source ?? undefined} />
             <AvatarFallback>
               {user?.telegram?.username?.slice(0, 2)}
             </AvatarFallback>
