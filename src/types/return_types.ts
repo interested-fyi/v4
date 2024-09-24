@@ -2,9 +2,13 @@ export interface UserCombinedProfile {
   privy_did: string | null;
   name: string | null;
   photo_source: string | null;
+  preferred_photo: string | null;
   preferred_profile: string | null;
   available: boolean | null;
   bio: string | null;
+  booking_description: string | null;
+  unlock_calendar_fee: string | null;
+  calendly_link: string | null;
   email: string | null;
   github_username: string | null;
   farcaster_fid: number | null;

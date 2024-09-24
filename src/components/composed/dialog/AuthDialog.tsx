@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { usePrivy } from "@privy-io/react-auth";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LoaderIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
@@ -39,6 +39,7 @@ export default function AuthDialog({
   });
   const [step, setStep] = useState(0);
   const [activeButton, setActiveButton] = useState<boolean>(true);
+  const [isProfileComplete, setIsProfileComplete] = useState<boolean>(false);
 
   const { user, getAccessToken } = usePrivy();
 
@@ -69,19 +70,24 @@ export default function AuthDialog({
     },
   });
 
-  // useEffect(() => {
-  //   if (userProfileData) {
-  //     setForm({
-  //       name: userProfileData.profile?.name ?? "",
-  //       email: userProfileData.profile?.email ?? "",
-  //       bio: userProfileData.profile?.bio ?? "",
-  //       bestProfile: userProfileData.profile?.preferred_profile ?? "",
-  //       calendar: userProfileData.profile?.calendly_link ?? "",
-  //       fee: userProfileData.profile?.unlock_calendar_fee ?? "",
-  //       bookingDescription: userProfileData.profile?.booking_description ?? "",
-  //     });
-  //   }
-  // }, [userProfileData]);
+  useEffect(() => {
+    if (userProfileData?.success) {
+      setForm({
+        name: userProfileData.profile?.name ?? "",
+        email: userProfileData.profile?.email ?? "",
+        bio: userProfileData.profile?.bio ?? "",
+        bestProfile: userProfileData.profile?.preferred_profile ?? "",
+        calendar: userProfileData.profile?.calendly_link ?? "",
+        fee: userProfileData.profile?.unlock_calendar_fee ?? "",
+        bookingDescription: userProfileData.profile?.booking_description ?? "",
+      });
+    }
+  }, [userProfileData]);
+
+  useEffect(() => {
+    const isFormComplete = form.name && form.bio && form.email;
+    setIsProfileComplete(!isFormComplete);
+  }, [form.name, form.bio, form.email]);
 
   const handleSelectPhoto = async (photoUrl: string) => {
     setTempPhotoUrl(photoUrl);
@@ -212,7 +218,7 @@ export default function AuthDialog({
                   <Input
                     className='rounded-lg'
                     id='name'
-                    defaultValue={user?.google?.name ?? ""}
+                    defaultValue={form?.name ?? ""}
                     onChange={(e) =>
                       setForm({ ...form, name: e.target.value.trim() })
                     }
@@ -226,7 +232,8 @@ export default function AuthDialog({
                   <Input
                     className='rounded-lg'
                     id='email'
-                    defaultValue={user?.google?.email}
+                    disabled
+                    defaultValue={form.email}
                     onChange={(e) =>
                       setForm({ ...form, email: e.target.value.trim() })
                     }
@@ -240,6 +247,8 @@ export default function AuthDialog({
                   <Textarea
                     className='rounded-lg'
                     id='bio'
+                    value={form.bio}
+                    defaultValue={userProfileData?.profile?.bio ?? ""}
                     onChange={(e) =>
                       setForm({ ...form, bio: e.target.value.trim() })
                     }
@@ -257,7 +266,7 @@ export default function AuthDialog({
 
               <Button
                 className='w-full text-sm font-body font-medium leading-[21px] mt-4 bg-[#2640eb]'
-                disabled={!form.name || !form.bio || !form.email}
+                disabled={isProfileComplete}
                 onClick={() => setStep(1)}
               >
                 Continue
@@ -409,7 +418,7 @@ export default function AuthDialog({
 
           <Button
             className='w-full text-sm font-body font-medium leading-[21px] mt-4 bg-[#2640eb]'
-            disabled={!form.name || !form.bio || !form.email}
+            disabled={isProfileComplete}
             onClick={() => handleSubmitForm()}
           >
             Save and continue to Interested
