@@ -19,7 +19,7 @@ const SwitchButtonGroup: React.FC<SwitchButtonGroupProps> = ({
   svgOnClick,
 }) => {
   return (
-    <div className='flex gap-4 relative w-fit max-w-sm mx-auto'>
+    <div className='flex gap-4 relative w-fit max-w-[343px] mx-auto'>
       {/* First Button */}
       <Button
         size={buttons[0].size || "lg"}

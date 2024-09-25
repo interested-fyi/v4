@@ -20,7 +20,7 @@ export default function ProfilePage() {
             />
             <AvatarFallback>CL</AvatarFallback>
           </Avatar>
-          <div className='pt-16 text-center'>
+          <div className='pt-16 flex flex-col gap-2 text-center max-w-[343px]'>
             <h1 className='text-[#2640eb] text-xl font-semibold font-body leading-[30px]'>
               Chester LaCroix
             </h1>
@@ -29,7 +29,7 @@ export default function ProfilePage() {
               somewhere - yes we do
             </p>
           </div>
-          <div className='flex justify-center gap-2 mt-4'>
+          <div className='flex justify-center gap-2 mt-8 max-w-[343px] mx-auto'>
             <Button
               className='flex-1 bg-white border border-black text-gray-700 text-xs font-medium font-body leading-[18px]
             '
@@ -57,7 +57,7 @@ export default function ProfilePage() {
               />
             </Button>
           </div>
-          <div className='w-full flex justify-center'>
+          <div className='w-full flex justify-center mt-4'>
             <div className='w-[343px] h-[34px] relative'>
               <div className='w-[343px] h-[34px] pl-3 pr-[11px] py-2 left-0 top-0 absolute opacity-40 bg-white rounded-lg border border-gray-700 blur-[3px] justify-center items-center gap-2 inline-flex'>
                 <div className='text-gray-700 text-xs font-medium font-body leading-[18px]'>
@@ -73,7 +73,7 @@ export default function ProfilePage() {
               </Button>
             </div>
           </div>
-          <div className='flex justify-center gap-4'>
+          <div className='flex justify-center gap-4 mt-8'>
             <Button className='bg-[#919cf4] bg-opacity-30 hover:bg-opacity-90 hover:bg-[#919cf4] w-[55px] h-8'>
               <Image
                 src='/svg/blue-logos/telegram.svg'
@@ -115,7 +115,7 @@ export default function ProfilePage() {
               />
             </Button>
           </div>
-          <div>
+          <div className='mt-8'>
             <SwitchButtonGroup
               buttons={[
                 { text: "ACTIVITY", onClick: () => {}, isActive: true },
@@ -129,7 +129,7 @@ export default function ProfilePage() {
           text-gray-600
 text-xl
 font-bold
-font-body text-center'
+font-body text-center mt-7 mb-6'
           >
             Endorsements
           </h2>
