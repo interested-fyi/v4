@@ -5,12 +5,13 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User } from "@privy-io/react-auth";
+import { UserCombinedProfile } from "@/types/return_types";
+import { usePrivy, User } from "@privy-io/react-auth";
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 import React from "react";
 
 interface AuthedNavProps {
@@ -70,15 +71,30 @@ interface AvatarMenuProps {
   logout: () => void;
 }
 export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
+  const { user } = usePrivy();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{avatar}</DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuItem className='text-gray-500 text-sm font-medium font-body leading-[21px]'>
+          <Link href={`/profile/${user?.id.replace("did:privy:", "")}`}>
+            View profile
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem className='text-gray-500 text-sm font-medium font-body leading-[21px]'>
+          Edit profile
+        </DropdownMenuItem>{" "}
+        <DropdownMenuItem className='text-gray-500 text-sm font-medium font-body leading-[21px]'>
+          Settings
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <Button variant={"ghost"} onClick={logout}>
-            Logout
+          <Button
+            variant={"ghost"}
+            className='text-[#f05252] text-sm font-medium font-body leading-[21px] pl-0'
+            onClick={logout}
+          >
+            Sign Out
           </Button>
         </DropdownMenuItem>
       </DropdownMenuContent>

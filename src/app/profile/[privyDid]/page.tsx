@@ -7,6 +7,7 @@ import SwitchButtonGroup from "@/components/composed/buttons/SwitchButtonGroup";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { usePrivy } from "@privy-io/react-auth";
+import { UserCombinedProfile } from "@/types/return_types";
 
 export default function ProfilePage() {
   const { user } = usePrivy();
@@ -26,16 +27,16 @@ export default function ProfilePage() {
       );
       return (await res.json()) as {
         success: boolean;
-        profile: any;
+        profile: UserCombinedProfile;
       };
     },
   });
 
   console.log("🚀 ~ ProfilePage ~ userProfileData:", userProfileData);
   return (
-    <div className='flex flex-col items-center min-h-screen bg-blue-600 text-white p-4 px-0 md:p-8'>
-      <div className='w-full max-w-4xl bg-white rounded-lg overflow-hidden shadow-lg'>
-        <div className='bg-blue-600 h-20'></div>
+    <div className='flex flex-col items-center min-h-screen bg-[#2640eb] text-white p-4 pt-0 px-0 md:p-8'>
+      <div className='w-full max-w-5xl bg-white rounded-lg overflow-hidden shadow-lg'>
+        <div className='bg-[#2640eb] h-20'></div>
         <div className='relative px-4 pb-4 bg-[#e1effe]'>
           <Avatar className='w-24 h-24 border-4 border-white rounded-full absolute -top-12 left-1/2 transform -translate-x-1/2'>
             <AvatarImage
@@ -44,7 +45,7 @@ export default function ProfilePage() {
             />
             <AvatarFallback>CL</AvatarFallback>
           </Avatar>
-          <div className='pt-16 flex flex-col gap-2 text-center max-w-[343px]'>
+          <div className='pt-16 flex flex-col gap-2 text-center max-w-[343px] mx-auto'>
             <h1 className='text-[#2640eb] text-xl font-semibold font-body leading-[30px]'>
               Chester LaCroix
             </h1>
@@ -55,7 +56,7 @@ export default function ProfilePage() {
           </div>
           <div className='flex justify-center gap-2 mt-8 max-w-[343px] mx-auto'>
             <Button
-              className='flex-1 bg-white border border-black text-gray-700 text-xs font-medium font-body leading-[18px]
+              className='flex-1 bg-white border border-black text-gray-700 text-xs font-medium font-body leading-[18px] hover:bg-[#2640eb] hover:text-yellow-200
             '
             >
               Support builder
@@ -68,7 +69,7 @@ export default function ProfilePage() {
               />
             </Button>
             <Button
-              className='flex-1 bg-white border border-black text-gray-700 text-xs font-medium font-body leading-[18px]
+              className='flex-1 bg-white border border-black text-gray-700 text-xs font-medium font-body leading-[18px] hover:bg-[#2640eb] hover:text-yellow-200
             '
             >
               Endorse
@@ -83,7 +84,7 @@ export default function ProfilePage() {
           </div>
           <div className='w-full flex justify-center mt-4'>
             <div className='w-[343px] h-[34px] relative'>
-              <div className='w-[343px] h-[34px] pl-3 pr-[11px] py-2 left-0 top-0 absolute opacity-40 bg-white rounded-lg border border-gray-700 blur-[3px] justify-center items-center gap-2 inline-flex'>
+              <div className='w-[343px] h-[34px] pl-3 pr-[11px] py-2 left-0 top-1 absolute opacity-40 bg-white rounded-lg border border-gray-700 blur-[3px] justify-center items-center gap-2 inline-flex'>
                 <div className='text-gray-700 text-xs font-medium font-body leading-[18px]'>
                   Schedule a call
                 </div>
@@ -91,7 +92,7 @@ export default function ProfilePage() {
               </div>
               <Button
                 variant={"link"}
-                className='w-[343px] hover:no-underline bg-transparent absolute text-center text-[#2640eb] text-sm font-semibold font-body leading-[21px]'
+                className='w-[343px]  hover:no-underline bg-transparent absolute text-center text-[#2640eb] text-sm font-semibold font-body leading-[21px]'
               >
                 Unlock scheduling for $15
               </Button>
@@ -168,10 +169,14 @@ font-body text-center mt-7 mb-6'
                   <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
                 <div>
-                  <h3 className='font-semibold text-blue-600'>Tina Haibodi</h3>
-                  <p className='text-sm text-gray-600'>August 14th, 2023</p>
-                  <p className='text-sm font-semibold mt-1'>Friend/Associate</p>
-                  <p className='text-sm text-gray-700 mt-2'>
+                  <h3 className='font-semibold text-[#2640eb]'>Tina Haibodi</h3>
+                  <p className='text-sm text-gray-500 font-medium font-body'>
+                    August 14th, 2023
+                  </p>
+                  <p className='text-sm font-medium font-body leading-[21px] mt-1 text-gray-600'>
+                    Friend/Associate
+                  </p>
+                  <p className='text-xs text-gray-600 font-medium font-body leading-[18px] mt-2'>
                     "Lorem ipsum dolor sit amet, consectetur adipiscing elit,
                     sed do eiusmod tempor incididunt ut labore et dolore magna
                     aliqua."
