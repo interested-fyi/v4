@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { GiftIcon, SendIcon } from "lucide-react";
 import SwitchButtonGroup from "@/components/composed/buttons/SwitchButtonGroup";
 import Image from "next/image";
 
