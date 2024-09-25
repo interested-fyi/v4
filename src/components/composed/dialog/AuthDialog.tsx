@@ -12,12 +12,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { usePrivy } from "@privy-io/react-auth";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LoaderIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { ProfileConnections } from "../profile/ProfileConnections";
 import { Textarea } from "@/components/ui/textarea";
+import { UserCombinedProfile } from "@/types/return_types";
 
 export default function AuthDialog({
   isOpen,
@@ -26,18 +27,19 @@ export default function AuthDialog({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const [open, setOpen] = useState(true);
   const [tempPhotoUrl, setTempPhotoUrl] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
     email: "",
     bio: "",
+    bestProfile: "",
     calendar: "",
     fee: "",
     bookingDescription: "",
   });
   const [step, setStep] = useState(0);
-  const [activeButton, setActiveButton] = useState<"yes" | "no">("yes");
+  const [activeButton, setActiveButton] = useState<boolean>(true);
+  const [isProfileComplete, setIsProfileComplete] = useState<boolean>(false);
 
   const { user, getAccessToken } = usePrivy();
 
@@ -47,27 +49,57 @@ export default function AuthDialog({
     error: userProfileError,
   } = useQuery({
     enabled: !!user,
-    queryKey: ["user", user?.id],
+    queryKey: ["user", user?.id?.replace("did:privy:", "")],
     queryFn: async () => {
       const accessToken = await getAccessToken();
-      const res = await fetch(`/api/users/profiles/${user?.id}`, {
-        method: "GET",
-        cache: "no-store",
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const res = await fetch(
+        `/api/users/${user?.id?.replace("did:privy:", "")}`,
+        {
+          method: "GET",
+          cache: "no-store",
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
       return (await res.json()) as {
         success: boolean;
-        profile: any;
+        profile: UserCombinedProfile;
       };
     },
   });
 
+  useEffect(() => {
+    if (userProfileData?.success) {
+      setForm({
+        name: userProfileData.profile?.name ?? "",
+        email: userProfileData.profile?.email ?? "",
+        bio: userProfileData.profile?.bio ?? "",
+        bestProfile: userProfileData.profile?.preferred_profile ?? "",
+        calendar: userProfileData.profile?.calendly_link ?? "",
+        fee: userProfileData.profile?.unlock_calendar_fee ?? "",
+        bookingDescription: userProfileData.profile?.booking_description ?? "",
+      });
+    }
+  }, [userProfileData]);
+
+  useEffect(() => {
+    const isFormComplete = form.name && form.bio && form.email;
+    setIsProfileComplete(!isFormComplete);
+  }, [form.name, form.bio, form.email]);
+
   const handleSelectPhoto = async (photoUrl: string) => {
+    setTempPhotoUrl(photoUrl);
+  };
+
+  const handleButtonClick = (button: boolean) => {
+    setActiveButton(button);
+  };
+
+  const handleSubmitForm = async () => {
     const accessToken = await getAccessToken();
-    const res = await fetch(`/api/users/profiles/update-photo/${user?.id}`, {
+    const res = await fetch(`/api/users/save-user-profile`, {
       method: "POST",
       cache: "no-store",
       headers: {
@@ -75,21 +107,21 @@ export default function AuthDialog({
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({
-        photoSource: photoUrl,
-        privyDid: user?.id,
+        name: form.name,
+        photo_source: tempPhotoUrl,
+        available: activeButton,
+        preferred_profile: form.bestProfile,
+        bio: form.bio,
+        calendly_link: form.calendar,
+        unlock_calendar_fee: form.fee,
+        booking_description: form.bookingDescription,
+        privy_did: user?.id,
       }),
     });
-    if (res.ok) {
-      setTempPhotoUrl(photoUrl);
-    }
-  };
-
-  const handleButtonClick = (button: "yes" | "no") => {
-    setActiveButton(button);
-  };
-
-  const handleSubmitForm = async () => {
-    //  TODO: Implement form submission
+    return (await res.json()) as {
+      success: boolean;
+      profile: any;
+    };
   };
 
   return (
@@ -117,7 +149,11 @@ export default function AuthDialog({
               <div className='flex flex-col items-center gap-0 mb-0'>
                 <Avatar className='w-24 h-24 border-blue-700 border-2'>
                   <AvatarImage
-                    src={tempPhotoUrl ?? userProfileData?.profile.photo_source}
+                    src={
+                      tempPhotoUrl ??
+                      userProfileData?.profile?.photo_source ??
+                      ""
+                    }
                   />
                   <AvatarFallback>CL</AvatarFallback>
                 </Avatar>
@@ -182,7 +218,7 @@ export default function AuthDialog({
                   <Input
                     className='rounded-lg'
                     id='name'
-                    defaultValue={user?.google?.name ?? ""}
+                    defaultValue={form?.name ?? ""}
                     onChange={(e) =>
                       setForm({ ...form, name: e.target.value.trim() })
                     }
@@ -196,7 +232,8 @@ export default function AuthDialog({
                   <Input
                     className='rounded-lg'
                     id='email'
-                    defaultValue={user?.google?.email}
+                    disabled
+                    defaultValue={form.email}
                     onChange={(e) =>
                       setForm({ ...form, email: e.target.value.trim() })
                     }
@@ -210,6 +247,8 @@ export default function AuthDialog({
                   <Textarea
                     className='rounded-lg'
                     id='bio'
+                    value={form.bio}
+                    defaultValue={userProfileData?.profile?.bio ?? ""}
                     onChange={(e) =>
                       setForm({ ...form, bio: e.target.value.trim() })
                     }
@@ -220,11 +259,14 @@ export default function AuthDialog({
               <ProfileConnections
                 setTempPhotoUrl={setTempPhotoUrl}
                 userProfileData={userProfileData}
+                onSetBestProfile={(bestProfile) =>
+                  setForm({ ...form, bestProfile: bestProfile })
+                }
               />
 
               <Button
                 className='w-full text-sm font-body font-medium leading-[21px] mt-4 bg-[#2640eb]'
-                disabled={!form.name || !form.bio || !form.email}
+                disabled={isProfileComplete}
                 onClick={() => setStep(1)}
               >
                 Continue
@@ -249,11 +291,11 @@ export default function AuthDialog({
                 <Button
                   size='lg'
                   className={`w-40 md:w-[180px] max-w-full rounded-[8px] font-heading font-bold uppercase justify-center text-center ${
-                    activeButton === "yes"
+                    activeButton === true
                       ? "bg-[#2640EB] hover:bg-blue-600 hover:text-white text-yellow-200"
                       : "border-[#D3D8FB] border-2 bg-[#fff] text-[#919CF4]"
                   }`}
-                  onClick={() => handleButtonClick("yes")}
+                  onClick={() => handleButtonClick(true)}
                 >
                   YES!
                 </Button>
@@ -261,9 +303,9 @@ export default function AuthDialog({
                 <Button
                   size='icon'
                   onClick={() =>
-                    activeButton === "no"
-                      ? handleButtonClick("yes")
-                      : handleButtonClick("no")
+                    activeButton === false
+                      ? handleButtonClick(true)
+                      : handleButtonClick(false)
                   }
                   className='bg-transparent hover:bg-transparent active:scale-95 transition-all duration-100 absolute right-[45%]'
                 >
@@ -304,11 +346,11 @@ export default function AuthDialog({
                 <Button
                   size='lg'
                   className={`w-40 md:w-[180px] rounded-[8px] font-heading font-bold uppercase justify-center ${
-                    activeButton === "no"
+                    activeButton === false
                       ? "bg-[#2640EB] text-white hover:bg-blue-600 hover:text-white"
                       : "border-[#D3D8FB] border-2 bg-[#fff] text-[#919CF4]"
                   }`}
-                  onClick={() => handleButtonClick("no")}
+                  onClick={() => handleButtonClick(false)}
                 >
                   MAYBE LATER
                 </Button>
@@ -376,8 +418,8 @@ export default function AuthDialog({
 
           <Button
             className='w-full text-sm font-body font-medium leading-[21px] mt-4 bg-[#2640eb]'
-            disabled={!form.name || !form.bio || !form.email}
-            onClick={() => setStep(1)}
+            disabled={isProfileComplete}
+            onClick={() => handleSubmitForm()}
           >
             Save and continue to Interested
           </Button>
