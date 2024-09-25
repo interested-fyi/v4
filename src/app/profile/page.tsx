@@ -5,8 +5,33 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import SwitchButtonGroup from "@/components/composed/buttons/SwitchButtonGroup";
 import Image from "next/image";
+import { useQuery } from "@tanstack/react-query";
+import { usePrivy } from "@privy-io/react-auth";
 
 export default function ProfilePage() {
+  const { user } = usePrivy();
+  const { data: userProfileData, isLoading: userProfileLoading } = useQuery({
+    enabled: !!user,
+    queryKey: ["user", user?.id.replace("did:privy:", "")],
+    queryFn: async () => {
+      const res = await fetch(
+        `/api/users/${user?.id.replace("did:privy:", "")}`,
+        {
+          method: "GET",
+          cache: "no-store",
+          headers: {
+            "Content-type": "application/json",
+          },
+        }
+      );
+      return (await res.json()) as {
+        success: boolean;
+        profile: any;
+      };
+    },
+  });
+
+  console.log("🚀 ~ ProfilePage ~ userProfileData:", userProfileData);
   return (
     <div className='flex flex-col items-center min-h-screen bg-blue-600 text-white p-4 px-0 md:p-8'>
       <div className='w-full max-w-4xl bg-white rounded-lg overflow-hidden shadow-lg'>

@@ -10,7 +10,6 @@ import { useState } from "react";
 export default function Home() {
   const { user } = usePrivy();
   const [dialogClosed, setDialogClosed] = useState(false);
-  // Fetch companies with pagination
   const { data: userProfileData, isLoading: userProfileLoading } = useQuery({
     enabled: !!user,
     queryKey: ["user", user?.id.replace("did:privy:", "")],
