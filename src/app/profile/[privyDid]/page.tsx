@@ -8,6 +8,7 @@ import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { usePrivy } from "@privy-io/react-auth";
 import { UserCombinedProfile } from "@/types/return_types";
+import Link from "next/link";
 
 export default function ProfilePage() {
   const { user } = usePrivy();
@@ -32,7 +33,22 @@ export default function ProfilePage() {
     },
   });
 
-  console.log("🚀 ~ ProfilePage ~ userProfileData:", userProfileData);
+  const telegram = userProfileData?.profile?.telegram_username
+    ? `https://t.me/${userProfileData?.profile?.telegram_username}`
+    : null;
+  const github = userProfileData?.profile?.github_username
+    ? `https://github.com/${userProfileData?.profile?.github_username}`
+    : null;
+  const linkedin = userProfileData?.profile?.linkedin_name
+    ? `https://linkedin.com/in/${userProfileData?.profile?.linkedin_name}`
+    : null;
+  const farcast = userProfileData?.profile?.farcaster_username
+    ? `https://farcast.com/${userProfileData?.profile?.farcaster_username}`
+    : null;
+  const x = userProfileData?.profile?.x_username
+    ? `https://x.com/${userProfileData?.profile?.x_username}`
+    : null;
+
   return (
     <div className='flex flex-col items-center min-h-screen bg-[#2640eb] text-white p-4 pt-0 px-0 md:p-8'>
       <div className='w-full max-w-5xl bg-white rounded-lg overflow-hidden shadow-lg'>
@@ -40,7 +56,7 @@ export default function ProfilePage() {
         <div className='relative px-4 pb-4 bg-[#e1effe]'>
           <Avatar className='w-24 h-24 border-4 border-white rounded-full absolute -top-12 left-1/2 transform -translate-x-1/2'>
             <AvatarImage
-              src='/placeholder.svg?height=96&width=96'
+              src={userProfileData?.profile.photo_source ?? ""}
               alt='Profile picture'
             />
             <AvatarFallback>CL</AvatarFallback>
@@ -98,47 +114,68 @@ export default function ProfilePage() {
               </Button>
             </div>
           </div>
-          <div className='flex justify-center gap-4 mt-8'>
-            <Button className='bg-[#919cf4] bg-opacity-30 hover:bg-opacity-90 hover:bg-[#919cf4] w-[55px] h-8'>
-              <Image
-                src='/svg/blue-logos/telegram.svg'
-                alt='telegram'
-                height={16}
-                width={16}
-              />
-            </Button>
-            <Button className='bg-[#919cf4] bg-opacity-30 hover:bg-opacity-90 hover:bg-[#919cf4]  w-[55px] h-8'>
-              <Image
-                src='/svg/blue-logos/farcast.svg'
-                alt='farcast'
-                height={16}
-                width={16}
-              />
-            </Button>
-            <Button className='bg-[#919cf4] bg-opacity-30 hover:bg-opacity-90 hover:bg-[#919cf4] w-[55px] h-8'>
-              <Image
-                src='/svg/blue-logos/github.svg'
-                alt='github'
-                height={16}
-                width={16}
-              />
-            </Button>
-            <Button className='bg-[#919cf4] bg-opacity-30 hover:bg-opacity-90 hover:bg-[#919cf4] w-[55px] h-8'>
-              <Image
-                src='/svg/blue-logos/linkedin.svg'
-                alt='linkedin'
-                height={16}
-                width={16}
-              />
-            </Button>
-            <Button className='bg-[#919cf4] bg-opacity-30 hover:bg-opacity-90 hover:bg-[#919cf4] w-[55px] h-8'>
-              <Image
-                src='/svg/blue-logos/x.svg'
-                alt='x'
-                height={16}
-                width={16}
-              />
-            </Button>
+          <div className='flex justify-start max-w-[343px] mx-auto gap-4 mt-8'>
+            {telegram ? (
+              <Link target={"_blank"} href={telegram}>
+                <Button className='bg-[#919cf4] bg-opacity-30 hover:bg-opacity-90 hover:bg-[#919cf4] w-[55px] h-8'>
+                  <Image
+                    src='/svg/blue-logos/telegram.svg'
+                    alt='telegram'
+                    height={16}
+                    width={16}
+                  />
+                </Button>
+              </Link>
+            ) : null}
+            {farcast ? (
+              <Link target={"_blank"} href={farcast}>
+                <Button className='bg-[#919cf4] bg-opacity-30 hover:bg-opacity-90 hover:bg-[#919cf4]  w-[55px] h-8'>
+                  <Image
+                    src='/svg/blue-logos/farcast.svg'
+                    alt='farcast'
+                    height={16}
+                    width={16}
+                  />
+                </Button>
+              </Link>
+            ) : null}
+            {github ? (
+              <Link target={"_blank"} href={github}>
+                <Button className='bg-[#919cf4] bg-opacity-30 hover:bg-opacity-90 hover:bg-[#919cf4] w-[55px] h-8'>
+                  <Image
+                    src='/svg/blue-logos/github.svg'
+                    alt='github'
+                    height={16}
+                    width={16}
+                  />
+                </Button>
+              </Link>
+            ) : null}
+            {linkedin ? (
+              <Link target={"_blank"} href={linkedin}>
+                <Button className='bg-[#919cf4] bg-opacity-30 hover:bg-opacity-90 hover:bg-[#919cf4] w-[55px] h-8'>
+                  <Image
+                    src='/svg/blue-logos/linkedin.svg'
+                    alt='linkedin'
+                    height={16}
+                    width={16}
+                  />
+                </Button>
+              </Link>
+            ) : null}
+            {x ? (
+              <Link target={"_blank"} href={x}>
+                {" "}
+                <Button className='bg-[#919cf4] bg-opacity-30 hover:bg-opacity-90 hover:bg-[#919cf4] w-[55px] h-8'>
+                  <Image
+                    src='/svg/blue-logos/x.svg'
+                    alt='x'
+                    height={16}
+                    width={16}
+                  />
+                </Button>
+              </Link>
+            ) : null}
           </div>
           <div className='mt-8'>
             <SwitchButtonGroup
