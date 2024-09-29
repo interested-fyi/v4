@@ -8,91 +8,21 @@ import { usePrivy } from "@privy-io/react-auth";
 import JobPosting from "@/types/job-posting";
 import { JobPostingList } from "@/components/JobPostingList";
 import { CompanyResponse } from "@/app/api/companies/get-approved-companies/route";
+import { LoaderCircle } from "lucide-react";
 
 export default function Explore() {
   const [activeButton, setActiveButton] = useState("companies");
-  const { getAccessToken } = usePrivy();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
 
-  // Fetch companies with pagination
-  const { data: companiesData, isLoading: isLoadingCompanies } = useQuery({
-    queryKey: ["companies", page, limit],
-    queryFn: async () => {
-      const accessToken = await getAccessToken();
-      const res = await fetch(
-        `/api/companies/get-approved-companies?page=${page}&limit=${limit}`,
-        {
-          method: "GET",
-          cache: "no-store",
-          headers: {
-            "Content-type": "application/json",
-            authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-      return (await res.json()) as {
-        success: boolean;
-        companies: CompanyResponse[];
-        totalCompanies: number;
-        currentPage: number;
-        totalPages: number;
-      };
-    },
-  });
-
-  // Fetch job postings with pagination
-  const { data: jobs, isLoading: isLoadingJobs } = useQuery({
-    queryKey: ["jobs", page, limit],
-    queryFn: async () => {
-      const accessToken = await getAccessToken();
-      const res = await fetch(
-        `/api/jobs/get-all-jobs?page=${page}&limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-type": "application/json",
-            authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-      return (await res.json()) as {
-        success: boolean;
-        jobs: JobPosting[];
-        totalJobs: number;
-        currentPage: number;
-        totalPages: number;
-      };
-    },
-  });
-
   const handleButtonClick = (button: string) => {
     setActiveButton(button);
-  };
-
-  const handleNextPage = () => {
-    const totalPages =
-      activeButton === "companies"
-        ? companiesData?.totalPages
-        : jobs?.totalPages;
-    if (page < (totalPages ?? 1)) {
-      setPage((prevPage) => prevPage + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (page > 1) {
-      setPage((prevPage) => prevPage - 1);
-    }
-  };
-
-  const handlePageSelect = (selectedPage: number) => {
-    setPage(selectedPage);
+    setPage(1); // Reset page when switching
   };
 
   return (
     <>
-      <div className='flex flex-col px-4 md:px-28 h-fit py-6 max-h-full items-start md:items-center justify-center md:justify-between w-full bg-[#e1effe] '>
+      <div className='flex flex-col px-4 md:px-28 h-fit py-6 max-h-full items-start md:items-center justify-center md:justify-between w-full bg-[#e1effe]'>
         <div className='flex flex-col w-full m-auto gap-8 items-start'>
           <Selector
             activeButton={activeButton}
@@ -100,128 +30,21 @@ export default function Explore() {
           />
         </div>
       </div>
+
       {activeButton === "companies" ? (
-        <>
-          {/* a selector for changing how many companies to show per page */}
-          <div className='flex justify-end items-center gap-4 px-8'>
-            <span>Companies per page:</span>
-            <select
-              value={limit}
-              onChange={(e) => setLimit(Number(e.target.value))}
-              className='border p-1 rounded'
-            >
-              {[10, 20, 50].map((limit) => (
-                <option key={limit} value={limit}>
-                  {limit}
-                </option>
-              ))}
-            </select>
-          </div>
-          <section className='grid grid-cols-1 gap-6 p-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:p-6'>
-            {isLoadingCompanies ? (
-              <div className='text-center'>
-                <p>Loading...</p>
-              </div>
-            ) : (
-              companiesData?.companies?.map((company: CompanyResponse) => (
-                <Link
-                  className='w-full'
-                  href={`/company-details/${company.id}`}
-                  key={company.id}
-                >
-                  <CompanyCard company={company} />
-                </Link>
-              ))
-            )}
-          </section>
-          <div className='flex justify-between items-center mt-4 max-w-96 pb-8 mx-auto'>
-            <Button
-              onClick={handlePreviousPage}
-              disabled={page === 1}
-              variant='outline'
-            >
-              Previous
-            </Button>
-            <span>
-              Page{" "}
-              <select
-                value={page}
-                onChange={(e) => handlePageSelect(Number(e.target.value))}
-                className='border p-1 rounded'
-              >
-                {Array.from(
-                  { length: companiesData?.totalPages ?? 1 },
-                  (_, i) => i + 1
-                ).map((pageNum) => (
-                  <option key={pageNum} value={pageNum}>
-                    {pageNum}
-                  </option>
-                ))}
-              </select>{" "}
-              of {companiesData?.totalPages ?? 1}
-            </span>
-            <Button
-              onClick={handleNextPage}
-              disabled={page === (companiesData?.totalPages ?? 1)}
-              variant='outline'
-            >
-              Next
-            </Button>
-          </div>
-        </>
+        <Companies
+          page={page}
+          limit={limit}
+          onPageChange={setPage}
+          onLimitChange={setLimit}
+        />
       ) : (
-        <>
-          {/* a selector for changing how many jobs to show per page */}
-          <div className='flex justify-end items-center gap-4 px-8'>
-            <span>Jobs per page:</span>
-            <select
-              value={limit}
-              onChange={(e) => setLimit(Number(e.target.value))}
-              className='border p-1 rounded'
-            >
-              {[10, 20, 50].map((limit) => (
-                <option key={limit} value={limit}>
-                  {limit}
-                </option>
-              ))}
-            </select>
-          </div>
-          <JobPostingList jobs={jobs?.jobs ?? []} />
-          <div className='flex justify-between items-center mt-4 max-w-96 pb-8 mx-auto'>
-            <Button
-              onClick={handlePreviousPage}
-              disabled={page === 1}
-              variant='outline'
-            >
-              Previous
-            </Button>
-            <span>
-              Page{" "}
-              <select
-                value={page}
-                onChange={(e) => handlePageSelect(Number(e.target.value))}
-                className='border p-1 rounded'
-              >
-                {Array.from(
-                  { length: jobs?.totalPages ?? 1 },
-                  (_, i) => i + 1
-                ).map((pageNum) => (
-                  <option key={pageNum} value={pageNum}>
-                    {pageNum}
-                  </option>
-                ))}
-              </select>{" "}
-              of {jobs?.totalPages ?? 1}
-            </span>
-            <Button
-              onClick={handleNextPage}
-              disabled={page === (jobs?.totalPages ?? 1)}
-              variant='outline'
-            >
-              Next
-            </Button>
-          </div>
-        </>
+        <Jobs
+          page={page}
+          limit={limit}
+          onPageChange={setPage}
+          onLimitChange={setLimit}
+        />
       )}
     </>
   );
@@ -292,6 +115,210 @@ function Selector({ activeButton, handleButtonClick }: SelectorProps) {
         onClick={() => handleButtonClick("jobs")}
       >
         jobs
+      </Button>
+    </div>
+  );
+}
+interface CompaniesProps {
+  page: number;
+  limit: number;
+  onPageChange: (page: number) => void;
+  onLimitChange: (limit: number) => void;
+}
+
+export function Companies({
+  page,
+  limit,
+  onPageChange,
+  onLimitChange,
+}: CompaniesProps) {
+  const { getAccessToken } = usePrivy();
+
+  const { data: companiesData, isLoading: isLoadingCompanies } = useQuery({
+    queryKey: ["companies", page, limit],
+    queryFn: async () => {
+      const accessToken = await getAccessToken();
+      const res = await fetch(
+        `/api/companies/get-approved-companies?page=${page}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json",
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return (await res.json()) as {
+        success: boolean;
+        companies: CompanyResponse[];
+        totalCompanies: number;
+        totalPages: number;
+      };
+    },
+  });
+
+  return (
+    <>
+      <div className='flex justify-end items-center gap-4 px-8'>
+        <span>Companies per page:</span>
+        <select
+          value={limit}
+          onChange={(e) => onLimitChange(Number(e.target.value))}
+          className='border p-1 rounded'
+        >
+          {[10, 20, 50].map((limitOption) => (
+            <option key={limitOption} value={limitOption}>
+              {limitOption}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {isLoadingCompanies ? (
+        <div className='text-center flex items-center w-full min-h-60'>
+          <LoaderCircle className='w-12 h-12 text-blue-500 animate-spin mx-auto' />
+        </div>
+      ) : (
+        <section className='grid grid-cols-1 gap-6 p-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:p-6 min-h-48'>
+          {companiesData?.companies?.map((company: CompanyResponse) => (
+            <Link
+              className='w-full'
+              href={`/company-details/${company.id}`}
+              key={company.id}
+            >
+              <CompanyCard company={company} />
+            </Link>
+          ))}
+        </section>
+      )}
+
+      <Pagination
+        page={page}
+        totalPages={companiesData?.totalPages ?? 1}
+        onPageChange={onPageChange}
+      />
+    </>
+  );
+}
+
+interface JobsProps {
+  page: number;
+  limit: number;
+  onPageChange: (page: number) => void;
+  onLimitChange: (limit: number) => void;
+}
+
+export function Jobs({ page, limit, onPageChange, onLimitChange }: JobsProps) {
+  const { getAccessToken } = usePrivy();
+
+  const { data: jobsData, isLoading: isLoadingJobs } = useQuery({
+    queryKey: ["jobs", page, limit],
+    queryFn: async () => {
+      const accessToken = await getAccessToken();
+      const res = await fetch(
+        `/api/jobs/get-all-jobs?page=${page}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json",
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return (await res.json()) as {
+        success: boolean;
+        jobs: JobPosting[];
+        totalJobs: number;
+        totalPages: number;
+      };
+    },
+  });
+
+  return (
+    <>
+      <div className='flex justify-end items-center gap-4 px-8'>
+        <span>Jobs per page:</span>
+        <select
+          value={limit}
+          onChange={(e) => onLimitChange(Number(e.target.value))}
+          className='border p-1 rounded'
+        >
+          {[10, 20, 50].map((limitOption) => (
+            <option key={limitOption} value={limitOption}>
+              {limitOption}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {isLoadingJobs ? (
+        <div className='text-center flex items-center w-full min-h-60'>
+          <LoaderCircle className='w-12 h-12 text-blue-500 animate-spin mx-auto' />
+        </div>
+      ) : (
+        <JobPostingList jobs={jobsData?.jobs ?? []} />
+      )}
+
+      <Pagination
+        page={page}
+        totalPages={jobsData?.totalPages ?? 1}
+        onPageChange={onPageChange}
+      />
+    </>
+  );
+}
+
+interface PaginationProps {
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
+
+function Pagination({ page, totalPages, onPageChange }: PaginationProps) {
+  const handleNextPage = () => {
+    if (page < totalPages) {
+      onPageChange(page + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (page > 1) {
+      onPageChange(page - 1);
+    }
+  };
+
+  return (
+    <div className='flex justify-between items-center mt-4 max-w-96 pb-8 mx-auto'>
+      <Button
+        onClick={handlePreviousPage}
+        disabled={page === 1}
+        variant='outline'
+      >
+        Previous
+      </Button>
+      <span>
+        Page{" "}
+        <select
+          value={page}
+          onChange={(e) => onPageChange(Number(e.target.value))}
+          className='border p-1 rounded'
+        >
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+            (pageNum) => (
+              <option key={pageNum} value={pageNum}>
+                {pageNum}
+              </option>
+            )
+          )}
+        </select>{" "}
+        of {totalPages}
+      </span>
+      <Button
+        onClick={handleNextPage}
+        disabled={page === totalPages}
+        variant='outline'
+      >
+        Next
       </Button>
     </div>
   );
