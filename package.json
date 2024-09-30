@@ -28,6 +28,7 @@
     "@radix-ui/react-separator": "^1.1.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-switch": "^1.1.0",
+    "@radix-ui/react-tabs": "^1.1.0",
     "@radix-ui/react-toast": "^1.2.1",
     "@reduxjs/toolkit": "^2.2.6",
     "@sparticuz/chromium": "^126.0.0",
@@ -64,7 +65,8 @@
     "ts-jest": "^29.2.2",
     "ts-node": "^10.9.2",
     "uuid": "^10.0.0",
-    "viem": "^2.21.15"
+    "viem": "^2.21.15",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^5.50.1",

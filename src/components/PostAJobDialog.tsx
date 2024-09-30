@@ -11,87 +11,83 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-
 import { useToast } from "@/components/ui/use-toast";
-import Company from "@/types/company";
+import { z } from "zod";
 import Image from "next/image";
 
-export function PostAJob() {
-  const [companyName, setCompanyName] = useState("");
-  const [careersPageUrl, setCareersPageUrl] = useState("");
-  const [email, setEmail] = useState("");
-  const [urlError, setUrlError] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [telegramEasier, setTelegramEasier] = useState(false);
-  const [recruitingHelp, setRecruitingHelp] = useState(false);
-  const [hostBounty, setHostBounty] = useState(false);
-  const [telegramError, setTelegramError] = useState("");
-  const [telegramHandle, setTelegramHandle] = useState("");
-  const [submitSuccess, setSubmitSuccess] = useState(false);
+// Zod schema for validation
+const postJobSchema = z.object({
+  companyName: z.string().min(1, "Company name is required"),
+  careersPageUrl: z.string().url("Invalid URL"),
+  email: z.string().email("Invalid email address"),
+  telegramHandle: z.string().optional(),
+});
 
+export function PostAJob() {
+  const [formData, setFormData] = useState({
+    companyName: "",
+    careersPageUrl: "",
+    email: "",
+    telegramHandle: "",
+    recruitingHelp: false,
+    hostBounty: false,
+    telegramEasier: false,
+  });
+
+  const [errors, setErrors] = useState<{
+    companyName?: { _errors: string[] };
+    careersPageUrl?: { _errors: string[] };
+    email?: { _errors: string[] };
+    telegramHandle?: { _errors: string[] };
+  } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
   const { toast } = useToast();
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value, type } = e.target;
 
-  const validateUrl = (url: string) => {
-    try {
-      new URL(url);
-      return true;
-    } catch (_) {
-      return false;
+    if (type === "checkbox") {
+      const checked = (e.target as HTMLInputElement).checked;
+      setFormData((prev) => ({
+        ...prev,
+        [name]: checked,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
     }
   };
 
-  const validateTelegram = (handle: string) => {
-    if ((!handle || handle.length === 0) && telegramEasier) {
+  // Validate form using Zod
+  const validateForm = () => {
+    const result = postJobSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors = result.error.format();
+      setErrors(fieldErrors);
       return false;
     }
+    setErrors(null);
     return true;
   };
 
-  async function submitForm() {
+  const submitForm = async () => {
+    if (!validateForm()) return;
+
     setLoading(true);
-    setUrlError("");
-    setEmailError("");
-    setTelegramError("");
-
-    if (!validateUrl(careersPageUrl)) {
-      setUrlError("Invalid URL");
-      setLoading(false);
-      return;
-    }
-    if (!validateEmail(email)) {
-      setEmailError("Invalid Email Address");
-      setLoading(false);
-      return;
-    }
-
-    if (!validateTelegram(telegramHandle)) {
-      setTelegramError("Invalid telegram handle");
-      setLoading(false);
-      return;
-    }
-
     try {
       const response = await fetch("/api/create-company", {
         method: "POST",
         headers: {
-          "Content-type": "application/json",
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          company: {
-            company_name: companyName,
-            careers_page_url: careersPageUrl,
-            creator_email: email,
-            recruiting_help: recruitingHelp,
-            host_bounty: hostBounty,
-            telegram_handle: telegramHandle,
-          } as Company,
-        }),
+        body: JSON.stringify({ company: formData }),
       });
 
       if (!response.ok) {
@@ -102,15 +98,15 @@ export function PostAJob() {
       if (result) {
         setSubmitSuccess(true);
       }
-    } catch (e) {
+    } catch (error) {
       toast({
         title: "Error",
-        description: "There was an error creating your company profile",
+        description: "There was an error creating your company profile.",
       });
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const onClose = () => {
     setSubmitSuccess(false);
@@ -123,16 +119,10 @@ export function PostAJob() {
   }, []);
 
   return (
-    <Dialog
-      onOpenChange={(e) => {
-        if (e.valueOf() === false) {
-          onClose();
-        }
-      }}
-    >
+    <Dialog onOpenChange={(open) => !open && onClose()}>
       <DialogTrigger asChild>
         <Button
-          variant={"link"}
+          variant='link'
           className='text-center my-0 py-0 h-fit text-white text-sm font-semibold font-body underline leading-[21px]'
         >
           I want to post a job
@@ -143,9 +133,8 @@ export function PostAJob() {
           <SuccessMessage />
         ) : (
           <>
-            {" "}
             <div className='flex'>
-              <DialogTitle className='text-[#1e1e1e] mx-auto text-4xl font-bold font-heading leading-9'>
+              <DialogTitle className='text-center text-[#1e1e1e] text-4xl font-bold font-heading mx-auto leading-9'>
                 POST A JOB
               </DialogTitle>
             </div>
@@ -159,27 +148,35 @@ export function PostAJob() {
                 </Label>
                 <Input
                   id='company-name'
+                  name='companyName'
                   placeholder='Company Name'
-                  onChange={(e) => setCompanyName(e.target.value)}
+                  value={formData.companyName}
+                  onChange={handleInputChange}
                 />
-                {urlError && (
-                  <p className='text-red-700 font-bold'>{urlError}</p>
+                {errors?.companyName && (
+                  <p className='text-red-700 font-bold text-xs -top-1 relative'>
+                    {errors?.companyName._errors[0]}
+                  </p>
                 )}
               </div>
               <div className='space-y-2'>
                 <Label
-                  htmlFor='careers-page'
                   className='text-[#111928] text-sm font-medium font-body leading-[21px]'
+                  htmlFor='careers-page'
                 >
-                  Your company&apos;s careers page (url)
+                  Your company&apos;s careers page (URL)
                 </Label>
                 <Input
                   id='careers-page'
+                  name='careersPageUrl'
                   placeholder='https://'
-                  onChange={(e) => setCareersPageUrl(e.target.value)}
+                  value={formData.careersPageUrl}
+                  onChange={handleInputChange}
                 />
-                {urlError && (
-                  <p className='text-red-700 font-bold'>{urlError}</p>
+                {errors?.careersPageUrl && (
+                  <p className='text-red-700 font-bold text-xs -top-1 relative'>
+                    {errors?.careersPageUrl._errors[0]}
+                  </p>
                 )}
               </div>
               <div className='space-y-2'>
@@ -191,61 +188,86 @@ export function PostAJob() {
                 </Label>
                 <Input
                   id='email'
-                  placeholder='name@example.com'
+                  name='email'
                   type='email'
-                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder='name@example.com'
+                  value={formData.email}
+                  onChange={handleInputChange}
                 />
-                {emailError && (
-                  <p className='text-red-700 font-bold'>{emailError}</p>
+                {errors?.email && (
+                  <p className='text-red-700 font-bold text-xs -top-1 relative'>
+                    {errors?.email._errors[0]}
+                  </p>
                 )}
               </div>
             </div>
-            <h3 className='text-[#1e1e1e] mx-auto text-xl font-bold font-heading leading-tight'>
+            <h3 className='text-center text-[#1e1e1e] text-xl font-bold font-heading leading-tight'>
               ADDITIONAL OPTIONS
             </h3>
             <div className='flex flex-col gap-4'>
               <div className='flex items-center space-x-6'>
                 <Input
                   type='checkbox'
-                  className='h-6 w-6 text-[#111928] text-sm font-medium font-body leading-[21px]'
+                  className='h-6 w-6'
                   id='recruiting-help'
-                  onChange={(e) => setRecruitingHelp(e.target.checked)}
+                  name='recruitingHelp'
+                  checked={formData.recruitingHelp}
+                  onChange={handleInputChange}
                 />
-                <Label htmlFor='recruiting-help'>
+                <Label
+                  className='text-[#111928] text-sm font-medium font-body leading-[21px]'
+                  htmlFor='recruiting-help'
+                >
                   Do you need recruiting help?
                 </Label>
               </div>
               <div className='flex items-center space-x-6'>
                 <Input
                   type='checkbox'
-                  className='h-6 w-6 text-[#111928] text-sm font-medium font-body leading-[21px]'
+                  className='h-6 w-6'
                   id='bounty-host'
-                  onChange={(e) => setHostBounty(e.target.checked)}
+                  name='hostBounty'
+                  checked={formData.hostBounty}
+                  onChange={handleInputChange}
                 />
-                <Label htmlFor='bounty-host'>
+                <Label
+                  className='text-[#111928] text-sm font-medium font-body leading-[21px]'
+                  htmlFor='bounty-host'
+                >
                   Do you want to host a bounty for your community?
                 </Label>
               </div>
               <div className='flex items-center space-x-6'>
                 <Input
                   type='checkbox'
-                  className='h-6 w-6 text-[#111928] text-sm font-medium font-body leading-[21px]'
+                  className='h-6 w-6'
                   id='telegram-easier'
-                  onChange={(e) => setTelegramEasier(e.target.checked)}
+                  name='telegramEasier'
+                  checked={formData.telegramEasier}
+                  onChange={handleInputChange}
                 />
-                <Label htmlFor='telegram-easier'>Is Telegram easier?</Label>
+                <Label
+                  className='text-[#111928] text-sm font-medium font-body leading-[21px]'
+                  htmlFor='telegram-easier'
+                >
+                  Is Telegram easier?
+                </Label>
               </div>
-              {telegramEasier && (
+              {formData.telegramEasier && (
                 <div className='space-y-2'>
                   <Label className='text-[#111928] text-sm font-medium font-body leading-[21px]'>
                     Telegram Handle
                   </Label>
                   <Input
                     placeholder='@telegram'
-                    onChange={(e) => setTelegramHandle(e.target.value)}
+                    name='telegramHandle'
+                    value={formData.telegramHandle}
+                    onChange={handleInputChange}
                   />
-                  {telegramError && (
-                    <p className='text-red-700 font-bold'>{telegramError}</p>
+                  {errors?.telegramHandle && (
+                    <p className='text-red-700 font-bold text-xs -top-1 relative'>
+                      {errors?.telegramHandle._errors[0]}
+                    </p>
                   )}
                 </div>
               )}
@@ -254,7 +276,12 @@ export function PostAJob() {
               <Button
                 className='place-self-end w-full bg-[#2640eb] hover:bg-[#2640eb] hover:font-bold hover:scale-[1.01] transition-all duration-100 hover:text-yellow-200 text-white text-sm font-medium font-body leading-[21px]'
                 onClick={submitForm}
-                disabled={loading || !companyName || !careersPageUrl || !email}
+                disabled={
+                  loading ||
+                  !formData.companyName ||
+                  !formData.careersPageUrl ||
+                  !formData.email
+                }
               >
                 {loading ? (
                   <l-hourglass
@@ -286,15 +313,13 @@ function SuccessMessage() {
           className='w-[75.14px] h-16'
           src='/svg/Union.svg'
         />
-        <div className='h-12 flex-col justify-start items-center gap-6 flex'>
-          <div className='self-stretch text-center text-[#1e1e1e] text-2xl font-bold font-heading leading-none'>
-            YOUR COMPANY PROFILE HAS BEEN CREATED.
-          </div>
-        </div>
-        <div className='w-[343px] text-center text-gray-700 text-sm font-semibold font-body leading-[21px]'>
+        <h1 className='text-center text-[#1e1e1e] text-2xl font-bold font-heading leading-normal'>
+          YOUR COMPANY PROFILE HAS BEEN CREATED.
+        </h1>
+        <p className='w-[343px] text-center text-gray-700 text-sm font-semibold font-body leading-[21px]'>
           We will be in touch soon to help get your open positions and bounties
           posted.
-        </div>
+        </p>
       </div>
     </div>
   );
