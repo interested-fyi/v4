@@ -51,7 +51,7 @@ export default function ProfilePage() {
 
   return (
     <div className='flex flex-col items-center min-h-screen bg-[#2640eb] text-white p-4 pt-0 px-0 md:p-8'>
-      <div className='relative w-full max-w-5xl bg-white rounded-lg overflow-hidden shadow-lg'>
+      <div className='relative w-full max-w-5xl bg-white overflow-hidden'>
         <div className='bg-[#2640eb] h-[135px]'></div>
         <div className='relative px-4 pb-4 bg-[#e1effe]'>
           <Avatar className='w-[140px] h-[140px] border-4 border-white rounded-full absolute -top-[100px] left-1/2 transform -translate-x-1/2'>
