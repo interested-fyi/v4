@@ -12,6 +12,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { usePrivy } from "@privy-io/react-auth";
+import { useSmartWallets } from '@privy-io/react-auth/smart-wallets';
+import schemaRegistryAbi from "@ethereum-attestation-service/eas-contracts/deployments/optimism/SchemaRegistry.json";
 import { useEffect, useState } from "react";
 import { LoaderIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -19,6 +21,9 @@ import Image from "next/image";
 import { ProfileConnections } from "../profile/ProfileConnections";
 import { Textarea } from "@/components/ui/textarea";
 import { UserCombinedProfile } from "@/types/return_types";
+import { optimism, optimismSepolia } from "viem/chains";
+import { Chain, createPublicClient, http } from "viem";
+import { publicClient } from "@/lib/viemClient";
 
 export default function AuthDialog({
   isOpen,
@@ -42,6 +47,7 @@ export default function AuthDialog({
   const [isProfileComplete, setIsProfileComplete] = useState<boolean>(false);
 
   const { user, getAccessToken } = usePrivy();
+  const { client } = useSmartWallets();
 
   const {
     data: userProfileData,
@@ -118,9 +124,52 @@ export default function AuthDialog({
         privy_did: user?.id,
       }),
     });
-    return (await res.json()) as {
+    const resData = await res.json()
+    // create user attestation schema
+    if (resData.success) {
+      const { request, result } = await publicClient.simulateContract({
+        address: process.env.SCHEMA_REGISTRY_ADDRESS as `0x${string}`,
+        abi: schemaRegistryAbi.abi,
+        functionName: 'register',
+        args: [
+            "string relationshipTest, string endorsementTest", //schema string
+            "0x0000000000000000000000000000000000000000	", // resolver address
+            true // revocable or not
+        ],
+        chain:
+          process.env.NODE_ENV === "development" ||
+          process.env.NODE_ENV === "test"
+            ?  optimismSepolia as Chain
+            : optimism as Chain,
+        account: client?.account,
+      });
+      const txHash = await client?.writeContract(request);
+      console.log(`Result: ${JSON.stringify(result)}\ntx hash: ${txHash}\nRegistering address: ${client?.account}`)
+      // if result and txhash, exist, then schema is registered. need to save schemaUID and txHash to supabase
+      const schemaRes = await fetch(`/api/users/save-endorsement-schema`, {
+        method: "POST",
+        cache: "no-store",
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          schema_uid: result,
+          schema_tx_hash: txHash,
+          privy_did: user?.id,
+        }),
+      });
+      const schemaSuccess = (await schemaRes.json()).success;
+      return {
+        success: resData.success,
+        profile: resData.profile,
+        schema_success: schemaSuccess,
+      }
+    }
+    return resData as {
       success: boolean;
       profile: any;
+      schema_success: false;
     };
   };
 

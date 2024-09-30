@@ -8,7 +8,7 @@ const privyClient = new PrivyClient(
 );
 
 export async function POST(req: NextRequest) {
-  const { privy_did, name, photo_source, available, preferred_profile, bio, calendly_link, unlock_calendar_fee, booking_description } = await req.json();
+  const { privy_did, schema_uid, schema_tx_hash } = await req.json();
   const accessToken = req.headers.get("Authorization")?.replace("Bearer ", "");
 
   // verify authenticate user sent request
@@ -27,21 +27,15 @@ export async function POST(req: NextRequest) {
     .from("users")
     .upsert([{
         privy_did: privyDid,
-        name: name,
-        photo_source: photo_source,
-        available: available,
-        preferred_profile: preferred_profile,
-        bio: bio,
-        calendly_link: calendly_link,
-        unlock_calendar_fee: unlock_calendar_fee,
-        booking_description: booking_description
+        endorsement_schema_uid: schema_uid,
+        endorsement_schema_tx_hash: schema_tx_hash
     }], { onConflict: 'privy_did' })
     .select().single();
 
   if (error) throw error;
 
   return NextResponse.json(
-    { profile: data, success: true },
+    { success: true },
     { status: 200 }
   );
 }
