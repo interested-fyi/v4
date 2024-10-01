@@ -31,8 +31,6 @@ export default function Home() {
     },
   });
 
-  console.log(`show dialog: ${!dialogClosed && !!user && !userProfileData?.profile && !userProfileLoading}\nDialog Closed: ${dialogClosed}\nUser: ${JSON.stringify(user)}\nUser Profile Data: ${JSON.stringify(userProfileData)}\nUser Profile Loading: ${userProfileLoading}`);
-
   return (
     <main className='flex  min-h-screen flex-col gap-0 items-center justify-start '>
       <section className='w-full max-w-full bg-[#2640EB] py-24 sm:p-8 p-2 md:p-24'>

@@ -7,7 +7,7 @@ dotenv.config();
 // Jest test function
 test('simulateContract on SchemaRegistry contract', async () => {
     const contractParams = {
-      address: process.env.SCHEMA_REGISTRY_ADDRESS as `0x${string}`,
+      address: process.env.NEXT_PUBLIC_SCHEMA_REGISTRY_ADDRESS as `0x${string}`,
       abi: schemaRegistryAbi.abi,
       functionName: 'register',
       args: [
@@ -16,8 +16,7 @@ test('simulateContract on SchemaRegistry contract', async () => {
           true // revocable or not
       ],
       chain:
-        process.env.NODE_ENV === "development" ||
-        process.env.NODE_ENV === "test"
+        process.env.NODE_ENV !== "production"
           ? optimismSepolia as Chain
           : optimism as Chain,
       account: "0x08143826FEcD65D2fABc8d5D37a667028fdbA409" as `0x${string}`,

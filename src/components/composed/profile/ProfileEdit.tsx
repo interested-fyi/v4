@@ -72,8 +72,8 @@ export const ProfileEditForm = ({ onSubmit }: Props) => {
   useEffect(() => {
     if (userProfileData?.success) {
       setForm({
-        name: userProfileData.profile?.name ?? "",
-        email: userProfileData.profile?.email ?? "",
+        name: user?.google?.name ?? "",
+        email: user?.google?.email ?? "",
         bio: userProfileData.profile?.bio ?? "",
         bestProfile: userProfileData.profile?.preferred_profile ?? "",
       });
@@ -183,7 +183,7 @@ export const ProfileEditForm = ({ onSubmit }: Props) => {
             id='bio'
             value={form.bio}
             defaultValue={userProfileData?.profile?.bio ?? ""}
-            onChange={(e) => setForm({ ...form, bio: e.target.value.trim() })}
+            onChange={(e) => setForm({ ...form, bio: e.target.value })}
           />
         </div>
       </div>

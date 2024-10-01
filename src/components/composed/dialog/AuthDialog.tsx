@@ -19,6 +19,8 @@ import { UserCombinedProfile } from "@/types/return_types";
 import { optimism, optimismSepolia } from "viem/chains";
 import { Chain, createPublicClient, http } from "viem";
 import { publicClient } from "@/lib/viemClient";
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 export default function AuthDialog({
   isOpen,
@@ -77,6 +79,9 @@ export default function AuthDialog({
     isAvailable: boolean;
   }) => {
     const accessToken = await getAccessToken();
+    const formToSubmit = Object.fromEntries(
+      Object.entries(form).map(([key, value]) => [key, value === "" ? null : value])
+    );
     const res = await fetch(`/api/users/save-user-profile`, {
       method: "POST",
       cache: "no-store",
@@ -85,57 +90,62 @@ export default function AuthDialog({
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({
-        name: form.name,
+        name: formToSubmit.name,
         photo_source: tempPhotoUrl,
-        available: form.isAvailable,
-        preferred_profile: form.bestProfile,
-        bio: form.bio,
-        calendly_link: form.calendar,
-        unlock_calendar_fee: form.fee,
-        booking_description: form.bookingDescription,
+        available: formToSubmit.isAvailable,
+        preferred_profile: formToSubmit.bestProfile,
+        bio: formToSubmit.bio,
+        calendly_link: formToSubmit.calendar,
+        unlock_calendar_fee: formToSubmit.fee,
+        booking_description: formToSubmit.bookingDescription,
         privy_did: user?.id,
       }),
     });
     const resData = await res.json()
     // create user attestation schema
     if (resData.success) {
-      const { request, result } = await publicClient.simulateContract({
-        address: process.env.SCHEMA_REGISTRY_ADDRESS as `0x${string}`,
-        abi: schemaRegistryAbi.abi,
-        functionName: 'register',
-        args: [
-            "string relationshipTest, string endorsementTest", //schema string
-            "0x0000000000000000000000000000000000000000	", // resolver address
-            true // revocable or not
-        ],
-        chain:
-          process.env.NODE_ENV === "development" ||
-          process.env.NODE_ENV === "test"
-            ?  optimismSepolia as Chain
-            : optimism as Chain,
-        account: client?.account,
-      });
-      const txHash = await client?.writeContract(request);
-      console.log(`Result: ${JSON.stringify(result)}\ntx hash: ${txHash}\nRegistering address: ${client?.account}`)
-      // if result and txhash, exist, then schema is registered. need to save schemaUID and txHash to supabase
-      const schemaRes = await fetch(`/api/users/save-endorsement-schema`, {
-        method: "POST",
-        cache: "no-store",
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          schema_uid: result,
-          schema_tx_hash: txHash,
-          privy_did: user?.id,
-        }),
-      });
-      const schemaSuccess = (await schemaRes.json()).success;
-      return {
-        success: resData.success,
-        profile: resData.profile,
-        schema_success: schemaSuccess,
+      try {
+        const contractParams = {
+          address: process.env.NEXT_PUBLIC_SCHEMA_REGISTRY_ADDRESS as `0x${string}`,
+          abi: schemaRegistryAbi.abi,
+          functionName: 'register',
+          args: [
+              "string relationship, string endorsement", //schema string
+              "0x0000000000000000000000000000000000000000", // resolver address
+              true // revocable or not
+          ],
+          chain:
+            process.env.NODE_ENV !== "production"
+              ?  optimismSepolia as Chain
+              : optimism as Chain,
+          account: client?.account,
+        }
+        const  { abi, ...contractParamNoABI } = contractParams;
+        const { request, result } = await publicClient.simulateContract(contractParams);
+        const txHash = await client?.writeContract(request);
+        console.log(`Result: ${JSON.stringify(result)}\ntx hash: ${txHash}\nRegistering address: ${client?.account.address}`)
+        // if result and txhash, exist, then schema is registered. need to save schemaUID and txHash to supabase
+        const schemaRes = await fetch(`/api/users/save-endorsement-schema`, {
+          method: "POST",
+          cache: "no-store",
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },  
+          body: JSON.stringify({
+            schema_uid: result,
+            schema_tx_hash: txHash,
+            privy_did: user?.id,
+          }),
+        });
+        const schemaSuccess = (await schemaRes.json()).success;
+        return {
+          success: resData.success,
+          profile: resData.profile,
+          schema_success: schemaSuccess,
+        }
+      } catch (error) {
+        console.error(error);
       }
     }
     return resData as {
@@ -199,8 +209,8 @@ export default function AuthDialog({
               interests you.
             </div>
             <ProfileSettings
-              onSubmit={(formDetails) => {
-                handleSubmitForm({
+              onSubmit={async (formDetails) => {
+                await handleSubmitForm({
                   ...form,
                   ...formDetails,
                 });
