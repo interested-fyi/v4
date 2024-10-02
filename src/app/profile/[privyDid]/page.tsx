@@ -214,9 +214,9 @@ font-body text-center mt-7 mb-6'
                     Friend/Associate
                   </p>
                   <p className='text-xs text-gray-600 font-medium font-body leading-[18px] mt-2'>
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit,
                     sed do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua."
+                    aliqua.
                   </p>
                 </div>
               </div>
