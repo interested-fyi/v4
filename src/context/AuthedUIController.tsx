@@ -83,6 +83,8 @@ const AuthedUIController = ({
       linkedAccount
     ) => {
       const accessToken = await getAccessToken();
+      console.log("New user:", isNewUser);
+      console.log("User:", user.google?.email);
       if (isNewUser) {
         const res = await fetch(`/api/users/save-user`, {
           method: "POST",
