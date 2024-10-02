@@ -27,7 +27,7 @@ const JobTable = () => {
         `/api/companies/get-company-by-id?companyId=${slug["company-id"]}`,
         {
           method: "GET",
-          cache: 'no-store',
+          cache: "no-store",
           headers: {
             "Content-type": "application/json",
             authorization: `Bearer ${accessToken}`,
@@ -40,7 +40,6 @@ const JobTable = () => {
       };
     },
   });
-
   const {
     data: jobs,
     isLoading: isLoadingJobs,
@@ -53,7 +52,7 @@ const JobTable = () => {
         `/api/jobs/get-jobs-by-company?companyId=${slug["company-id"]}`,
         {
           method: "GET",
-          cache: 'no-store',
+          cache: "no-store",
           headers: {
             "Content-type": "application/json",
             authorization: `Bearer ${accessToken}`,
@@ -70,7 +69,9 @@ const JobTable = () => {
   if (isLoadingJobs || isRefetching) {
     return (
       // Loading state
-      <div className='text-center'>Loading...</div>
+      <div className='text-center min-h-96 flex justify-center items-center'>
+        <h1>Loading...</h1>
+      </div>
     );
   }
 
