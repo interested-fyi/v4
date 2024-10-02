@@ -115,7 +115,7 @@ export default function AuthDialog({
               true // revocable or not
           ],
           chain:
-            process.env.NODE_ENV !== "production"
+            process.env.VERCEL_ENV !== "production"
               ?  optimismSepolia as Chain
               : optimism as Chain,
           account: client?.account,

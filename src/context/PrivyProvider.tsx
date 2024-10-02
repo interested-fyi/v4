@@ -14,7 +14,7 @@ const PrivyProviderWrapper = ({ children }: { children: React.ReactNode }) => {
           createOnLogin: "users-without-wallets", // defaults to 'off'
         },
         loginMethods: ['google'],
-        defaultChain: process.env.NODE_ENV !== "production" ? optimismSepolia : optimism,
+        defaultChain: process.env.VERCEL_ENV !== "production" ? optimismSepolia : optimism,
       }}
     >
       <SmartWalletsProvider>
