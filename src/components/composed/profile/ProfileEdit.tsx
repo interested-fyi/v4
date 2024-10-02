@@ -96,7 +96,9 @@ export const ProfileEditForm = ({ onSubmit }: Props) => {
           <AvatarImage
             src={tempPhotoUrl ?? userProfileData?.profile?.photo_source ?? ""}
           />
-          <AvatarFallback>CL</AvatarFallback>
+          <AvatarFallback>
+            {userProfileData?.profile?.name?.slice(0, 2)}
+          </AvatarFallback>
         </Avatar>
 
         <Dialog>
