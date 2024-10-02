@@ -1,5 +1,7 @@
 "use client";
 import { PrivyProvider } from "@privy-io/react-auth";
+import { SmartWalletsProvider } from "@privy-io/react-auth/smart-wallets";
+import { optimism, optimismSepolia } from "viem/chains";
 import React from "react";
 
 const PrivyProviderWrapper = ({ children }: { children: React.ReactNode }) => {
@@ -12,9 +14,12 @@ const PrivyProviderWrapper = ({ children }: { children: React.ReactNode }) => {
           createOnLogin: "users-without-wallets", // defaults to 'off'
         },
         loginMethods: ['google'],
+        defaultChain: process.env.NODE_ENV !== "production" ? optimismSepolia : optimism,
       }}
     >
+      <SmartWalletsProvider>
       {children}
+      </SmartWalletsProvider>
     </PrivyProvider>
   );
 };

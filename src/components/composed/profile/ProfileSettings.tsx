@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { LoaderIcon } from "lucide-react";
 import { usePrivy } from "@privy-io/react-auth";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -15,7 +16,7 @@ interface ProfileSettingsProps {
     calendar: string;
     fee: string;
     bookingDescription: string;
-  }) => void;
+  }) => Promise<void>;
 }
 export const ProfileSettings = ({ onSubmit }: ProfileSettingsProps) => {
   const [form, setForm] = useState({
@@ -24,8 +25,7 @@ export const ProfileSettings = ({ onSubmit }: ProfileSettingsProps) => {
     bookingDescription: "",
     isAvailable: true,
   });
-
-  const [isProfileComplete, setIsProfileComplete] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { user, getAccessToken } = usePrivy();
 
@@ -66,11 +66,6 @@ export const ProfileSettings = ({ onSubmit }: ProfileSettingsProps) => {
       });
     }
   }, [userProfileData]);
-
-  useEffect(() => {
-    const isFormComplete = form.calendar && form.fee && form.bookingDescription;
-    setIsProfileComplete(!isFormComplete);
-  }, [form.calendar, form.fee, form.bookingDescription]);
 
   const handleButtonClick = (button: boolean) => {
     setForm({ ...form, isAvailable: button });
@@ -198,10 +193,18 @@ export const ProfileSettings = ({ onSubmit }: ProfileSettingsProps) => {
       </div>
       <Button
         className='w-full text-sm font-body font-medium leading-[21px] mt-4 bg-[#2640eb]'
-        disabled={isProfileComplete}
-        onClick={() => onSubmit(form)}
+        onClick={async () => {
+          setIsLoading(true);
+          try {
+            await onSubmit(form);
+          } catch (error) {
+            console.error(error);
+          } finally {
+            setIsLoading(false);
+          }
+        }}
       >
-        Save and continue to Interested
+        {isLoading ? <LoaderIcon className='w-6 h-6 m-auto animate-spin' /> : "Save and continue to Interested"}
       </Button>
     </>
   );

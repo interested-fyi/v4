@@ -322,7 +322,7 @@ export const ProfileConnections = ({
   const handleUnlink = (linkMethod: string) => {
     if (
       userProfileData &&
-      userProfileData.profile.preferred_profile === linkMethod
+      userProfileData?.profile?.preferred_profile === linkMethod
     ) {
       updateUserProfileData(null);
     }
@@ -384,7 +384,7 @@ export const ProfileConnections = ({
             );
 
             if (
-              accountName !== userProfileData.profile.preferred_profile &&
+              accountName !== userProfileData?.profile?.preferred_profile &&
               profileData
             ) {
               return (

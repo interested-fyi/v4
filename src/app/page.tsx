@@ -77,7 +77,7 @@ export default function Home() {
         {
           <AuthDialog
             isOpen={
-              !dialogClosed && !!user && !userProfileData && !userProfileLoading
+              !dialogClosed && !!user && !userProfileData?.profile && !userProfileLoading
             }
             onClose={() => {
               setDialogClosed(true);

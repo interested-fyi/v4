@@ -12,8 +12,10 @@
     "test": "jest"
   },
   "dependencies": {
+    "@ethereum-attestation-service/eas-contracts": "^1.7.1",
+    "@ethereum-attestation-service/eas-sdk": "^2.6.0",
     "@neynar/nodejs-sdk": "^1.48.0",
-    "@privy-io/react-auth": "^1.74.0",
+    "@privy-io/react-auth": "^1.87.0",
     "@privy-io/server-auth": "^1.9.1",
     "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-aspect-ratio": "^1.1.0",
@@ -63,7 +65,7 @@
     "ts-jest": "^29.2.2",
     "ts-node": "^10.9.2",
     "uuid": "^10.0.0",
-    "viem": "^2.20.0",
+    "viem": "^2.21.15",
     "zod": "^3.23.8"
   },
   "devDependencies": {
