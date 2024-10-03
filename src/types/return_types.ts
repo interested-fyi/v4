@@ -7,6 +7,7 @@ export interface UserCombinedProfile {
   available: boolean | null;
   bio: string | null;
   booking_description: string | null;
+  smart_wallet_address: string | null;
   unlock_calendar_fee: string | null;
   calendly_link: string | null;
   email: string | null;

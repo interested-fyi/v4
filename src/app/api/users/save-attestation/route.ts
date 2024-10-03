@@ -8,7 +8,7 @@ const privyClient = new PrivyClient(
 );
 
 export async function POST(req: NextRequest) {
-  const { privy_did, name, photo_source, available, preferred_profile, bio, calendly_link, unlock_calendar_fee, booking_description, smart_wallet_address } = await req.json();
+  const { attestation_uid, attestation_tx_hash, recipient, recipient_address, endorser, endorser_address, relationship, endorsement, privy_did } = await req.json();
   const accessToken = req.headers.get("Authorization")?.replace("Bearer ", "");
 
   // verify authenticate user sent request
@@ -24,25 +24,23 @@ export async function POST(req: NextRequest) {
   }
 
   const { data, error } = await supabase
-    .from("user_profiles")
+    .from("attestations")
     .upsert([{
-        privy_did: privyDid,
-        name: name,
-        photo_source: photo_source,
-        available: available,
-        preferred_profile: preferred_profile,
-        bio: bio,
-        calendly_link: calendly_link,
-        unlock_calendar_fee: unlock_calendar_fee,
-        booking_description: booking_description,
-        smart_wallet_address: smart_wallet_address
-    }], { onConflict: 'privy_did' })
+        attestation_uid: attestation_uid,
+        attestation_tx_hash: attestation_tx_hash,
+        recipient: recipient,
+        recipient_address: recipient_address,
+        endorser: endorser,
+        endorser_address: endorser_address,
+        relationship: relationship,
+        endorsement: endorsement
+    }], { onConflict: 'attestation_uid' })
     .select().single();
 
   if (error) throw error;
 
   return NextResponse.json(
-    { profile: data, success: true },
+    { success: true, attestation: data },
     { status: 200 }
   );
 }
