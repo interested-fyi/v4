@@ -116,7 +116,7 @@ export const ProfileConnections = ({
               bio: bio,
             }),
           });
-          if (!userProfileData?.profile.photo_source && pfp) {
+          if (!userProfileData?.profile?.photo_source && pfp) {
             handleSelectPhoto(pfp);
           }
         }
@@ -171,7 +171,7 @@ export const ProfileConnections = ({
               last_name: last_name,
             }),
           });
-          if (!userProfileData?.profile.photo_source && photo_url) {
+          if (!userProfileData?.profile?.photo_source && photo_url) {
             handleSelectPhoto(photo_url);
           }
         }
@@ -199,7 +199,7 @@ export const ProfileConnections = ({
               subject: subject,
             }),
           });
-          if (!userProfileData?.profile.photo_source && profile_picture_url) {
+          if (!userProfileData?.profile?.photo_source && profile_picture_url) {
             handleSelectPhoto(profile_picture_url);
           }
         }
