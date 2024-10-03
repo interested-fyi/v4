@@ -42,7 +42,7 @@ export default function EndorseDialog({
                 abi: easAbi.abi,
                 functionName: 'attest',
                 args: [
-                    process.env.NEXT_PUBLIC_SEPOLIA_ENDORSEMENT_SCHEMA_UID, // schema uid
+                    process.env.VERCEL_ENV !== "production" ? process.env.NEXT_PUBLIC_SEPOLIA_ENDORSEMENT_SCHEMA_UID : process.env.NEXT_PUBLIC_ENDORSEMENT_SCHEMA_UID, // schema uid
                     {
                         recipient: user?.smart_wallet_address as `0x${string}`,
                         expirationTime: 0,
