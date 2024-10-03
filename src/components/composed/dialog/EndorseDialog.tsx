@@ -41,15 +41,15 @@ export default function EndorseDialog({
                 address: process.env.NEXT_PUBLIC_EAS_CONTRACT_ADDRESS as `0x${string}`,
                 abi: easAbi.abi,
                 functionName: 'attest',
-                args: [
-                    process.env.VERCEL_ENV !== "production" ? process.env.NEXT_PUBLIC_SEPOLIA_ENDORSEMENT_SCHEMA_UID : process.env.NEXT_PUBLIC_ENDORSEMENT_SCHEMA_UID, // schema uid
-                    {
+                args: [{
+                    schema: process.env.VERCEL_ENV !== "production" ? process.env.NEXT_PUBLIC_SEPOLIA_ENDORSEMENT_SCHEMA_UID : process.env.NEXT_PUBLIC_ENDORSEMENT_SCHEMA_UID, // schema uid
+                    data: {
                         recipient: user?.smart_wallet_address as `0x${string}`,
                         expirationTime: 0,
                         revocable: true,
                         data: encodedData,
-                    }// attestation data
-                ],
+                    } // attestation data
+                }],
                 chain:
                     process.env.VERCEL_ENV !== "production"
                     ?  optimismSepolia as Chain
