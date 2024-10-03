@@ -98,56 +98,57 @@ export default function AuthDialog({
         calendly_link: formToSubmit.calendar,
         unlock_calendar_fee: formToSubmit.fee,
         booking_description: formToSubmit.bookingDescription,
+        smart_wallet_address: user?.smartWallet?.address,
         privy_did: user?.id,
       }),
     });
     const resData = await res.json()
     // create user attestation schema
-    if (resData.success) {
-      try {
-        const contractParams = {
-          address: process.env.NEXT_PUBLIC_SCHEMA_REGISTRY_ADDRESS as `0x${string}`,
-          abi: schemaRegistryAbi.abi,
-          functionName: 'register',
-          args: [
-              "string relationship, string endorsement", //schema string
-              "0x0000000000000000000000000000000000000000", // resolver address
-              true // revocable or not
-          ],
-          chain:
-            process.env.VERCEL_ENV !== "production"
-              ?  optimismSepolia as Chain
-              : optimism as Chain,
-          account: client?.account,
-        }
-        const  { abi, ...contractParamNoABI } = contractParams;
-        const { request, result } = await publicClient.simulateContract(contractParams);
-        const txHash = await client?.writeContract(request);
-        console.log(`Result: ${JSON.stringify(result)}\ntx hash: ${txHash}\nRegistering address: ${client?.account.address}`)
-        // if result and txhash, exist, then schema is registered. need to save schemaUID and txHash to supabase
-        const schemaRes = await fetch(`/api/users/save-endorsement-schema`, {
-          method: "POST",
-          cache: "no-store",
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },  
-          body: JSON.stringify({
-            schema_uid: result,
-            schema_tx_hash: txHash,
-            privy_did: user?.id,
-          }),
-        });
-        const schemaSuccess = (await schemaRes.json()).success;
-        return {
-          success: resData.success,
-          profile: resData.profile,
-          schema_success: schemaSuccess,
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
+    // if (resData.success) {
+    //   try {
+    //     const contractParams = {
+    //       address: process.env.NEXT_PUBLIC_SCHEMA_REGISTRY_ADDRESS as `0x${string}`,
+    //       abi: schemaRegistryAbi.abi,
+    //       functionName: 'register',
+    //       args: [
+    //           "string relationship, string endorsement", //schema string
+    //           "0x0000000000000000000000000000000000000000", // resolver address
+    //           true // revocable or not
+    //       ],
+    //       chain:
+    //         process.env.VERCEL_ENV !== "production"
+    //           ?  optimismSepolia as Chain
+    //           : optimism as Chain,
+    //       account: client?.account,
+    //     }
+    //     const  { abi, ...contractParamNoABI } = contractParams;
+    //     const { request, result } = await publicClient.simulateContract(contractParams);
+    //     const txHash = await client?.writeContract(request);
+    //     console.log(`Result: ${JSON.stringify(result)}\ntx hash: ${txHash}\nRegistering address: ${client?.account.address}`)
+    //     // if result and txhash, exist, then schema is registered. need to save schemaUID and txHash to supabase
+    //     const schemaRes = await fetch(`/api/users/save-endorsement-schema`, {
+    //       method: "POST",
+    //       cache: "no-store",
+    //       headers: {
+    //         "Content-type": "application/json",
+    //         Authorization: `Bearer ${accessToken}`,
+    //       },  
+    //       body: JSON.stringify({
+    //         schema_uid: result,
+    //         schema_tx_hash: txHash,
+    //         privy_did: user?.id,
+    //       }),
+    //     });
+    //     const schemaSuccess = (await schemaRes.json()).success;
+    //     return {
+    //       success: resData.success,
+    //       profile: resData.profile,
+    //       schema_success: schemaSuccess,
+    //     }
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // }
     return resData as {
       success: boolean;
       profile: any;

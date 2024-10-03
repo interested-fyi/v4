@@ -9,15 +9,21 @@ import { useQuery } from "@tanstack/react-query";
 import { usePrivy } from "@privy-io/react-auth";
 import { UserCombinedProfile } from "@/types/return_types";
 import Link from "next/link";
+import { useParams } from "next/navigation";
+import EndorseDialog from "@/components/composed/dialog/EndorseDialog";
+import { useState } from "react";
 
 export default function ProfilePage() {
+  const [endorseDialogOpen, setEndorseDialogOpen] = useState(false);
   const { user } = usePrivy();
+  const params = useParams();
+  const privyDid = params.privyDid as string;
   const { data: userProfileData, isLoading: userProfileLoading } = useQuery({
     enabled: !!user,
-    queryKey: ["user", user?.id.replace("did:privy:", "")],
+    queryKey: ["user", privyDid.replace("did:privy:", "")],
     queryFn: async () => {
       const res = await fetch(
-        `/api/users/${user?.id.replace("did:privy:", "")}`,
+        `/api/users/${privyDid.replace("did:privy:", "")}`,
         {
           method: "GET",
           cache: "no-store",
@@ -56,18 +62,17 @@ export default function ProfilePage() {
         <div className='relative px-4 pb-4 bg-[#e1effe]'>
           <Avatar className='w-[140px] h-[140px] border-4 border-white rounded-full absolute -top-[100px] left-1/2 transform -translate-x-1/2'>
             <AvatarImage
-              src={userProfileData?.profile.photo_source ?? ""}
+              src={userProfileData?.profile?.photo_source ?? ""}
               alt='Profile picture'
             />
             <AvatarFallback>CL</AvatarFallback>
           </Avatar>
           <div className='pt-16 flex flex-col gap-2 text-center max-w-[343px] mx-auto'>
             <h1 className='text-[#2640eb] text-xl font-semibold font-body leading-[30px]'>
-              Chester LaCroix
+              {userProfileData?.profile?.name ?? 'Chester LaCroix'}
             </h1>
             <p className='text-gray-700 text-sm font-semibold font-body leading-[21px]'>
-              Short bio here? Do we have this in the profile editing flow
-              somewhere - yes we do
+              {userProfileData?.profile?.bio ?? 'Short bio here? Do we have this in the profile editing flow somewhere - yes we do'}
             </p>
           </div>
           <div className='flex justify-center gap-2 mt-8 max-w-[343px] mx-auto'>
@@ -85,8 +90,8 @@ export default function ProfilePage() {
               />
             </Button>
             <Button
-              className='flex-1 bg-white border border-black text-gray-700 text-xs font-medium font-body leading-[18px] hover:bg-[#2640eb] hover:text-yellow-200
-            '
+              className='flex-1 bg-white border border-black text-gray-700 text-xs font-medium font-body leading-[18px] hover:bg-[#2640eb] hover:text-yellow-200'
+              onClick={() => setEndorseDialogOpen(true)}
             >
               Endorse
               <Image
@@ -97,6 +102,9 @@ export default function ProfilePage() {
                 width={16}
               />
             </Button>
+            {
+              endorseDialogOpen && userProfileData?.profile && <EndorseDialog isOpen={endorseDialogOpen} onClose={() => setEndorseDialogOpen(false)} user={userProfileData?.profile as UserCombinedProfile} />
+            }
           </div>
           <div className='w-full flex justify-center mt-4'>
             <div className='w-[343px] h-[34px] relative'>
