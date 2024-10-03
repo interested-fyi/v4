@@ -146,6 +146,9 @@ export const ProfileEditForm = ({ onSubmit }: Props) => {
               <ProfileConnections
                 setTempPhotoUrl={setTempPhotoUrl}
                 userProfileData={userProfileData}
+                onSetBestProfile={(bestProfile) =>
+                  setForm({ ...form, bestProfile: bestProfile })
+                }
               />
             </DialogHeader>
           </DialogContent>
