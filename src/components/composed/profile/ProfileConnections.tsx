@@ -11,9 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import { X } from "lucide-react";
-import Image from "next/image";
+import { Checkbox } from "@/components/ui/checkbox";
 
 enum PROFILE_TYPE {
   GITHUB = "github",
@@ -116,7 +115,7 @@ export const ProfileConnections = ({
               bio: bio,
             }),
           });
-          if (!userProfileData?.profile.photo_source && pfp) {
+          if (!userProfileData?.profile?.photo_source && pfp) {
             handleSelectPhoto(pfp);
           }
         }
@@ -171,7 +170,7 @@ export const ProfileConnections = ({
               last_name: last_name,
             }),
           });
-          if (!userProfileData?.profile.photo_source && photo_url) {
+          if (!userProfileData?.profile?.photo_source && photo_url) {
             handleSelectPhoto(photo_url);
           }
         }
@@ -199,7 +198,7 @@ export const ProfileConnections = ({
               subject: subject,
             }),
           });
-          if (!userProfileData?.profile.photo_source && profile_picture_url) {
+          if (!userProfileData?.profile?.photo_source && profile_picture_url) {
             handleSelectPhoto(profile_picture_url);
           }
         }
@@ -288,7 +287,7 @@ export const ProfileConnections = ({
     }
   }, [userProfileData]);
 
-  const handleLink = (linkMethod: string, isBestProfile: boolean) => {
+  const handleLink = (linkMethod: string) => {
     setAddProfile(false);
     switch (linkMethod) {
       case "github":
@@ -308,13 +307,8 @@ export const ProfileConnections = ({
         break;
     }
     if (selectedProfile) {
-      if (isBestProfile) {
-        setBestProfile(selectedProfile);
-        onSetBestProfile && onSetBestProfile(selectedProfile);
-      } else {
-        setAdditionalProfile(selectedProfile);
-        onSetProfile && onSetProfile(selectedProfile);
-      }
+      setAdditionalProfile(selectedProfile);
+      onSetProfile && onSetProfile(selectedProfile);
       setSelectedProfile(null);
     }
   };
@@ -355,75 +349,89 @@ export const ProfileConnections = ({
     }
   };
 
+  const linkedAccounts = user?.linkedAccounts.filter((linkedAccount: any) => {
+    if (
+      linkedAccount.type !== "wallet" &&
+      linkedAccount.type !== "smart_wallet" &&
+      linkedAccount.type !== "google_oauth"
+    ) {
+      return linkedAccount;
+    }
+  });
+
   return (
     <>
-      <div className='flex flex-col gap-2'>
-        <Label>Best profile:</Label>
-        {bestProfile ? (
-          <UnlinkAccountButton
-            profile={bestProfile}
-            handleUnlink={handleUnlink}
-            setProfile={setBestProfile}
-          />
-        ) : (
-          <LinkAccountSelect
-            profiles={profiles}
-            selectedProfile={selectedProfile}
-            setSelectedProfile={setSelectedProfile}
-            handleLink={handleLink}
-            isBestProfile={true}
-          />
-        )}
-        {userProfileData &&
-          user?.linkedAccounts?.map((linkedAccount: any) => {
-            const accountName = linkedAccount.type.replace("_oauth", "");
-            if (accountName === "wallet") return;
-
-            const profileData = profiles.find(
-              (p) => p === linkedAccount.type.replace("_oauth", "")
-            );
-
-            if (
-              accountName !== userProfileData?.profile?.preferred_profile &&
-              profileData
-            ) {
-              return (
-                <div key={linkedAccount.type}>
-                  <UnlinkAccountButton
-                    profile={profileData}
-                    handleUnlink={handleUnlink}
-                    setProfile={setSelectedProfile}
-                  />
-                </div>
+      <div className='flex flex-col gap-4'>
+        <div className='flex justify-between'>
+          <Label>Profiles</Label>
+          <Label>Select Primary</Label>
+        </div>
+        <div className='flex flex-col gap-4'>
+          {userProfileData &&
+            linkedAccounts?.map((linkedAccount: any) => {
+              const accountName = linkedAccount.type.replace("_oauth", "");
+              if (accountName === "wallet") return;
+              const profileData = profiles.find(
+                (p) => p === linkedAccount.type.replace("_oauth", "")
               );
-            }
-            return null;
-          })}
-        {addProfile && (
+
+              if (profileData) {
+                return (
+                  <div
+                    className='flex w-full gap-4 items-center'
+                    key={linkedAccount.type}
+                  >
+                    <UnlinkAccountButton
+                      profile={profileData}
+                      handleUnlink={handleUnlink}
+                      setProfile={setSelectedProfile}
+                    />
+                    <div className='w-[40%] flex justify-center'>
+                      <Checkbox
+                        className='w-6 h-6'
+                        onCheckedChange={(e) => {
+                          if (e.valueOf() === true) {
+                            setBestProfile(linkedAccount);
+                            onSetBestProfile && onSetBestProfile(linkedAccount);
+                          } else {
+                            setBestProfile(null);
+                            onSetBestProfile && onSetBestProfile("");
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              }
+            })}
+        </div>
+
+        {(addProfile || (!!linkedAccounts && linkedAccounts?.length === 0)) && (
           <div>
             <LinkAccountSelect
               profiles={profiles}
               selectedProfile={selectedProfile}
               setSelectedProfile={setSelectedProfile}
               handleLink={handleLink}
-              isBestProfile={false}
             />
           </div>
         )}
       </div>
-
-      {bestProfile && !additionalProfile && !addProfile && (
-        <Button
-          variant='link'
-          className='w-full mt-2 text-blue-700'
-          onClick={() => {
-            setAddProfile(true);
-            setSelectedProfile(null);
-          }}
-        >
-          + Add another
-        </Button>
-      )}
+      {!additionalProfile &&
+        !addProfile &&
+        !!linkedAccounts &&
+        linkedAccounts?.length > 0 && (
+          <Button
+            variant='link'
+            className='w-full mt-2 text-blue-700'
+            onClick={() => {
+              setAddProfile(true);
+              setSelectedProfile(null);
+            }}
+          >
+            + Add another
+          </Button>
+        )}{" "}
     </>
   );
 };
@@ -432,8 +440,7 @@ interface LinkAccountSelectProps {
   profiles: string[];
   selectedProfile: string | null;
   setSelectedProfile: (profile: string | null) => void;
-  handleLink: (linkMethod: string, isBestProfile: boolean) => void;
-  isBestProfile: boolean;
+  handleLink: (linkMethod: string) => void;
 }
 
 export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
@@ -441,10 +448,9 @@ export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
   selectedProfile,
   setSelectedProfile,
   handleLink,
-  isBestProfile,
 }) => {
   return (
-    <div className='flex items-center mt-2  rounded-lg text-black'>
+    <div className='flex items-center rounded-lg text-black'>
       <Select
         onValueChange={(value) =>
           setSelectedProfile(profiles.find((p) => p === value) || null)
@@ -463,9 +469,7 @@ export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
       </Select>
       <Button
         className='ml-4 bg-[#2640eb]'
-        onClick={() =>
-          handleLink(selectedProfile?.toLocaleLowerCase() ?? "", isBestProfile)
-        }
+        onClick={() => handleLink(selectedProfile?.toLocaleLowerCase() ?? "")}
       >
         Link
       </Button>
@@ -486,7 +490,7 @@ export const UnlinkAccountButton: React.FC<UnlinkAccountButtonProps> = ({
 }) => {
   if (!profile) return null;
   return (
-    <div className='flex items-center mt-2 bg-white rounded-lg text-black px-5 pr-2'>
+    <div className='flex items-center bg-white rounded-lg text-black px-5 pr-2 w-full'>
       <span className='flex-grow'>{profile}</span>
       <Button
         variant='ghost'

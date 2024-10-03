@@ -97,7 +97,8 @@ export const ProfileEditForm = ({ onSubmit }: Props) => {
             src={tempPhotoUrl ?? userProfileData?.profile?.photo_source ?? ""}
           />
           <AvatarFallback>
-            {userProfileData?.profile?.name?.slice(0, 2)}
+            {userProfileData?.profile?.name?.slice(0, 2) ??
+              user?.google?.name?.slice(0, 2)}
           </AvatarFallback>
         </Avatar>
 
@@ -145,6 +146,9 @@ export const ProfileEditForm = ({ onSubmit }: Props) => {
               <ProfileConnections
                 setTempPhotoUrl={setTempPhotoUrl}
                 userProfileData={userProfileData}
+                onSetBestProfile={(bestProfile) =>
+                  setForm({ ...form, bestProfile: bestProfile })
+                }
               />
             </DialogHeader>
           </DialogContent>
@@ -184,7 +188,6 @@ export const ProfileEditForm = ({ onSubmit }: Props) => {
             className='rounded-lg'
             id='bio'
             value={form.bio}
-            defaultValue={userProfileData?.profile?.bio ?? ""}
             onChange={(e) => setForm({ ...form, bio: e.target.value })}
           />
         </div>
