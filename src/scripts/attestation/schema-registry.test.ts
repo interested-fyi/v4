@@ -31,3 +31,11 @@ test('simulateContract on SchemaRegistry contract', async () => {
     // You can make assertions here based on the expected result
     expect(result).toBeDefined(); // This just checks if `result` exists
 });
+
+test('simulateContract on attestation', async () => {
+  const transaction = await publicClient.getTransactionReceipt({hash: "0x49e58e916431369379e13229985cdf3c1ffea56278509498965bf6b0f6ce2df5"});
+  console.log("transaction: ", transaction);
+
+  // You can make assertions here based on the expected result
+  expect(transaction).toBeDefined(); // This just checks if `result` exists
+});
