@@ -11,6 +11,8 @@ import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import { optimism, optimismSepolia } from "viem/chains";
 import { Chain, createPublicClient, http } from "viem";
 import { publicClient } from "@/lib/viemClient";import { useState } from "react";
+import { getEndorsementUid } from "@/functions/general/get-endorsement-uid";
+import { LoaderIcon } from "lucide-react";
 
 export default function EndorseDialog({
     isOpen,
@@ -25,10 +27,12 @@ export default function EndorseDialog({
         relationship: null,
         endorsement: null,
     });
+    const [isLoading, setIsLoading] = useState(false);
     const { user: privyUser, getAccessToken } = usePrivy();
     const { client } = useSmartWallets();
 
     const handleEndorse = async (form: { relationship: string | null; endorsement: string | null }) => {
+        setIsLoading(true);
         const accessToken = await getAccessToken();
         if (client && accessToken && form.relationship && form.endorsement) {
             try {
@@ -38,27 +42,29 @@ export default function EndorseDialog({
                     { name: "endorsement", type: "string", value: form.endorsement },
                 ]);
                 const contractParams = {
-                address: process.env.NEXT_PUBLIC_EAS_CONTRACT_ADDRESS as `0x${string}`,
-                abi: easAbi.abi,
-                functionName: 'attest',
-                args: [{
-                    schema: process.env.VERCEL_ENV !== "production" ? process.env.NEXT_PUBLIC_SEPOLIA_ENDORSEMENT_SCHEMA_UID : process.env.NEXT_PUBLIC_ENDORSEMENT_SCHEMA_UID, // schema uid
-                    data: {
-                        recipient: user?.smart_wallet_address as `0x${string}`,
-                        expirationTime: 0,
-                        revocable: true,
-                        data: encodedData,
-                    } // attestation data
-                }],
-                chain:
-                    process.env.VERCEL_ENV !== "production"
-                    ?  optimismSepolia as Chain
-                    : optimism as Chain,
-                account: client?.account,
+                    address: process.env.NEXT_PUBLIC_EAS_CONTRACT_ADDRESS as `0x${string}`,
+                    abi: easAbi.abi,
+                    functionName: 'attest',
+                    args: [{
+                        schema: process.env.VERCEL_ENV !== "production" ? process.env.NEXT_PUBLIC_SEPOLIA_ENDORSEMENT_SCHEMA_UID : process.env.NEXT_PUBLIC_ENDORSEMENT_SCHEMA_UID, // schema uid
+                        data: {
+                            recipient: user?.smart_wallet_address as `0x${string}`,
+                            expirationTime: 0,
+                            revocable: true,
+                            refUID: '0x' + '00'.repeat(32),
+                            data: encodedData,
+                            value: 0,
+                        } // attestation data
+                    }],
+                    chain:
+                        process.env.VERCEL_ENV !== "production"
+                        ?  optimismSepolia as Chain
+                        : optimism as Chain,
+                    account: client?.account,
                 }
                 const { request, result } = await publicClient.simulateContract(contractParams);
                 const txHash = await client?.writeContract(request);
-                console.log(`Result (attestation uid): ${JSON.stringify(result)}\ntx hash: ${txHash}\nRegistering address: ${client?.account.address}`)
+                const uid = await getEndorsementUid(txHash);
                 // if result and txhash, exist, then schema is registered. need to save schemaUID and txHash to supabase
                 const res = await fetch(`/api/users/save-attestation`, {
                     method: "POST",
@@ -68,7 +74,7 @@ export default function EndorseDialog({
                         Authorization: `Bearer ${accessToken}`,
                     },  
                     body: JSON.stringify({
-                        attestation_uid: result,
+                        attestation_uid: uid,
                         attestation_tx_hash: txHash,
                         recipient: user?.privy_did,
                         recipient_address: user?.smart_wallet_address as `0x${string}`,
@@ -80,6 +86,8 @@ export default function EndorseDialog({
                     }),
                 });
                 const resData = (await res.json()).success;
+                setIsLoading(false);
+                onClose();
                 return {
                     success: resData.success,
                     attestation: resData.attestation,
@@ -88,6 +96,7 @@ export default function EndorseDialog({
                 console.error(error);
             }
         }
+        setIsLoading(false);
     }
 
     return (
@@ -129,10 +138,10 @@ export default function EndorseDialog({
                     </div>
                     <Button
                         className='w-full text-sm font-body font-medium leading-[21px] mt-4 bg-[#2640eb]'
-                        disabled={!form.relationship || !form.endorsement}
+                        disabled={!form.relationship || !form.endorsement || isLoading}
                         onClick={() => handleEndorse(form)}
                     >
-                        Continue
+                        {isLoading ? <LoaderIcon className='w-6 h-6 m-auto animate-spin' /> : "Endorse" }
                     </Button>
                 </div>
             </DialogContent>
