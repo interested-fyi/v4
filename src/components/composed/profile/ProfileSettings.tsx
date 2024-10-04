@@ -17,8 +17,12 @@ interface ProfileSettingsProps {
     fee: string;
     bookingDescription: string;
   }) => Promise<void>;
+  onClose: () => void;
 }
-export const ProfileSettings = ({ onSubmit }: ProfileSettingsProps) => {
+export const ProfileSettings = ({
+  onSubmit,
+  onClose,
+}: ProfileSettingsProps) => {
   const [form, setForm] = useState({
     calendar: "",
     fee: "",
@@ -197,6 +201,7 @@ export const ProfileSettings = ({ onSubmit }: ProfileSettingsProps) => {
           setIsLoading(true);
           try {
             await onSubmit(form);
+            onClose();
           } catch (error) {
             console.error(error);
           } finally {
@@ -204,7 +209,11 @@ export const ProfileSettings = ({ onSubmit }: ProfileSettingsProps) => {
           }
         }}
       >
-        {isLoading ? <LoaderIcon className='w-6 h-6 m-auto animate-spin' /> : "Save and continue to Interested"}
+        {isLoading ? (
+          <LoaderIcon className='w-6 h-6 m-auto animate-spin' />
+        ) : (
+          "Save and continue to Interested"
+        )}
       </Button>
     </>
   );

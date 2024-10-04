@@ -280,8 +280,10 @@ export const ProfileConnections = ({
   useEffect(() => {
     if (userProfileData) {
       const profile = userProfileData?.profile?.preferred_profile;
-      setBestProfile(profile);
-      if (onSetBestProfile) {
+      if (profile) {
+        setBestProfile(profile);
+      }
+      if (onSetBestProfile && profile) {
         onSetBestProfile(profile);
       }
     }
@@ -361,10 +363,12 @@ export const ProfileConnections = ({
 
   return (
     <>
-      <div className='flex flex-col gap-4'>
+      <div className='flex flex-col gap-2'>
         <div className='flex justify-between'>
           <Label>Profiles</Label>
-          <Label>Select Primary</Label>
+          {linkedAccounts && linkedAccounts.length > 0 && (
+            <Label>Select Primary</Label>
+          )}
         </div>
         <div className='flex flex-col gap-4'>
           {userProfileData &&
@@ -379,7 +383,7 @@ export const ProfileConnections = ({
                 return (
                   <div
                     className='flex w-full gap-4 items-center'
-                    key={linkedAccount.type}
+                    key={accountName}
                   >
                     <UnlinkAccountButton
                       profile={profileData}
@@ -391,8 +395,8 @@ export const ProfileConnections = ({
                         className='w-6 h-6'
                         onCheckedChange={(e) => {
                           if (e.valueOf() === true) {
-                            setBestProfile(linkedAccount);
-                            onSetBestProfile && onSetBestProfile(linkedAccount);
+                            setBestProfile(accountName);
+                            onSetBestProfile && onSetBestProfile(accountName);
                           } else {
                             setBestProfile(null);
                             onSetBestProfile && onSetBestProfile("");

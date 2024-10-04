@@ -215,6 +215,7 @@ export default function AuthDialog({
                   ...formDetails,
                 });
               }}
+              onClose={() => onClose()}
             />
           </DialogHeader>
         </DialogContent>
