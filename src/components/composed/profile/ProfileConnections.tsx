@@ -393,6 +393,7 @@ export const ProfileConnections = ({
                     <div className='w-[40%] flex justify-center'>
                       <Checkbox
                         className='w-6 h-6'
+                        checked={bestProfile === accountName}
                         onCheckedChange={(e) => {
                           if (e.valueOf() === true) {
                             setBestProfile(accountName);
