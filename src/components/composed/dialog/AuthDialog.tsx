@@ -10,16 +10,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { usePrivy } from "@privy-io/react-auth";
-import { useSmartWallets } from '@privy-io/react-auth/smart-wallets';
-import schemaRegistryAbi from "@ethereum-attestation-service/eas-contracts/deployments/optimism/SchemaRegistry.json";
-import { useEffect, useState } from "react";
+import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
+import { useState } from "react";
 import { LoaderIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { UserCombinedProfile } from "@/types/return_types";
-import { optimism, optimismSepolia } from "viem/chains";
-import { Chain, createPublicClient, http } from "viem";
-import { publicClient } from "@/lib/viemClient";
-import * as dotenv from 'dotenv';
+import * as dotenv from "dotenv";
 dotenv.config();
 
 export default function AuthDialog({
@@ -80,7 +76,10 @@ export default function AuthDialog({
   }) => {
     const accessToken = await getAccessToken();
     const formToSubmit = Object.fromEntries(
-      Object.entries(form).map(([key, value]) => [key, value === "" ? null : value])
+      Object.entries(form).map(([key, value]) => [
+        key,
+        value === "" ? null : value,
+      ])
     );
     const res = await fetch(`/api/users/save-user-profile`, {
       method: "POST",
@@ -102,7 +101,7 @@ export default function AuthDialog({
         privy_did: user?.id,
       }),
     });
-    const resData = await res.json()
+    const resData = await res.json();
     // create user attestation schema
     // if (resData.success) {
     //   try {
@@ -132,7 +131,7 @@ export default function AuthDialog({
     //       headers: {
     //         "Content-type": "application/json",
     //         Authorization: `Bearer ${accessToken}`,
-    //       },  
+    //       },
     //       body: JSON.stringify({
     //         schema_uid: result,
     //         schema_tx_hash: txHash,

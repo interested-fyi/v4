@@ -18,8 +18,10 @@ import Image from "next/image";
 import { ProfileConnections } from "../profile/ProfileConnections";
 import { Textarea } from "@/components/ui/textarea";
 import { UserCombinedProfile } from "@/types/return_types";
+import { Loader } from "lucide-react";
 
 interface Props {
+  isEditMode?: boolean;
   onSubmit: (formDetails: {
     name: string;
     email: string;
@@ -29,7 +31,8 @@ interface Props {
   }) => void;
 }
 
-export const ProfileEditForm = ({ onSubmit }: Props) => {
+export const ProfileEditForm = ({ isEditMode, onSubmit }: Props) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [tempPhotoUrl, setTempPhotoUrl] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
@@ -89,6 +92,9 @@ export const ProfileEditForm = ({ onSubmit }: Props) => {
     setTempPhotoUrl(photoUrl);
   };
 
+  useEffect(() => {
+    console.log("isLoading state:", isLoading);
+  }, [isLoading]);
   return (
     <>
       <div className='flex flex-col items-center gap-0 mb-0'>
@@ -203,10 +209,25 @@ export const ProfileEditForm = ({ onSubmit }: Props) => {
 
       <Button
         className='w-full text-sm font-body font-medium leading-[21px] mt-4 bg-[#2640eb]'
-        disabled={isProfileComplete}
-        onClick={() => onSubmit({ ...form, tempPhotoUrl })}
+        disabled={isProfileComplete || isLoading}
+        onClick={async () => {
+          setIsLoading(true);
+          try {
+            await onSubmit({ ...form, tempPhotoUrl });
+          } catch (e) {
+            console.error(e);
+          } finally {
+            setIsLoading(false);
+          }
+        }}
       >
-        Continue
+        {isLoading ? (
+          <Loader className='w-6 h-6 animate-spin' />
+        ) : isEditMode ? (
+          "Save and exit"
+        ) : (
+          "Continue"
+        )}
       </Button>
     </>
   );
