@@ -78,6 +78,8 @@ interface AvatarMenuProps {
   logout: () => void;
 }
 export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
+  const [open, setOpen] = useState(false);
+
   const [tempPhotoUrl, setTempPhotoUrl] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
@@ -152,7 +154,7 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>{avatar}</DropdownMenuTrigger>
         <DropdownMenuContent>
@@ -208,6 +210,7 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
               tempPhotoUrl: string | null;
             }) => {
               await handleSubmitForm(formDetails);
+              setOpen(false);
             }}
             isEditMode
           />
