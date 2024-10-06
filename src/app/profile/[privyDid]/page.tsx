@@ -82,7 +82,10 @@ export default function ProfilePage() {
               src={userProfileData?.profile?.photo_source ?? ""}
               alt='Profile picture'
             />
-            <AvatarFallback>CL</AvatarFallback>
+            <AvatarFallback>
+              {userProfileData?.profile?.name?.slice(0, 2) ??
+                user?.google?.name?.slice(0, 2)}
+            </AvatarFallback>
           </Avatar>
           <div className='pt-16 flex flex-col gap-2 text-center max-w-[343px] mx-auto'>
             <h1 className='text-[#2640eb] text-xl font-semibold font-body leading-[30px]'>
@@ -94,7 +97,7 @@ export default function ProfilePage() {
             </p>
           </div>
           <div className='flex justify-center gap-2 mt-8 max-w-[343px] mx-auto'>
-            <Button
+            {/* <Button
               className='flex-1 bg-white border border-black text-gray-700 text-xs font-medium font-body leading-[18px] hover:bg-[#2640eb] hover:text-yellow-200
             '
             >
@@ -106,7 +109,7 @@ export default function ProfilePage() {
                 height={16}
                 width={16}
               />
-            </Button>
+            </Button> */}
             <Button
               className='flex-1 bg-white border border-black text-gray-700 text-xs font-medium font-body leading-[18px] hover:bg-[#2640eb] hover:text-yellow-200'
               onClick={() => setEndorseDialogOpen(true)}
@@ -128,7 +131,7 @@ export default function ProfilePage() {
               />
             )}
           </div>
-          <div className='w-full flex justify-center mt-4'>
+          {/* <div className='w-full flex justify-center mt-4'>
             <div className='w-[343px] h-[34px] relative'>
               <div className='w-[343px] h-[34px] pl-3 pr-[11px] py-2 left-0 top-1 absolute opacity-40 bg-white rounded-lg border border-gray-700 blur-[3px] justify-center items-center gap-2 inline-flex'>
                 <div className='text-gray-700 text-xs font-medium font-body leading-[18px]'>
@@ -143,7 +146,7 @@ export default function ProfilePage() {
                 Unlock scheduling for $15
               </Button>
             </div>
-          </div>
+          </div> */}
           <div className='flex justify-start max-w-[343px] mx-auto gap-4 mt-8'>
             {telegram ? (
               <Link target={"_blank"} href={telegram}>
@@ -207,7 +210,7 @@ export default function ProfilePage() {
               </Link>
             ) : null}
           </div>
-          <div className='mt-8'>
+          {/* <div className='mt-8'>
             <SwitchButtonGroup
               buttons={[
                 { text: "ACTIVITY", onClick: () => {}, isActive: true },
@@ -215,7 +218,7 @@ export default function ProfilePage() {
               ]}
               svgOnClick={() => {}}
             />
-          </div>
+          </div> */}
           <h2
             className='
           text-gray-600
