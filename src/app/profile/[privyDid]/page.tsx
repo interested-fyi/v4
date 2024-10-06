@@ -12,6 +12,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import EndorseDialog from "@/components/composed/dialog/EndorseDialog";
 import { useState } from "react";
+import { Loader } from "lucide-react";
 
 export default function ProfilePage() {
   const [endorseDialogOpen, setEndorseDialogOpen] = useState(false);
@@ -19,7 +20,7 @@ export default function ProfilePage() {
   const params = useParams();
   const privyDid = params.privyDid as string;
   const { data: userProfileData, isLoading: userProfileLoading } = useQuery({
-    enabled: !!user,
+    enabled: !!privyDid,
     queryKey: ["user", privyDid.replace("did:privy:", "")],
     queryFn: async () => {
       const res = await fetch(
@@ -39,6 +40,22 @@ export default function ProfilePage() {
     },
   });
 
+  if (userProfileLoading) {
+    return (
+      <div className='flex flex-col items-center justify-center min-h-screen bg-[#2640eb] text-white p-4 pt-0 px-0 md:p-8'>
+        <div className='relative w-full max-w-5xl bg-white overflow-hidden shadow-lg rounded-lg'>
+          <div className='bg-[#2640eb] h-[135px]'></div>
+          <div className='relative px-4 pb-4 bg-[#e1effe] flex flex-col justify-center items-center min-h-[400px]'>
+            <p className='text-lg text-gray-700 font-semibold'>
+              Fetching Profile...
+            </p>
+            <Loader className='animate-spin mt-6 text-blue-700' />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const telegram = userProfileData?.profile?.telegram_username
     ? `https://t.me/${userProfileData?.profile?.telegram_username}`
     : null;
@@ -49,7 +66,7 @@ export default function ProfilePage() {
     ? `https://linkedin.com/in/${userProfileData?.profile?.linkedin_name}`
     : null;
   const farcast = userProfileData?.profile?.farcaster_username
-    ? `https://farcast.com/${userProfileData?.profile?.farcaster_username}`
+    ? `https://warpcast.com/${userProfileData?.profile?.farcaster_username}`
     : null;
   const x = userProfileData?.profile?.x_username
     ? `https://x.com/${userProfileData?.profile?.x_username}`
@@ -69,10 +86,11 @@ export default function ProfilePage() {
           </Avatar>
           <div className='pt-16 flex flex-col gap-2 text-center max-w-[343px] mx-auto'>
             <h1 className='text-[#2640eb] text-xl font-semibold font-body leading-[30px]'>
-              {userProfileData?.profile?.name ?? 'Chester LaCroix'}
+              {userProfileData?.profile?.name ?? "Chester LaCroix"}
             </h1>
             <p className='text-gray-700 text-sm font-semibold font-body leading-[21px]'>
-              {userProfileData?.profile?.bio ?? 'Short bio here? Do we have this in the profile editing flow somewhere - yes we do'}
+              {userProfileData?.profile?.bio ??
+                "Short bio here? Do we have this in the profile editing flow somewhere - yes we do"}
             </p>
           </div>
           <div className='flex justify-center gap-2 mt-8 max-w-[343px] mx-auto'>
@@ -102,9 +120,13 @@ export default function ProfilePage() {
                 width={16}
               />
             </Button>
-            {
-              endorseDialogOpen && userProfileData?.profile && <EndorseDialog isOpen={endorseDialogOpen} onClose={() => setEndorseDialogOpen(false)} user={userProfileData?.profile as UserCombinedProfile} />
-            }
+            {endorseDialogOpen && userProfileData?.profile && (
+              <EndorseDialog
+                isOpen={endorseDialogOpen}
+                onClose={() => setEndorseDialogOpen(false)}
+                user={userProfileData?.profile as UserCombinedProfile}
+              />
+            )}
           </div>
           <div className='w-full flex justify-center mt-4'>
             <div className='w-[343px] h-[34px] relative'>
@@ -222,8 +244,8 @@ font-body text-center mt-7 mb-6'
                     Friend/Associate
                   </p>
                   <p className='text-xs text-gray-600 font-medium font-body leading-[18px] mt-2'>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                    sed do eiusmod tempor incididunt ut labore et dolore magna
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                    do eiusmod tempor incididunt ut labore et dolore magna
                     aliqua.
                   </p>
                 </div>
