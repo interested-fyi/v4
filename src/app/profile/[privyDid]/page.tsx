@@ -39,6 +39,27 @@ export default function ProfilePage() {
     },
   });
 
+  const { data: endorsements, isLoading: endorsementsLoading } = useQuery({
+    enabled: !!user && !!userProfileData?.profile?.smart_wallet_address,
+    queryKey: ["endorsements", privyDid.replace("did:privy:", ""), userProfileData?.profile?.smart_wallet_address],
+    queryFn: async () => {
+      const res = await fetch(
+        `/api/users/profiles/${privyDid.replace("did:privy:", "")}/get-endorsements?recipient_address=${userProfileData?.profile?.smart_wallet_address}`,
+        {
+          method: "GET",
+          cache: "no-store",
+          headers: {
+            "Content-type": "application/json",
+          },
+        }
+      );
+      return (await res.json()) as {
+        success: boolean;
+        endorsements: any[];
+      };
+    },
+  });
+
   const telegram = userProfileData?.profile?.telegram_username
     ? `https://t.me/${userProfileData?.profile?.telegram_username}`
     : null;
