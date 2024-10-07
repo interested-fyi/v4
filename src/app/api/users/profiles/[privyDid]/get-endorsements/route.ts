@@ -33,7 +33,6 @@ export async function GET(
   `
 
   try {
-    console.log(`Recipient Address--: ${recipient_address}`);
     const response = await fetch(endpoint, {
         method: "POST",
         headers: {
@@ -41,42 +40,52 @@ export async function GET(
         },
         body: JSON.stringify({ query })
     });
-    console.log(`Response: ${JSON.stringify(response.statusText)}`);
 
     if (response.ok) {
         const data = await response.json();
 
         const endorsementsRaw = data?.data?.schema?.attestations;
-        const endorsements = endorsementsRaw.map((endorsement: any) => {
-            const decodedDataJson = JSON.parse(endorsement.decodedDataJson);
-            return {
-                endorser: endorsement.attester,
-                id: endorsement.id,
-                schemaId: endorsement.schemaId,
-                timeCreated: endorsement.timeCreated,
-                revoked: endorsement.revoked,
-                revocationTime: endorsement.revocationTime,
-                recipient: endorsement.recipient,
-                expirationTime: endorsement.expirationTime,
-                relationship: decodedDataJson.find((item: any) => item.name === "relationship")?.value?.value,
-                endorsement: decodedDataJson?.find((item: any) => item.name === "endorsement")?.value?.value,
+        const endorsements = [];
+        for (const endorsement of endorsementsRaw) {
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/users/get-profile-from-wallet?walletAddress=${endorsement.attester}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                const endorserData = response.ok ? (await response.json())?.profile : null;
+
+                const decodedDataJson = JSON.parse(endorsement.decodedDataJson);
+
+                endorsements.push({
+                    endorser: endorsement.attester,
+                    endorserData: endorserData,
+                    id: endorsement.id,
+                    schemaId: endorsement.schemaId,
+                    timeCreated: new Date((endorsement?.timeCreated ?? 0) * 1000),
+                    revoked: endorsement.revoked,
+                    revocationTime: new Date((endorsement?.revocationTime ?? 0) * 1000),
+                    recipient: endorsement.recipient,
+                    expirationTime: new Date((endorsement?.expirationTime ?? 0) * 1000),
+                    relationship: decodedDataJson.find((item: any) => item.name === "relationship")?.value?.value,
+                    endorsement: decodedDataJson?.find((item: any) => item.name === "endorsement")?.value?.value,
+                });
+            } catch (error) {
+                console.log(`Error: ${error}`);
             }
-        });
-        console.log(`Endorsements: ${JSON.stringify(endorsements)}`);
+        }
         return NextResponse.json(
             {
               success: true,
-              endorsements: {
-                ...data,
-              },
+              endorsements: endorsements,
             },
             { status: 200 }
           );
     } else {
         throw new Error("Failed to fetch endorsements");
     }
-
-    
   } catch (error) {
     console.log(`Error: ${error}`);
     return NextResponse.json({ error: error }, { status: 500 });

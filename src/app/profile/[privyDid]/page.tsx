@@ -12,6 +12,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import EndorseDialog from "@/components/composed/dialog/EndorseDialog";
 import { useState } from "react";
+import { Loader } from "lucide-react";
 
 export default function ProfilePage() {
   const [endorseDialogOpen, setEndorseDialogOpen] = useState(false);
@@ -19,7 +20,7 @@ export default function ProfilePage() {
   const params = useParams();
   const privyDid = params.privyDid as string;
   const { data: userProfileData, isLoading: userProfileLoading } = useQuery({
-    enabled: !!user,
+    enabled: !!privyDid,
     queryKey: ["user", privyDid.replace("did:privy:", "")],
     queryFn: async () => {
       const res = await fetch(
@@ -40,9 +41,16 @@ export default function ProfilePage() {
   });
 
   const { data: endorsements, isLoading: endorsementsLoading } = useQuery({
-    enabled: !!user && !!userProfileData?.profile?.smart_wallet_address,
+    enabled: true,
     queryKey: ["endorsements", privyDid.replace("did:privy:", ""), userProfileData?.profile?.smart_wallet_address],
     queryFn: async () => {
+      if (!userProfileData?.profile?.smart_wallet_address) {
+        return {
+          success: false,
+          endorsements: [],
+        };
+      }
+
       const res = await fetch(
         `/api/users/profiles/${privyDid.replace("did:privy:", "")}/get-endorsements?recipient_address=${userProfileData?.profile?.smart_wallet_address}`,
         {
@@ -53,12 +61,29 @@ export default function ProfilePage() {
           },
         }
       );
-      return (await res.json()) as {
+      const endorsementData = await res.json();
+      return endorsementData as {
         success: boolean;
         endorsements: any[];
       };
     },
   });
+
+  if (userProfileLoading) {
+    return (
+      <div className='flex flex-col items-center justify-center min-h-screen bg-[#2640eb] text-white p-4 pt-0 px-0 md:p-8'>
+        <div className='relative w-full max-w-5xl bg-white overflow-hidden shadow-lg rounded-lg'>
+          <div className='bg-[#2640eb] h-[135px]'></div>
+          <div className='relative px-4 pb-4 bg-[#e1effe] flex flex-col justify-center items-center min-h-[400px]'>
+            <p className='text-lg text-gray-700 font-semibold'>
+              Fetching Profile...
+            </p>
+            <Loader className='animate-spin mt-6 text-blue-700' />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const telegram = userProfileData?.profile?.telegram_username
     ? `https://t.me/${userProfileData?.profile?.telegram_username}`
@@ -70,7 +95,7 @@ export default function ProfilePage() {
     ? `https://linkedin.com/in/${userProfileData?.profile?.linkedin_name}`
     : null;
   const farcast = userProfileData?.profile?.farcaster_username
-    ? `https://farcast.com/${userProfileData?.profile?.farcaster_username}`
+    ? `https://warpcast.com/${userProfileData?.profile?.farcaster_username}`
     : null;
   const x = userProfileData?.profile?.x_username
     ? `https://x.com/${userProfileData?.profile?.x_username}`
@@ -86,18 +111,22 @@ export default function ProfilePage() {
               src={userProfileData?.profile?.photo_source ?? ""}
               alt='Profile picture'
             />
-            <AvatarFallback>CL</AvatarFallback>
+            <AvatarFallback>
+              {userProfileData?.profile?.name?.slice(0, 2) ??
+                user?.google?.name?.slice(0, 2)}
+            </AvatarFallback>
           </Avatar>
           <div className='pt-16 flex flex-col gap-2 text-center max-w-[343px] mx-auto'>
             <h1 className='text-[#2640eb] text-xl font-semibold font-body leading-[30px]'>
-              {userProfileData?.profile?.name ?? 'Chester LaCroix'}
+              {userProfileData?.profile?.name ?? "Chester LaCroix"}
             </h1>
             <p className='text-gray-700 text-sm font-semibold font-body leading-[21px]'>
-              {userProfileData?.profile?.bio ?? 'Short bio here? Do we have this in the profile editing flow somewhere - yes we do'}
+              {userProfileData?.profile?.bio ??
+                "Short bio here? Do we have this in the profile editing flow somewhere - yes we do"}
             </p>
           </div>
           <div className='flex justify-center gap-2 mt-8 max-w-[343px] mx-auto'>
-            <Button
+            {/* <Button
               className='flex-1 bg-white border border-black text-gray-700 text-xs font-medium font-body leading-[18px] hover:bg-[#2640eb] hover:text-yellow-200
             '
             >
@@ -109,7 +138,7 @@ export default function ProfilePage() {
                 height={16}
                 width={16}
               />
-            </Button>
+            </Button> */}
             <Button
               className='flex-1 bg-white border border-black text-gray-700 text-xs font-medium font-body leading-[18px] hover:bg-[#2640eb] hover:text-yellow-200'
               onClick={() => setEndorseDialogOpen(true)}
@@ -123,11 +152,15 @@ export default function ProfilePage() {
                 width={16}
               />
             </Button>
-            {
-              endorseDialogOpen && userProfileData?.profile && <EndorseDialog isOpen={endorseDialogOpen} onClose={() => setEndorseDialogOpen(false)} user={userProfileData?.profile as UserCombinedProfile} />
-            }
+            {endorseDialogOpen && userProfileData?.profile && (
+              <EndorseDialog
+                isOpen={endorseDialogOpen}
+                onClose={() => setEndorseDialogOpen(false)}
+                user={userProfileData?.profile as UserCombinedProfile}
+              />
+            )}
           </div>
-          <div className='w-full flex justify-center mt-4'>
+          {/* <div className='w-full flex justify-center mt-4'>
             <div className='w-[343px] h-[34px] relative'>
               <div className='w-[343px] h-[34px] pl-3 pr-[11px] py-2 left-0 top-1 absolute opacity-40 bg-white rounded-lg border border-gray-700 blur-[3px] justify-center items-center gap-2 inline-flex'>
                 <div className='text-gray-700 text-xs font-medium font-body leading-[18px]'>
@@ -142,7 +175,7 @@ export default function ProfilePage() {
                 Unlock scheduling for $15
               </Button>
             </div>
-          </div>
+          </div> */}
           <div className='flex justify-start max-w-[343px] mx-auto gap-4 mt-8'>
             {telegram ? (
               <Link target={"_blank"} href={telegram}>
@@ -206,7 +239,7 @@ export default function ProfilePage() {
               </Link>
             ) : null}
           </div>
-          <div className='mt-8'>
+          {/* <div className='mt-8'>
             <SwitchButtonGroup
               buttons={[
                 { text: "ACTIVITY", onClick: () => {}, isActive: true },
@@ -214,38 +247,33 @@ export default function ProfilePage() {
               ]}
               svgOnClick={() => {}}
             />
-          </div>
+          </div> */}
           <h2
-            className='
-          text-gray-600
-text-xl
-font-bold
-font-body text-center mt-7 mb-6'
+            className='text-gray-600 text-xl font-bold font-body text-center mt-7 mb-6'
           >
             Endorsements
           </h2>
-          {[1, 2, 3].map((index) => (
+          {endorsementsLoading || !endorsements ? <Loader className='animate-spin mt-6 text-blue-700' /> : 
+          endorsements?.endorsements.map((endorsement, index) => (
             <Card key={index} className='mb-4 p-4'>
               <div className='flex items-start gap-4'>
                 <Avatar>
                   <AvatarImage
-                    src='/placeholder.svg?height=40&width=40'
-                    alt='Tina Haibodi'
+                    src={endorsement.endorserData?.preferred_photo ?? endorsement.endorserData?.photo_source ?? '/placeholder.svg?height=40&width=40'}
+                    alt={endorsement.endorserData?.name ?? "Endorser"}
                   />
                   <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
                 <div>
-                  <h3 className='font-semibold text-[#2640eb]'>Tina Haibodi</h3>
+                  <h3 className='font-semibold text-[#2640eb]'>{endorsement.endorserData?.name}</h3>
                   <p className='text-sm text-gray-500 font-medium font-body'>
-                    August 14th, 2023
+                    {new Date(endorsement.timeCreated).toLocaleString()}
                   </p>
                   <p className='text-sm font-medium font-body leading-[21px] mt-1 text-gray-600'>
-                    Friend/Associate
+                    {endorsement.relationship}
                   </p>
                   <p className='text-xs text-gray-600 font-medium font-body leading-[18px] mt-2'>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                    sed do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua.
+                    {endorsement.endorsement}
                   </p>
                 </div>
               </div>

@@ -312,6 +312,12 @@ export const ProfileConnections = ({
       setAdditionalProfile(selectedProfile);
       onSetProfile && onSetProfile(selectedProfile);
       setSelectedProfile(null);
+      setAddProfile(true);
+    } else {
+      setAdditionalProfile(null);
+      setSelectedProfile(null);
+      onSetProfile && onSetProfile("");
+      setAddProfile(true);
     }
   };
 
