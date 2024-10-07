@@ -144,9 +144,8 @@ export default function ProfilePage() {
                 "Short bio here? Do we have this in the profile editing flow somewhere - yes we do"}
             </p>
             <div className='absolute -top-28 right-0'>
-              {user?.id === userProfileData?.profile?.privy_did ? //   <Image // <Button className='h-8 pl-[11px] pr-3 py-2 bg-[#919cf4] hover:bg-[#919cf4] hover:bg-opacity-90 rounded-lg justify-center items-center gap-2 inline-flex'>
-              //     src='/svg/pencil.svg'
-              //     alt='edit'
+              {user?.id ===
+              userProfileData?.profile?.privy_did ? //     alt='edit' //     src='/svg/pencil.svg' //   <Image // <Button className='h-8 pl-[11px] pr-3 py-2 bg-[#919cf4] hover:bg-[#919cf4] hover:bg-opacity-90 rounded-lg justify-center items-center gap-2 inline-flex'>
               //     height={16}
               //     width={16}
               //   />

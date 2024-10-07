@@ -62,7 +62,13 @@ const AuthedNav = ({ user, logout, getAccessToken }: AuthedNavProps) => {
       <AvatarMenu
         avatar={
           <Avatar className='h-8 w-8'>
-            <AvatarImage src={data?.profile?.photo_source ?? undefined} />
+            <AvatarImage
+              src={
+                data?.profile?.photo_source ??
+                data?.profile?.preferred_photo ??
+                undefined
+              }
+            />
             <AvatarFallback>{user?.google?.name?.slice(0, 2)}</AvatarFallback>
           </Avatar>
         }

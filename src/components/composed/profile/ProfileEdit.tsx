@@ -100,7 +100,12 @@ export const ProfileEditForm = ({ isEditMode, onSubmit }: Props) => {
       <div className='flex flex-col items-center gap-0 mb-0'>
         <Avatar className='w-24 h-24 border-blue-700 border-2'>
           <AvatarImage
-            src={tempPhotoUrl ?? userProfileData?.profile?.photo_source ?? ""}
+            src={
+              tempPhotoUrl ??
+              userProfileData?.profile?.photo_source ??
+              userProfileData?.profile?.preferred_photo ??
+              ""
+            }
           />
           <AvatarFallback>
             {userProfileData?.profile?.name?.slice(0, 2) ??
