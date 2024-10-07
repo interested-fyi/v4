@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import SwitchButtonGroup from "@/components/composed/buttons/SwitchButtonGroup";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { usePrivy } from "@privy-io/react-auth";
@@ -13,11 +12,15 @@ import { useParams } from "next/navigation";
 import EndorseDialog from "@/components/composed/dialog/EndorseDialog";
 import { useState } from "react";
 import { Loader } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function ProfilePage() {
   const [endorseDialogOpen, setEndorseDialogOpen] = useState(false);
+
   const { user } = usePrivy();
   const params = useParams();
+  const { toast } = useToast();
+
   const privyDid = params.privyDid as string;
   const { data: userProfileData, isLoading: userProfileLoading } = useQuery({
     enabled: !!privyDid,
@@ -40,6 +43,18 @@ export default function ProfilePage() {
     },
   });
 
+  const handleCopyToClipboard = async () => {
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(
+        `${window.location.origin}/profile/${privyDid}`
+      );
+    }
+    toast({
+      title: "Copied to clipboard",
+      description: "Your profile link has been copied to your clipboard.",
+    });
+  };
+
   if (userProfileLoading) {
     return (
       <div className='flex flex-col items-center justify-center min-h-screen bg-[#2640eb] text-white p-4 pt-0 px-0 md:p-8'>
@@ -56,21 +71,50 @@ export default function ProfilePage() {
     );
   }
 
-  const telegram = userProfileData?.profile?.telegram_username
-    ? `https://t.me/${userProfileData?.profile?.telegram_username}`
-    : null;
-  const github = userProfileData?.profile?.github_username
-    ? `https://github.com/${userProfileData?.profile?.github_username}`
-    : null;
-  const linkedin = userProfileData?.profile?.linkedin_name
-    ? `https://linkedin.com/in/${userProfileData?.profile?.linkedin_name}`
-    : null;
-  const farcast = userProfileData?.profile?.farcaster_username
-    ? `https://warpcast.com/${userProfileData?.profile?.farcaster_username}`
-    : null;
-  const x = userProfileData?.profile?.x_username
-    ? `https://x.com/${userProfileData?.profile?.x_username}`
-    : null;
+  const socialLinks = [
+    {
+      platform: "telegram",
+      url: userProfileData?.profile?.telegram_username
+        ? `https://t.me/${userProfileData?.profile?.telegram_username}`
+        : null,
+      image: "/svg/blue-logos/telegram.svg",
+      alt: "telegram",
+    },
+    {
+      platform: "github",
+      url: userProfileData?.profile?.github_username
+        ? `https://github.com/${userProfileData?.profile?.github_username}`
+        : null,
+      image: "/svg/blue-logos/github.svg",
+      alt: "github",
+    },
+    {
+      platform: "linkedin",
+      url: userProfileData?.profile?.linkedin_name
+        ? `https://linkedin.com/in/${userProfileData?.profile?.linkedin_name}`
+        : null,
+      image: "/svg/blue-logos/linkedin.svg",
+      alt: "linkedin",
+    },
+    {
+      platform: "farcaster",
+      url: userProfileData?.profile?.farcaster_username
+        ? `https://warpcast.com/${userProfileData?.profile?.farcaster_username}`
+        : null,
+      image: "/svg/blue-logos/farcast.svg",
+      alt: "farcaster",
+    },
+    {
+      platform: "x",
+      url: userProfileData?.profile?.x_username
+        ? `https://x.com/${userProfileData?.profile?.x_username}`
+        : null,
+      image: "/svg/blue-logos/x.svg",
+      alt: "x",
+    },
+  ];
+
+  const connectedSocials = socialLinks.filter((social) => social.url);
 
   return (
     <div className='flex flex-col items-center min-h-screen bg-[#2640eb] text-white p-4 pt-0 px-0 md:p-8'>
@@ -79,7 +123,11 @@ export default function ProfilePage() {
         <div className='relative px-4 pb-4 bg-[#e1effe]'>
           <Avatar className='w-[140px] h-[140px] border-4 border-white rounded-full absolute -top-[100px] left-1/2 transform -translate-x-1/2'>
             <AvatarImage
-              src={userProfileData?.profile?.photo_source ?? ""}
+              src={
+                userProfileData?.profile?.photo_source ??
+                userProfileData?.profile?.preferred_photo ??
+                ""
+              }
               alt='Profile picture'
             />
             <AvatarFallback>
@@ -95,6 +143,28 @@ export default function ProfilePage() {
               {userProfileData?.profile?.bio ??
                 "Short bio here? Do we have this in the profile editing flow somewhere - yes we do"}
             </p>
+            <div className='absolute -top-28 right-0'>
+              {user?.id === userProfileData?.profile?.privy_did ? //   <Image // <Button className='h-8 pl-[11px] pr-3 py-2 bg-[#919cf4] hover:bg-[#919cf4] hover:bg-opacity-90 rounded-lg justify-center items-center gap-2 inline-flex'>
+              //     src='/svg/pencil.svg'
+              //     alt='edit'
+              //     height={16}
+              //     width={16}
+              //   />
+              // </Button>
+              null : (
+                <Button
+                  onClick={handleCopyToClipboard}
+                  className='h-8 pl-[11px] pr-3 py-2 bg-[#919cf4] hover:bg-[#919cf4] hover:bg-opacity-90 rounded-lg justify-center items-center gap-2 inline-flex'
+                >
+                  <Image
+                    src='/svg/share.svg'
+                    alt='like'
+                    height={16}
+                    width={16}
+                  />
+                </Button>
+              )}
+            </div>
           </div>
           <div className='flex justify-center gap-2 mt-8 max-w-[343px] mx-auto'>
             {/* <Button
@@ -148,66 +218,33 @@ export default function ProfilePage() {
             </div>
           </div> */}
           <div className='flex justify-start max-w-[343px] mx-auto gap-4 mt-8'>
-            {telegram ? (
-              <Link target={"_blank"} href={telegram}>
-                <Button className='bg-[#919cf4] bg-opacity-30 hover:bg-opacity-90 hover:bg-[#919cf4] w-[55px] h-8'>
-                  <Image
-                    src='/svg/blue-logos/telegram.svg'
-                    alt='telegram'
-                    height={16}
-                    width={16}
-                  />
-                </Button>
-              </Link>
-            ) : null}
-            {farcast ? (
-              <Link target={"_blank"} href={farcast}>
-                <Button className='bg-[#919cf4] bg-opacity-30 hover:bg-opacity-90 hover:bg-[#919cf4]  w-[55px] h-8'>
-                  <Image
-                    src='/svg/blue-logos/farcast.svg'
-                    alt='farcast'
-                    height={16}
-                    width={16}
-                  />
-                </Button>
-              </Link>
-            ) : null}
-            {github ? (
-              <Link target={"_blank"} href={github}>
-                <Button className='bg-[#919cf4] bg-opacity-30 hover:bg-opacity-90 hover:bg-[#919cf4] w-[55px] h-8'>
-                  <Image
-                    src='/svg/blue-logos/github.svg'
-                    alt='github'
-                    height={16}
-                    width={16}
-                  />
-                </Button>
-              </Link>
-            ) : null}
-            {linkedin ? (
-              <Link target={"_blank"} href={linkedin}>
-                <Button className='bg-[#919cf4] bg-opacity-30 hover:bg-opacity-90 hover:bg-[#919cf4] w-[55px] h-8'>
-                  <Image
-                    src='/svg/blue-logos/linkedin.svg'
-                    alt='linkedin'
-                    height={16}
-                    width={16}
-                  />
-                </Button>
-              </Link>
-            ) : null}
-            {x ? (
-              <Link target={"_blank"} href={x}>
-                {" "}
-                <Button className='bg-[#919cf4] bg-opacity-30 hover:bg-opacity-90 hover:bg-[#919cf4] w-[55px] h-8'>
-                  <Image
-                    src='/svg/blue-logos/x.svg'
-                    alt='x'
-                    height={16}
-                    width={16}
-                  />
-                </Button>
-              </Link>
+            {connectedSocials.length > 0 ? (
+              connectedSocials.map((social, index) => (
+                <Link key={index} target={"_blank"} href={social.url || "#"}>
+                  <Button className='bg-[#919cf4] bg-opacity-30 hover:bg-opacity-90 hover:bg-[#919cf4] w-[55px] h-8'>
+                    <Image
+                      src={social.image}
+                      alt={social.alt}
+                      height={16}
+                      width={16}
+                    />
+                  </Button>
+                </Link>
+              ))
+            ) : user?.id === userProfileData?.profile?.privy_did ? (
+              <Button
+                className='flex-1 bg-white border border-black text-gray-700 text-xs font-medium font-body leading-[18px] hover:bg-[#2640eb] hover:text-yellow-200'
+                onClick={() => console.log("Link accounts clicked")}
+              >
+                Link Accounts
+                <Image
+                  className='ml-2'
+                  src={"/svg/link.svg"}
+                  alt='link'
+                  height={16}
+                  width={16}
+                />
+              </Button>
             ) : null}
           </div>
           {/* <div className='mt-8'>
