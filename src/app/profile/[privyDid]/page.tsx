@@ -43,6 +43,34 @@ export default function ProfilePage() {
     },
   });
 
+  const { data: endorsements, isLoading: endorsementsLoading } = useQuery({
+    enabled: true,
+    queryKey: ["endorsements", privyDid.replace("did:privy:", ""), userProfileData?.profile?.smart_wallet_address],
+    queryFn: async () => {
+      if (!userProfileData?.profile?.smart_wallet_address) {
+        return {
+          success: false,
+          endorsements: [],
+        };
+      }
+
+      const res = await fetch(
+        `/api/users/profiles/${privyDid.replace("did:privy:", "")}/get-endorsements?recipient_address=${userProfileData?.profile?.smart_wallet_address}`,
+        {
+          method: "GET",
+          cache: "no-store",
+          headers: {
+            "Content-type": "application/json",
+          },
+        }
+      );
+      const endorsementData = await res.json();
+      return endorsementData as {
+        success: boolean;
+        endorsements: any[];
+      };
+    },
+  });
   const handleCopyToClipboard = async () => {
     if (navigator.clipboard) {
       await navigator.clipboard.writeText(
@@ -256,36 +284,31 @@ export default function ProfilePage() {
             />
           </div> */}
           <h2
-            className='
-          text-gray-600
-text-xl
-font-bold
-font-body text-center mt-7 mb-6'
+            className='text-gray-600 text-xl font-bold font-body text-center mt-7 mb-6'
           >
             Endorsements
           </h2>
-          {[1, 2, 3].map((index) => (
+          {endorsementsLoading || !endorsements ? <Loader className='animate-spin mt-6 text-blue-700' /> : 
+          endorsements?.endorsements.map((endorsement, index) => (
             <Card key={index} className='mb-4 p-4'>
               <div className='flex items-start gap-4'>
                 <Avatar>
                   <AvatarImage
-                    src='/placeholder.svg?height=40&width=40'
-                    alt='Tina Haibodi'
+                    src={endorsement.endorserData?.preferred_photo ?? endorsement.endorserData?.photo_source ?? '/placeholder.svg?height=40&width=40'}
+                    alt={endorsement.endorserData?.name ?? "Endorser"}
                   />
                   <AvatarFallback>TH</AvatarFallback>
                 </Avatar>
                 <div>
-                  <h3 className='font-semibold text-[#2640eb]'>Tina Haibodi</h3>
+                  <h3 className='font-semibold text-[#2640eb]'>{endorsement.endorserData?.name}</h3>
                   <p className='text-sm text-gray-500 font-medium font-body'>
-                    August 14th, 2023
+                    {new Date(endorsement.timeCreated).toLocaleString()}
                   </p>
                   <p className='text-sm font-medium font-body leading-[21px] mt-1 text-gray-600'>
-                    Friend/Associate
+                    {endorsement.relationship}
                   </p>
                   <p className='text-xs text-gray-600 font-medium font-body leading-[18px] mt-2'>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua.
+                    {endorsement.endorsement}
                   </p>
                 </div>
               </div>

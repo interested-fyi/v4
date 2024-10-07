@@ -148,6 +148,7 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
         preferred_profile: formToSubmit.bestProfile,
         bio: formToSubmit.bio,
         privy_did: user?.id,
+        smart_wallet_address: user?.smartWallet?.address,
       }),
     });
     const resData = await res.json();
