@@ -1,3 +1,4 @@
+"use client";
 import { NavButtons } from "./NavButtons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -18,10 +19,12 @@ import {
 import { usePrivy, User } from "@privy-io/react-auth";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ProfileEditForm } from "../profile/ProfileEdit";
 import { LoaderIcon } from "lucide-react";
 import { UserCombinedProfile } from "@/types/return_types";
+import { fetchUserProfile } from "@/lib/api/helpers";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface AuthedNavProps {
   user: User | null;
@@ -33,23 +36,9 @@ const AuthedNav = ({ user, logout, getAccessToken }: AuthedNavProps) => {
   const { data } = useQuery({
     enabled: !!user,
     queryKey: ["user", user?.id.replace("did:privy:", "")],
-    queryFn: async () => {
-      const res = await fetch(
-        `/api/users/${user?.id.replace("did:privy:", "")}`,
-        {
-          method: "GET",
-          cache: "no-store",
-          headers: {
-            "Content-type": "application/json",
-          },
-        }
-      );
-      return (await res.json()) as {
-        success: boolean;
-        profile: any;
-      };
-    },
+    queryFn: async () => await fetchUserProfile({ userId: user?.id }),
   });
+
   return (
     <div className='flex gap-4'>
       {/* <Button size={"icon"} variant={"ghost"}>
@@ -94,11 +83,14 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
     bestProfile: "",
   });
   const { user, getAccessToken } = usePrivy();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const {
     data: userProfileData,
     isLoading: userProfileDataLoading,
     error: userProfileError,
+    refetch: refetchUserProfile,
   } = useQuery({
     enabled: !!user,
     queryKey: ["user", user?.id?.replace("did:privy:", "")],
@@ -160,8 +152,23 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
     };
   };
 
+  useEffect(() => {
+    if (searchParams.get("editMode")) {
+      setOpen(true);
+    }
+  }, [searchParams]);
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={async (open) => {
+        setOpen(open);
+        if (!open) {
+          router.push(`/profile/${user?.id.replace("did:privy:", "")}`);
+          await refetchUserProfile();
+        }
+      }}
+    >
       <DropdownMenu>
         <DropdownMenuTrigger asChild>{avatar}</DropdownMenuTrigger>
         <DropdownMenuContent>
@@ -170,7 +177,17 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
               View profile
             </Link>
           </DropdownMenuItem>
-          <DialogTrigger asChild>
+          <DialogTrigger
+            asChild
+            onClick={() => {
+              // add a editMode url param to the profile page
+              // this will allow the profile page to know that it should be in edit mode
+              // and display the edit form
+              router.push(
+                `/profile/${user?.id.replace("did:privy:", "")}?editMode=true`
+              );
+            }}
+          >
             <DropdownMenuItem className='text-gray-500 text-sm font-medium font-body leading-[21px]'>
               Edit profile
             </DropdownMenuItem>
@@ -218,6 +235,8 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
             }) => {
               await handleSubmitForm(formDetails);
               setOpen(false);
+              router.push(`/profile/${user?.id.replace("did:privy:", "")}`);
+              await refetchUserProfile();
             }}
             isEditMode
           />

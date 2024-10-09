@@ -13,6 +13,7 @@ import EndorseDialog from "@/components/composed/dialog/EndorseDialog";
 import { useState } from "react";
 import { Loader } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { fetchUserProfile } from "@/lib/api/helpers";
 
 export default function ProfilePage() {
   const [endorseDialogOpen, setEndorseDialogOpen] = useState(false);
@@ -25,27 +26,16 @@ export default function ProfilePage() {
   const { data: userProfileData, isLoading: userProfileLoading } = useQuery({
     enabled: !!privyDid,
     queryKey: ["user", privyDid.replace("did:privy:", "")],
-    queryFn: async () => {
-      const res = await fetch(
-        `/api/users/${privyDid.replace("did:privy:", "")}`,
-        {
-          method: "GET",
-          cache: "no-store",
-          headers: {
-            "Content-type": "application/json",
-          },
-        }
-      );
-      return (await res.json()) as {
-        success: boolean;
-        profile: UserCombinedProfile;
-      };
-    },
+    queryFn: async () => fetchUserProfile({ userId: privyDid }),
   });
 
   const { data: endorsements, isLoading: endorsementsLoading } = useQuery({
     enabled: true,
-    queryKey: ["endorsements", privyDid.replace("did:privy:", ""), userProfileData?.profile?.smart_wallet_address],
+    queryKey: [
+      "endorsements",
+      privyDid.replace("did:privy:", ""),
+      userProfileData?.profile?.smart_wallet_address,
+    ],
     queryFn: async () => {
       if (!userProfileData?.profile?.smart_wallet_address) {
         return {
@@ -55,7 +45,12 @@ export default function ProfilePage() {
       }
 
       const res = await fetch(
-        `/api/users/profiles/${privyDid.replace("did:privy:", "")}/get-endorsements?recipient_address=${userProfileData?.profile?.smart_wallet_address}`,
+        `/api/users/profiles/${privyDid.replace(
+          "did:privy:",
+          ""
+        )}/get-endorsements?recipient_address=${
+          userProfileData?.profile?.smart_wallet_address
+        }`,
         {
           method: "GET",
           cache: "no-store",
@@ -172,11 +167,7 @@ export default function ProfilePage() {
                 "Short bio here? Do we have this in the profile editing flow somewhere - yes we do"}
             </p>
             <div className='absolute -top-28 right-0'>
-              {user?.id ===
-              userProfileData?.profile?.privy_did ? //     alt='edit' //     src='/svg/pencil.svg' //   <Image // <Button className='h-8 pl-[11px] pr-3 py-2 bg-[#919cf4] hover:bg-[#919cf4] hover:bg-opacity-90 rounded-lg justify-center items-center gap-2 inline-flex'>
-              //     height={16}
-              //     width={16}
-              //   />
+              {user?.id === userProfileData?.profile?.privy_did ? //   /> //     width={16} //     height={16} //     alt='edit' //     src='/svg/pencil.svg' //   <Image // <Button className='h-8 pl-[11px] pr-3 py-2 bg-[#919cf4] hover:bg-[#919cf4] hover:bg-opacity-90 rounded-lg justify-center items-center gap-2 inline-flex'>
               // </Button>
               null : (
                 <Button
@@ -283,37 +274,44 @@ export default function ProfilePage() {
               svgOnClick={() => {}}
             />
           </div> */}
-          <h2
-            className='text-gray-600 text-xl font-bold font-body text-center mt-7 mb-6'
-          >
+          <h2 className='text-gray-600 text-xl font-bold font-body text-center mt-7 mb-6'>
             Endorsements
           </h2>
-          {endorsementsLoading || !endorsements ? <Loader className='animate-spin mt-6 text-blue-700' /> : 
-          endorsements?.endorsements.map((endorsement, index) => (
-            <Card key={index} className='mb-4 p-4'>
-              <div className='flex items-start gap-4'>
-                <Avatar>
-                  <AvatarImage
-                    src={endorsement.endorserData?.preferred_photo ?? endorsement.endorserData?.photo_source ?? '/placeholder.svg?height=40&width=40'}
-                    alt={endorsement.endorserData?.name ?? "Endorser"}
-                  />
-                  <AvatarFallback>TH</AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className='font-semibold text-[#2640eb]'>{endorsement.endorserData?.name}</h3>
-                  <p className='text-sm text-gray-500 font-medium font-body'>
-                    {new Date(endorsement.timeCreated).toLocaleString()}
-                  </p>
-                  <p className='text-sm font-medium font-body leading-[21px] mt-1 text-gray-600'>
-                    {endorsement.relationship}
-                  </p>
-                  <p className='text-xs text-gray-600 font-medium font-body leading-[18px] mt-2'>
-                    {endorsement.endorsement}
-                  </p>
+          {endorsementsLoading || !endorsements ? (
+            <Loader className='animate-spin mt-6 text-blue-700' />
+          ) : (
+            endorsements?.endorsements?.map((endorsement, index) => (
+              <Card key={index} className='mb-4 p-4'>
+                <div className='flex items-start gap-4'>
+                  <Avatar>
+                    <AvatarImage
+                      src={
+                        endorsement.endorserData?.preferred_photo ??
+                        endorsement.endorserData?.photo_source ??
+                        "/placeholder.svg?height=40&width=40"
+                      }
+                      alt={endorsement.endorserData?.name ?? "Endorser"}
+                    />
+                    <AvatarFallback>TH</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className='font-semibold text-[#2640eb]'>
+                      {endorsement.endorserData?.name}
+                    </h3>
+                    <p className='text-sm text-gray-500 font-medium font-body'>
+                      {new Date(endorsement.timeCreated).toLocaleString()}
+                    </p>
+                    <p className='text-sm font-medium font-body leading-[21px] mt-1 text-gray-600'>
+                      {endorsement.relationship}
+                    </p>
+                    <p className='text-xs text-gray-600 font-medium font-body leading-[18px] mt-2'>
+                      {endorsement.endorsement}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            ))
+          )}
         </div>
       </div>
     </div>

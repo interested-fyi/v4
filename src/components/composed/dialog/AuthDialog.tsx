@@ -14,8 +14,8 @@ import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 import { useState } from "react";
 import { LoaderIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { UserCombinedProfile } from "@/types/return_types";
 import * as dotenv from "dotenv";
+import { fetchUserProfile } from "@/lib/api/helpers";
 dotenv.config();
 
 export default function AuthDialog({
@@ -39,28 +39,14 @@ export default function AuthDialog({
 
   const {
     data: userProfileData,
-    isLoading: userProfileDataLoading,
-    error: userProfileError,
+    isLoading: userProfileLoading,
+    isError: userProfileError,
   } = useQuery({
     enabled: !!user,
-    queryKey: ["user", user?.id?.replace("did:privy:", "")],
+    queryKey: ["user", user?.id.replace("did:privy:", "")],
     queryFn: async () => {
       const accessToken = await getAccessToken();
-      const res = await fetch(
-        `/api/users/${user?.id?.replace("did:privy:", "")}`,
-        {
-          method: "GET",
-          cache: "no-store",
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-      return (await res.json()) as {
-        success: boolean;
-        profile: UserCombinedProfile;
-      };
+      await fetchUserProfile({ userId: user?.id, accessToken });
     },
   });
 
@@ -171,7 +157,7 @@ export default function AuthDialog({
               least one social authenticator.
             </div>
           </DialogHeader>
-          {(!userProfileData && !userProfileError) || userProfileDataLoading ? (
+          {(!userProfileData && !userProfileError) || userProfileLoading ? (
             <>
               <LoaderIcon className='w-10 h-10 m-auto animate-spin' />
             </>
