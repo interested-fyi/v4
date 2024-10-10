@@ -19,12 +19,12 @@ import {
 import { usePrivy, User } from "@privy-io/react-auth";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { ProfileEditForm } from "../profile/ProfileEdit";
 import { LoaderIcon } from "lucide-react";
 import { UserCombinedProfile } from "@/types/return_types";
 import { fetchUserProfile } from "@/lib/api/helpers";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface AuthedNavProps {
   user: User | null;
@@ -85,6 +85,16 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
   const { user, getAccessToken } = usePrivy();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(name, value);
+
+      return params.toString();
+    },
+    [searchParams]
+  );
 
   const {
     data: userProfileData,
@@ -164,8 +174,11 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
       onOpenChange={async (open) => {
         setOpen(open);
         if (!open) {
-          router.push(`/profile/${user?.id.replace("did:privy:", "")}`);
-          await refetchUserProfile();
+          // Remove the editMode param on close
+          const params = new URLSearchParams(searchParams.toString());
+          params.delete("editMode"); // Removes editMode parameter
+          router.replace(pathname + "?" + params.toString());
+          await refetchUserProfile(); // Refresh the user profile after dialog is closed
         }
       }}
     >
@@ -183,8 +196,10 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
               // add a editMode url param to the profile page
               // this will allow the profile page to know that it should be in edit mode
               // and display the edit form
-              router.push(
-                `/profile/${user?.id.replace("did:privy:", "")}?editMode=true`
+              // Get a new searchParams string by merging the current
+              // searchParams with a provided key/value pair
+              router.replace(
+                pathname + "?" + createQueryString("editMode", "true")
               );
             }}
           >
@@ -235,8 +250,11 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
             }) => {
               await handleSubmitForm(formDetails);
               setOpen(false);
-              router.push(`/profile/${user?.id.replace("did:privy:", "")}`);
-              await refetchUserProfile();
+              // Remove the editMode param on close
+              const params = new URLSearchParams(searchParams.toString());
+              params.delete("editMode"); // Removes editMode parameter
+              router.replace(pathname + "?" + params.toString());
+              await refetchUserProfile(); // Refresh the user profile after dialog is closed
             }}
             isEditMode
           />
