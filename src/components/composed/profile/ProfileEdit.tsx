@@ -17,8 +17,8 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { ProfileConnections } from "../profile/ProfileConnections";
 import { Textarea } from "@/components/ui/textarea";
-import { UserCombinedProfile } from "@/types/return_types";
 import { Loader } from "lucide-react";
+import { fetchUserProfile } from "@/lib/api/helpers";
 
 interface Props {
   isEditMode?: boolean;
@@ -54,21 +54,7 @@ export const ProfileEditForm = ({ isEditMode, onSubmit }: Props) => {
     queryKey: ["user", user?.id?.replace("did:privy:", "")],
     queryFn: async () => {
       const accessToken = await getAccessToken();
-      const res = await fetch(
-        `/api/users/${user?.id?.replace("did:privy:", "")}`,
-        {
-          method: "GET",
-          cache: "no-store",
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-      return (await res.json()) as {
-        success: boolean;
-        profile: UserCombinedProfile;
-      };
+      return await fetchUserProfile({ userId: user?.id, accessToken });
     },
   });
 

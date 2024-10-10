@@ -6,6 +6,7 @@ import AuthDialog from "@/components/composed/dialog/AuthDialog";
 import { usePrivy } from "@privy-io/react-auth";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { fetchUserProfile } from "@/lib/api/helpers";
 
 export default function Home() {
   const { user } = usePrivy();
@@ -13,22 +14,7 @@ export default function Home() {
   const { data: userProfileData, isLoading: userProfileLoading } = useQuery({
     enabled: !!user,
     queryKey: ["user", user?.id.replace("did:privy:", "")],
-    queryFn: async () => {
-      const res = await fetch(
-        `/api/users/${user?.id.replace("did:privy:", "")}`,
-        {
-          method: "GET",
-          cache: "no-store",
-          headers: {
-            "Content-type": "application/json",
-          },
-        }
-      );
-      return (await res.json()) as {
-        success: boolean;
-        profile: any;
-      };
-    },
+    queryFn: async () => await fetchUserProfile({userId: user?.id}),
   });
 
   return (

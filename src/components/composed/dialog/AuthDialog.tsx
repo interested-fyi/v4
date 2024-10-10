@@ -46,7 +46,7 @@ export default function AuthDialog({
     queryKey: ["user", user?.id.replace("did:privy:", "")],
     queryFn: async () => {
       const accessToken = await getAccessToken();
-      await fetchUserProfile({ userId: user?.id, accessToken });
+      return await fetchUserProfile({ userId: user?.id, accessToken });
     },
   });
 
