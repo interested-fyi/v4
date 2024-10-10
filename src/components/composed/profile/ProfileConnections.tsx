@@ -35,11 +35,13 @@ export const ProfileConnections = ({
   onSetBestProfile,
   onSetProfile,
   userProfileData,
+  onHandleLink,
 }: {
   setTempPhotoUrl: (photo_url: string) => void;
   userProfileData: { success: boolean; profile: any } | undefined;
   onSetBestProfile?: (profile: string) => void;
   onSetProfile?: (profile: string) => void;
+  onHandleLink?: (profile: string) => void;
 }) => {
   const [bestProfile, setBestProfile] = useState<string | null>(null);
   const [additionalProfile, setAdditionalProfile] = useState<string | null>(
@@ -290,6 +292,7 @@ export const ProfileConnections = ({
   }, [userProfileData]);
 
   const handleLink = (linkMethod: string) => {
+    onHandleLink && onHandleLink(linkMethod);
     setAddProfile(false);
     switch (linkMethod) {
       case "github":

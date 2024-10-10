@@ -19,6 +19,7 @@ import { ProfileConnections } from "../profile/ProfileConnections";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader } from "lucide-react";
 import { fetchUserProfile } from "@/lib/api/helpers";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface Props {
   isEditMode?: boolean;
@@ -44,6 +45,8 @@ export const ProfileEditForm = ({ isEditMode, onSubmit }: Props) => {
   const [isProfileComplete, setIsProfileComplete] = useState<boolean>(false);
 
   const { user, getAccessToken } = usePrivy();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const {
     data: userProfileData,
@@ -59,7 +62,18 @@ export const ProfileEditForm = ({ isEditMode, onSubmit }: Props) => {
   });
 
   useEffect(() => {
-    if (userProfileData?.success) {
+    // check if the url contains any query params and set the form state accordingly
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    const urlParams = Object.fromEntries(urlSearchParams.entries());
+    const isFormComplete = form.name && form.bio && form.email;
+    if (Object.keys(urlParams).length) {
+      setForm({
+        name: urlParams.name ?? "",
+        email: urlParams.email ?? "",
+        bio: urlParams.bio ?? "",
+        bestProfile: urlParams.bestProfile ?? "",
+      });
+    } else if (userProfileData?.success) {
       setForm({
         name: user?.google?.name ?? "",
         email: user?.google?.email ?? "",
@@ -78,9 +92,6 @@ export const ProfileEditForm = ({ isEditMode, onSubmit }: Props) => {
     setTempPhotoUrl(photoUrl);
   };
 
-  useEffect(() => {
-    console.log("isLoading state:", isLoading);
-  }, [isLoading]);
   return (
     <>
       <div className='flex flex-col items-center gap-0 mb-0'>
@@ -183,6 +194,7 @@ export const ProfileEditForm = ({ isEditMode, onSubmit }: Props) => {
           </Label>
           <Textarea
             className='rounded-lg'
+            maxLength={180}
             id='bio'
             value={form.bio}
             onChange={(e) => setForm({ ...form, bio: e.target.value })}
@@ -196,6 +208,12 @@ export const ProfileEditForm = ({ isEditMode, onSubmit }: Props) => {
         onSetBestProfile={(bestProfile) =>
           setForm({ ...form, bestProfile: bestProfile })
         }
+        onHandleLink={() => {
+          // url encode all the current form data and push it to the path
+          const formData = new URLSearchParams(form).toString();
+          const path = window.location.pathname + "?" + formData;
+          router.push(path);
+        }}
       />
 
       <Button
