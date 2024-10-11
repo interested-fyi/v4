@@ -39,3 +39,5 @@ next-env.d.ts
 src/scripts/python/**/venv
 
 certificates
+
+prod-deploy-checklist.txt
