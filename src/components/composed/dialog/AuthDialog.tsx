@@ -184,7 +184,7 @@ export default function AuthDialog({
           )}
         </DialogContent>
       ) : (
-        <DialogContent className='sm:max-w-[425px] h-full bg-[#e1effe] font-body m-auto py-8 overflow-scroll'>
+        <DialogContent className=' h-full bg-[#e1effe] font-body m-auto py-8 overflow-scroll'>
           <DialogHeader className='flex flex-col gap-3'>
             <DialogTitle className='text-2xl font-bold font-heading text-center mt-4'>
               PROFILE COMPLETE
@@ -202,6 +202,7 @@ export default function AuthDialog({
                 });
               }}
               onClose={() => onClose()}
+              isSettingsMode={false}
             />
           </DialogHeader>
         </DialogContent>

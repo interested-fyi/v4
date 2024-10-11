@@ -16,18 +16,22 @@ interface ProfileSettingsProps {
     calendar: string;
     fee: string;
     bookingDescription: string;
+    position: string;
   }) => Promise<void>;
   onClose: () => void;
+  isSettingsMode: boolean;
 }
 export const ProfileSettings = ({
   onSubmit,
   onClose,
+  isSettingsMode,
 }: ProfileSettingsProps) => {
   const [form, setForm] = useState({
     calendar: "",
     fee: "",
     bookingDescription: "",
     isAvailable: true,
+    position: "",
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -67,6 +71,7 @@ export const ProfileSettings = ({
         fee: userProfileData.profile?.unlock_calendar_fee ?? "",
         bookingDescription: userProfileData.profile?.booking_description ?? "",
         isAvailable: userProfileData.profile?.available ?? true,
+        position: userProfileData.profile?.position ?? "",
       });
     }
   }, [userProfileData]);
@@ -78,7 +83,7 @@ export const ProfileSettings = ({
   return (
     <>
       {" "}
-      <div className='text-center text-[#1e1e1e] text-sm font-bold font-heading leading-[14px]'>
+      <div className='text-center text-[#1e1e1e] text-sm font-bold font-heading leading-[14px] m-0 scroll-m-0 max-w-[360px]'>
         <p className='mb-1'>READY TO APPEAR ON OUR TALENT PAGE?</p>
         <div className='flex gap-4 relative max-w-full'>
           <Button
@@ -142,15 +147,29 @@ export const ProfileSettings = ({
           </Button>
         </div>
       </div>
-      <div className='w-[343px] text-center text-gray-700 text-sm font-semibold font-body leading-[21px] pt-5 '>
-        If you&apos;re on our talent page and looking for work, having
-        prospective companies and recruiters book a call with you is a great
-        first step.
-        <br />
-        <br />
-        (You can also do this later in settings).
-      </div>
+      {!isSettingsMode ? (
+        <div className='w-[343px] text-center text-gray-700 text-sm font-semibold font-body leading-[21px] pt-5 '>
+          If you&apos;re on our talent page and looking for work, having
+          prospective companies and recruiters book a call with you is a great
+          first step.
+          <br />
+          <br />
+          (You can also do this later in settings).
+        </div>
+      ) : null}
       <div className='grid gap-4'>
+        <div>
+          <Label className='text-sm font-medium' htmlFor='position'>
+            Job title
+          </Label>
+          <Input
+            className='rounded-lg'
+            id='position'
+            onChange={(e) =>
+              setForm({ ...form, position: e.target.value.trim() })
+            }
+          />
+        </div>
         <div>
           <Label className='text-sm font-medium' htmlFor='calendar'>
             Scheduling link (Calendly, etc)
@@ -211,8 +230,10 @@ export const ProfileSettings = ({
       >
         {isLoading ? (
           <LoaderIcon className='w-6 h-6 m-auto animate-spin' />
-        ) : (
+        ) : !isSettingsMode ? (
           "Save and continue to Interested"
+        ) : (
+          "Save and exit"
         )}
       </Button>
     </>
