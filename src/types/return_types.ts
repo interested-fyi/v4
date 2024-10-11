@@ -5,6 +5,7 @@ export interface UserCombinedProfile {
   preferred_photo: string | null;
   preferred_profile: string | null;
   available: boolean | null;
+  position: string | null;
   bio: string | null;
   booking_description: string | null;
   smart_wallet_address: string | null;
