@@ -1,6 +1,6 @@
 "use client";
 import { User, usePrivy, useLogin } from "@privy-io/react-auth";
-import React from "react";
+import React, { useEffect } from "react";
 
 /**
  * Props for the AuthedUIController component.
@@ -13,6 +13,7 @@ interface AuthedUIControllerProps {
    * @param authenticated - Boolean indicating if the user is authenticated.
    * @param user - The authenticated user object.
    * @param logout - Function to log out the user.
+   * @param getAccessToken - Function to get the access token.
    * @returns ReactNode - The UI to render when the user is authenticated.
    */
   authedUI: ({
@@ -20,11 +21,13 @@ interface AuthedUIControllerProps {
     authenticated,
     user,
     logout,
+    getAccessToken,
   }: {
     ready: boolean;
     authenticated: boolean;
     user: User | null;
     logout: () => void;
+    getAccessToken: () => Promise<string | null>;
   }) => React.ReactNode;
 
   /**
@@ -34,6 +37,7 @@ interface AuthedUIControllerProps {
    * @param authenticated - Boolean indicating if the user is authenticated.
    * @param user - The authenticated user object.
    * @param login - Function to log in the user.
+   * @param getAccessToken - Function to get the access token.
    * @returns ReactNode - The UI to render when the user is not authenticated.
    */
   unauthedUI: ({
@@ -41,11 +45,13 @@ interface AuthedUIControllerProps {
     authenticated,
     user,
     login,
+    getAccessToken,
   }: {
     ready: boolean;
     authenticated: boolean;
     user: User | null;
     login: () => void;
+    getAccessToken: () => Promise<string | null>;
   }) => React.ReactNode;
 }
 
@@ -67,35 +73,34 @@ const AuthedUIController = ({
   authedUI,
   unauthedUI,
 }: AuthedUIControllerProps) => {
-  const { ready, authenticated, user, logout, getAccessToken } = usePrivy();
-  const { login } = useLogin({
-    onComplete: async (user, isNewUser, wasAlreadyAuthenticated, loginMethod, linkedAccount) => {
-      const accessToken = await getAccessToken();
-      if (isNewUser) {
-        const res = await fetch(
-          `/api/users/save-user`,
-          {
-            method: "POST",
-            cache: "no-store",
-            headers: {
-              "Content-type": "application/json",
-              "Authorization": `Bearer ${accessToken}`
-            },
-            body: JSON.stringify({
-              privy_did: user?.id,
-              email: user?.google?.email, 
-              name: user?.google?.name, 
-              subject: user?.google?.subject
-            })
-          }
-        );
+  const { ready, authenticated, user, logout, login, getAccessToken } = usePrivy();
+  useEffect(() => {
+    async function saveUser() {
+      if(authenticated) {
+        const accessToken = await getAccessToken();
+        const res = await fetch(`/api/users/save-user`, {
+          method: "POST",
+          cache: "no-store",
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            privy_did: user?.id,
+            email: user?.google?.email,
+            name: user?.google?.name,
+            subject: user?.google?.subject,
+          }),
+        });
       }
     }
-  })
+
+    saveUser();
+  }, [authenticated]);
 
   return ready && authenticated && user
-    ? authedUI({ ready, authenticated, user, logout })
-    : unauthedUI({ ready, authenticated, user, login });
+    ? authedUI({ ready, authenticated, user, logout, getAccessToken })
+    : unauthedUI({ ready, authenticated, user, login, getAccessToken });
 };
 
 export default AuthedUIController;

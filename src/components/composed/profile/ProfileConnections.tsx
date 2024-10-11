@@ -11,19 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { X, Github, Linkedin, Twitter } from "lucide-react";
-import warpcast from "/public/svg/warpcast.svg";
-import Telegram from "/public/svg/telegram.svg";
-
-type Profile = {
-  name: PROFILE_TYPE;
-  icon:
-    | typeof Github
-    | typeof Linkedin
-    | typeof warpcast
-    | typeof Telegram
-    | typeof Twitter;
-};
+import { X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 enum PROFILE_TYPE {
   GITHUB = "github",
@@ -33,26 +22,32 @@ enum PROFILE_TYPE {
   FARCASTER = "farcaster",
 }
 
-const profiles: Profile[] = [
-  { name: PROFILE_TYPE.GITHUB, icon: Github },
-  { name: PROFILE_TYPE.LINKEDIN, icon: Linkedin },
-  { name: PROFILE_TYPE.FARCASTER, icon: warpcast },
-  { name: PROFILE_TYPE.TELEGRAM, icon: Telegram },
-  { name: PROFILE_TYPE.TWITTER, icon: Twitter },
+const profiles = [
+  PROFILE_TYPE.GITHUB,
+  PROFILE_TYPE.LINKEDIN,
+  PROFILE_TYPE.FARCASTER,
+  PROFILE_TYPE.TELEGRAM,
+  PROFILE_TYPE.TWITTER,
 ];
 
 export const ProfileConnections = ({
   setTempPhotoUrl,
+  onSetBestProfile,
+  onSetProfile,
   userProfileData,
+  onHandleLink,
 }: {
   setTempPhotoUrl: (photo_url: string) => void;
   userProfileData: { success: boolean; profile: any } | undefined;
+  onSetBestProfile?: (profile: string) => void;
+  onSetProfile?: (profile: string) => void;
+  onHandleLink?: (profile: string) => void;
 }) => {
-  const [bestProfile, setBestProfile] = useState<Profile | null>(null);
-  const [additionalProfile, setAdditionalProfile] = useState<Profile | null>(
+  const [bestProfile, setBestProfile] = useState<string | null>(null);
+  const [additionalProfile, setAdditionalProfile] = useState<string | null>(
     null
   );
-  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<string | null>(null);
   const [addProfile, setAddProfile] = useState(false);
 
   const {
@@ -122,7 +117,7 @@ export const ProfileConnections = ({
               bio: bio,
             }),
           });
-          if (!userProfileData?.profile.photo_source && pfp) {
+          if (!userProfileData?.profile?.photo_source && pfp) {
             handleSelectPhoto(pfp);
           }
         }
@@ -177,7 +172,7 @@ export const ProfileConnections = ({
               last_name: last_name,
             }),
           });
-          if (!userProfileData?.profile.photo_source && photo_url) {
+          if (!userProfileData?.profile?.photo_source && photo_url) {
             handleSelectPhoto(photo_url);
           }
         }
@@ -205,7 +200,7 @@ export const ProfileConnections = ({
               subject: subject,
             }),
           });
-          if (!userProfileData?.profile.photo_source && profile_picture_url) {
+          if (!userProfileData?.profile?.photo_source && profile_picture_url) {
             handleSelectPhoto(profile_picture_url);
           }
         }
@@ -264,11 +259,9 @@ export const ProfileConnections = ({
       },
     });
 
-  const updateUserProfileData = async (
-    userProfileData: PROFILE_TYPE | null
-  ) => {
+  const updateUserProfileData = async (userProfileData: string | null) => {
     const accessToken = await getAccessToken();
-    const res = await fetch(`/api/users/profiles/${user?.id}`, {
+    const res = await fetch(`/api/users/${user?.id}`, {
       method: "POST",
       cache: "no-store",
       headers: {
@@ -283,35 +276,23 @@ export const ProfileConnections = ({
   };
 
   const handleSelectPhoto = async (photoUrl: string) => {
-    const accessToken = await getAccessToken();
-    const res = await fetch(`/api/users/profiles/update-photo/${user?.id}`, {
-      method: "POST",
-      cache: "no-store",
-      headers: {
-        "Content-type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({
-        photoSource: photoUrl,
-        privyDid: user?.id,
-      }),
-    });
-    if (res.ok) {
-      setTempPhotoUrl(photoUrl);
-    }
+    setTempPhotoUrl(photoUrl);
   };
 
   useEffect(() => {
     if (userProfileData) {
-      setBestProfile(
-        profiles.find(
-          (p) => p.name === userProfileData.profile.preferred_profile
-        ) || null
-      );
+      const profile = userProfileData?.profile?.preferred_profile;
+      if (profile) {
+        setBestProfile(profile);
+      }
+      if (onSetBestProfile && profile) {
+        onSetBestProfile(profile);
+      }
     }
   }, [userProfileData]);
 
-  const handleLink = (linkMethod: string, isBestProfile: boolean) => {
+  const handleLink = (linkMethod: string) => {
+    onHandleLink && onHandleLink(linkMethod);
     setAddProfile(false);
     switch (linkMethod) {
       case "github":
@@ -331,24 +312,22 @@ export const ProfileConnections = ({
         break;
     }
     if (selectedProfile) {
-      if (isBestProfile) {
-        setBestProfile(selectedProfile);
-        try {
-          updateUserProfileData(selectedProfile.name);
-        } catch (e) {
-          console.log(e);
-        }
-      } else {
-        setAdditionalProfile(selectedProfile);
-      }
+      setAdditionalProfile(selectedProfile);
+      onSetProfile && onSetProfile(selectedProfile);
       setSelectedProfile(null);
+      setAddProfile(true);
+    } else {
+      setAdditionalProfile(null);
+      setSelectedProfile(null);
+      onSetProfile && onSetProfile("");
+      setAddProfile(true);
     }
   };
 
   const handleUnlink = (linkMethod: string) => {
     if (
       userProfileData &&
-      userProfileData.profile.preferred_profile === linkMethod
+      userProfileData?.profile?.preferred_profile === linkMethod
     ) {
       updateUserProfileData(null);
     }
@@ -381,85 +360,104 @@ export const ProfileConnections = ({
     }
   };
 
+  const linkedAccounts = user?.linkedAccounts.filter((linkedAccount: any) => {
+    if (
+      linkedAccount.type !== "wallet" &&
+      linkedAccount.type !== "smart_wallet" &&
+      linkedAccount.type !== "google_oauth"
+    ) {
+      return linkedAccount;
+    }
+  });
+
   return (
     <>
       <div className='flex flex-col gap-2'>
-        <Label>Best profile:</Label>
-        {bestProfile ? (
-          <UnlinkAccountButton
-            profile={bestProfile}
-            handleUnlink={handleUnlink}
-            setProfile={setBestProfile}
-          />
-        ) : (
-          <LinkAccountSelect
-            profiles={profiles}
-            selectedProfile={selectedProfile}
-            setSelectedProfile={setSelectedProfile}
-            handleLink={handleLink}
-            isBestProfile={true}
-          />
-        )}
-        {userProfileData &&
-          user?.linkedAccounts?.map((linkedAccount: any) => {
-            const accountName = linkedAccount.type.replace("_oauth", "");
-            if (accountName === "wallet") return;
-
-            const profileData = profiles.find(
-              (p) => p.name === linkedAccount.type.replace("_oauth", "")
-            );
-
-            if (
-              accountName !== userProfileData.profile.preferred_profile &&
-              profileData
-            ) {
-              return (
-                <div key={linkedAccount}>
-                  <UnlinkAccountButton
-                    profile={profileData}
-                    handleUnlink={handleUnlink}
-                    setProfile={setSelectedProfile}
-                  />
-                </div>
+        <div className='flex justify-between'>
+          <Label>Profiles</Label>
+          {linkedAccounts && linkedAccounts.length > 0 && (
+            <Label>Select Primary</Label>
+          )}
+        </div>
+        <div className='flex flex-col gap-4'>
+          {userProfileData &&
+            linkedAccounts?.map((linkedAccount: any) => {
+              const accountName = linkedAccount.type.replace("_oauth", "");
+              if (accountName === "wallet") return;
+              const profileData = profiles.find(
+                (p) => p === linkedAccount.type.replace("_oauth", "")
               );
-            }
-            return null;
-          })}
-        {addProfile && (
+
+              if (profileData) {
+                return (
+                  <div
+                    className='flex w-full gap-4 items-center'
+                    key={accountName}
+                  >
+                    <UnlinkAccountButton
+                      profile={profileData}
+                      handleUnlink={handleUnlink}
+                      setProfile={setSelectedProfile}
+                    />
+                    <div className='w-[40%] flex justify-center'>
+                      <Checkbox
+                        className='w-6 h-6'
+                        checked={
+                          bestProfile === accountName ||
+                          (bestProfile === "x" && accountName === "twitter")
+                        }
+                        onCheckedChange={(e) => {
+                          if (e.valueOf() === true) {
+                            setBestProfile(accountName);
+                            onSetBestProfile && onSetBestProfile(accountName);
+                          } else {
+                            setBestProfile(null);
+                            onSetBestProfile && onSetBestProfile("");
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              }
+            })}
+        </div>
+
+        {(addProfile || (!!linkedAccounts && linkedAccounts?.length === 0)) && (
           <div>
             <LinkAccountSelect
               profiles={profiles}
               selectedProfile={selectedProfile}
               setSelectedProfile={setSelectedProfile}
               handleLink={handleLink}
-              isBestProfile={false}
             />
           </div>
         )}
       </div>
-
-      {bestProfile && !additionalProfile && !addProfile && (
-        <Button
-          variant='link'
-          className='w-full mt-2 text-blue-700'
-          onClick={() => {
-            setAddProfile(true);
-            setSelectedProfile(null);
-          }}
-        >
-          + Add another
-        </Button>
-      )}
+      {!additionalProfile &&
+        !addProfile &&
+        !!linkedAccounts &&
+        linkedAccounts?.length > 0 && (
+          <Button
+            variant='link'
+            className='w-full mt-2 text-blue-700'
+            onClick={() => {
+              setAddProfile(true);
+              setSelectedProfile(null);
+            }}
+          >
+            + Add another
+          </Button>
+        )}{" "}
     </>
   );
 };
 
 interface LinkAccountSelectProps {
-  profiles: Profile[];
-  selectedProfile: Profile | null;
-  setSelectedProfile: (profile: Profile | null) => void;
-  handleLink: (linkMethod: string, isBestProfile: boolean) => void;
-  isBestProfile: boolean;
+  profiles: string[];
+  selectedProfile: string | null;
+  setSelectedProfile: (profile: string | null) => void;
+  handleLink: (linkMethod: string) => void;
 }
 
 export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
@@ -467,13 +465,12 @@ export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
   selectedProfile,
   setSelectedProfile,
   handleLink,
-  isBestProfile,
 }) => {
   return (
-    <div className='flex items-center mt-2  rounded-lg text-black'>
+    <div className='flex items-center rounded-lg text-black'>
       <Select
         onValueChange={(value) =>
-          setSelectedProfile(profiles.find((p) => p.name === value) || null)
+          setSelectedProfile(profiles.find((p) => p === value) || null)
         }
       >
         <SelectTrigger className='w-full bg-white'>
@@ -481,20 +478,15 @@ export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
         </SelectTrigger>
         <SelectContent>
           {profiles.map((profile) => (
-            <SelectItem key={profile.name} value={profile.name}>
-              {profile.name}
+            <SelectItem key={profile} value={profile}>
+              <span>{profile}</span>
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
       <Button
-        className='ml-2 bg-[#2640eb]'
-        onClick={() =>
-          handleLink(
-            selectedProfile?.name.toLocaleLowerCase() ?? "",
-            isBestProfile
-          )
-        }
+        className='ml-4 bg-[#2640eb]'
+        onClick={() => handleLink(selectedProfile?.toLocaleLowerCase() ?? "")}
       >
         Link
       </Button>
@@ -503,9 +495,9 @@ export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
 };
 
 interface UnlinkAccountButtonProps {
-  profile: Profile;
+  profile: string | null;
   handleUnlink: (linkMethod: string) => void;
-  setProfile: (profile: Profile | null) => void;
+  setProfile: (profile: string | null) => void;
 }
 
 export const UnlinkAccountButton: React.FC<UnlinkAccountButtonProps> = ({
@@ -513,16 +505,16 @@ export const UnlinkAccountButton: React.FC<UnlinkAccountButtonProps> = ({
   handleUnlink,
   setProfile,
 }) => {
+  if (!profile) return null;
   return (
-    <div className='flex items-center mt-2 bg-white rounded-lg text-black px-5 pr-2'>
-      <profile.icon className='mr-2' />
-      <span className='flex-grow'>{profile.name}</span>
+    <div className='flex items-center bg-white rounded-lg text-black px-5 pr-2 w-full'>
+      <span className='flex-grow'>{profile}</span>
       <Button
         variant='ghost'
         size='icon'
         onClick={() => {
           setProfile(null);
-          handleUnlink(profile.name.toLowerCase());
+          handleUnlink(profile.toLowerCase());
         }}
       >
         <X className='h-4 w-4' />

@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import supabase from "@/lib/supabase";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { privyDid: string } }
-) {
-  const { privyDid } = params;
-  console.log(privyDid);
+export async function GET(req: NextRequest) {
+  const walletAddress = req.nextUrl.searchParams.get('walletAddress');
+
+  if (!walletAddress) {
+    return NextResponse.json({ error: "Wallet address is required" }, { status: 400 });
+  }
+
   const { data, error } = await supabase
     .from("user_profile_combined")
     .select("*")
-    .eq("privy_did", `did:privy:${privyDid}`)
+    .eq("smart_wallet_address", walletAddress)
     .maybeSingle();
 
   if (error) {

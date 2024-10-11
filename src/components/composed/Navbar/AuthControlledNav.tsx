@@ -7,7 +7,13 @@ import UnauthedNav from "./UnauthedNav";
 const AuthControlledNav = () => {
   return (
     <AuthedUIController
-      authedUI={({ logout, user }) => <AuthedNav user={user} logout={logout} />}
+      authedUI={({ logout, user, getAccessToken }) => (
+        <AuthedNav
+          user={user}
+          logout={logout}
+          getAccessToken={getAccessToken}
+        />
+      )}
       unauthedUI={({ login }) => <UnauthedNav login={login} />}
     />
   );

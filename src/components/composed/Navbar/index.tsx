@@ -10,9 +10,9 @@ const Navbar = () => {
       <Link className='m-auto md:m-0 w-32 md:w-[165px]' href='/'>
         <AspectRatio ratio={16 / 3}>
           <Image
-            width={165}
-            height={28}
-            src='/images/main-logo.png'
+            width={37.5}
+            height={32}
+            src='/svg/small-binocular.svg'
             alt='Interested Logo'
           />
         </AspectRatio>
