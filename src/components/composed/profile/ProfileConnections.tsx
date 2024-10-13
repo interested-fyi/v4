@@ -291,8 +291,9 @@ export const ProfileConnections = ({
     }
   }, [userProfileData]);
 
-  const handleLink = (linkMethod: string) => {
-    onHandleLink && onHandleLink(linkMethod);
+  const handleLink = async (linkMethod: string) => {
+    onHandleLink && (await onHandleLink(linkMethod));
+    await new Promise((resolve) => setTimeout(resolve, 250));
     setAddProfile(false);
     switch (linkMethod) {
       case "github":

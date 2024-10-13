@@ -25,7 +25,6 @@ import { LoaderIcon } from "lucide-react";
 import { UserCombinedProfile } from "@/types/return_types";
 import { fetchUserProfile } from "@/lib/api/helpers";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ProfileSettings } from "../profile/ProfileSettings";
 
 interface AuthedNavProps {
   user: User | null;
@@ -259,7 +258,6 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
       onOpenChange={async (open) => {
         setOpen(open);
         if (!open) {
-          // Remove the editMode param on close
           const params = new URLSearchParams(searchParams.toString());
           params.delete("editMode"); // Removes editMode parameter
           router.replace(pathname + "?" + params.toString());
@@ -275,19 +273,7 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
               View profile
             </Link>
           </DropdownMenuItem>
-          <DialogTrigger
-            asChild
-            onClick={() => {
-              // add a editMode url param to the profile page
-              // this will allow the profile page to know that it should be in edit mode
-              // and display the edit form
-              // Get a new searchParams string by merging the current
-              // searchParams with a provided key/value pair
-              router.replace(
-                pathname + "?" + createQueryString("editMode", "true")
-              );
-            }}
-          >
+          <DialogTrigger asChild>
             <DropdownMenuItem className='text-gray-500 text-sm font-medium font-body leading-[21px]'>
               Edit profile
             </DropdownMenuItem>
@@ -312,11 +298,11 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
       <DialogContent className='sm:max-w-[425px] h-full bg-[#e1effe] font-body w-full py-8 overflow-scroll'>
         <DialogHeader className='flex flex-col gap-3'>
           <DialogTitle className='text-2xl font-bold font-heading text-center mt-4'>
-            {isEditMode ? "EDIT PROFILE" : "SETTINGS"}
+            EDIT PROFILE
           </DialogTitle>
           <div
             className='
-          text-gray-700 text-sm font-semibold font-body leading-[21px]'
+          text-gray-700 text-sm font-semibold font-body leading-[21px] text-center'
           >
             We ask that you please confirm your identity by connecting at least
             one social authenticator.
@@ -326,7 +312,7 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
           <>
             <LoaderIcon className='w-10 h-10 m-auto animate-spin' />
           </>
-        ) : isEditMode ? (
+        ) : (
           <ProfileEditForm
             onSubmit={async (formDetails: {
               name: string;
@@ -337,22 +323,9 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
             }) => {
               await handleSubmitEditForm(formDetails);
               setOpen(false);
-              // Remove the editMode param on close
-              const params = new URLSearchParams(searchParams.toString());
-              params.delete("editMode"); // Removes editMode parameter
-              router.replace(pathname + "?" + params.toString());
               await refetchUserProfile(); // Refresh the user profile after dialog is closed
             }}
             isEditMode
-          />
-        ) : (
-          <ProfileSettings
-            onSubmit={async (formDetails) => {
-              await handleSubmitForm(formDetails);
-              setOpen(false);
-            }}
-            onClose={() => setOpen(false)}
-            isSettingsMode
           />
         )}
       </DialogContent>
