@@ -19,7 +19,7 @@ import { ProfileConnections } from "../profile/ProfileConnections";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader } from "lucide-react";
 import { fetchUserProfile } from "@/lib/api/helpers";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface Props {
   isEditMode?: boolean;
@@ -46,7 +46,7 @@ export const ProfileEditForm = ({ isEditMode, onSubmit }: Props) => {
 
   const { user, getAccessToken } = usePrivy();
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const {
     data: userProfileData,
@@ -66,7 +66,11 @@ export const ProfileEditForm = ({ isEditMode, onSubmit }: Props) => {
     const urlSearchParams = new URLSearchParams(window.location.search);
     const urlParams = Object.fromEntries(urlSearchParams.entries());
     const isFormComplete = form.name && form.bio && form.email;
-    if (Object.keys(urlParams).length) {
+    if (
+      Object.keys(urlParams).filter(
+        (val) => val !== "settingsMode" && val !== "editMode"
+      ).length
+    ) {
       setForm({
         name: urlParams.name ?? "",
         email: urlParams.email ?? "",
@@ -210,8 +214,19 @@ export const ProfileEditForm = ({ isEditMode, onSubmit }: Props) => {
         }
         onHandleLink={() => {
           // url encode all the current form data and push it to the path
-          const formData = new URLSearchParams(form).toString();
-          const path = window.location.pathname + "?" + formData;
+          let params;
+
+          if (pathname.includes("/profile")) {
+            params = new URLSearchParams({
+              ...form,
+              editMode: "true",
+            });
+          } else {
+            params = new URLSearchParams(form);
+          }
+
+          const formData = params.toString();
+          const path = pathname + "?" + formData;
           router.push(path);
         }}
       />

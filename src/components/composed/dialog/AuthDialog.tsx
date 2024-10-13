@@ -88,7 +88,6 @@ export default function AuthDialog({
       }),
     });
     const resData = await res.json();
-    
     return resData as {
       success: boolean;
       profile: any;
@@ -106,7 +105,7 @@ export default function AuthDialog({
             </DialogTitle>
             <div
               className='
-          text-gray-700 text-sm font-semibold font-body leading-[21px]'
+          text-gray-700 text-sm font-semibold font-body leading-[21px] text-center'
             >
               We ask that you please confirm your identity by connecting at
               least one social authenticator.
@@ -157,6 +156,7 @@ export default function AuthDialog({
                 });
               }}
               onClose={() => onClose()}
+              isSettingsMode={false}
             />
           </DialogHeader>
         </DialogContent>

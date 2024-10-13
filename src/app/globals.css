@@ -88,3 +88,7 @@
     url("/repeated-square.png");
   background-blend-mode: overlay;
 }
+
+[role="dialog"] {
+  scrollbar-width: none !important;
+}

@@ -3,12 +3,10 @@ import supabase from "@/lib/supabase";
 
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
-    // Get page and limit from query parameters, with default values
     const url = new URL(req.url);
     const page = parseInt(url.searchParams.get("page") || "1");
     const limit = parseInt(url.searchParams.get("limit") || "10");
 
-    // Calculate the starting index
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
 
@@ -22,6 +20,28 @@ export async function GET(req: NextRequest, res: NextResponse) {
     if (userError) {
       throw new Error(`Error fetching user data: ${userError.message}`);
     }
+
+    // Fetch attestation count for each user
+    const usersWithAttestations = await Promise.all(
+      userData.map(async (user) => {
+        const { count: attestationCount, error: attestationError } =
+          await supabase
+            .from("attestations")
+            .select("*", { count: "exact" })
+            .eq("recipient", user.privy_did);
+
+        if (attestationError) {
+          throw new Error(
+            `Error fetching attestation count: ${attestationError.message}`
+          );
+        }
+
+        return {
+          ...user,
+          attestation_count: attestationCount || 0, // Add the count of attestations
+        };
+      })
+    );
 
     // Count the total number of available users
     const { count: totalUsers, error: countError } = await supabase
@@ -37,7 +57,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     return NextResponse.json(
       {
         success: true,
-        users: userData,
+        users: usersWithAttestations,
         totalUsers,
         currentPage: page,
         totalPages: totalUsers ? Math.ceil(totalUsers / limit) : 0,

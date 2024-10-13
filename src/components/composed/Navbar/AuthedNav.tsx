@@ -74,7 +74,6 @@ interface AvatarMenuProps {
 }
 export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
   const [open, setOpen] = useState(false);
-
   const [tempPhotoUrl, setTempPhotoUrl] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
@@ -95,6 +94,7 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
     },
     [searchParams]
   );
+  const isEditMode = searchParams.get("editMode") === "true";
 
   const {
     data: userProfileData,
@@ -124,7 +124,7 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
     },
   });
 
-  const handleSubmitForm = async (form: {
+  const handleSubmitEditForm = async (form: {
     name: string;
     email: string;
     bio: string;
@@ -162,6 +162,90 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
     };
   };
 
+  const handleSubmitForm = async (form: {
+    calendar: string;
+    fee: string;
+    bookingDescription: string;
+    isAvailable: boolean;
+    position: string;
+  }) => {
+    const accessToken = await getAccessToken();
+    const formToSubmit = Object.fromEntries(
+      Object.entries(form).map(([key, value]) => [
+        key,
+        value === "" ? null : value,
+      ])
+    );
+    const res = await fetch(`/api/users/save-user-profile`, {
+      method: "POST",
+      cache: "no-store",
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        calendly_link: formToSubmit.calendar,
+        unlock_calendar_fee: formToSubmit.fee,
+        booking_description: formToSubmit.bookingDescription,
+        available: formToSubmit.isAvailable,
+        position: formToSubmit.position,
+        privy_did: user?.id,
+      }),
+    });
+    const resData = await res.json();
+    // create user attestation schema
+    // if (resData.success) {
+    //   try {
+    //     const contractParams = {
+    //       address: process.env.NEXT_PUBLIC_SCHEMA_REGISTRY_ADDRESS as `0x${string}`,
+    //       abi: schemaRegistryAbi.abi,
+    //       functionName: 'register',
+    //       args: [
+    //           "string relationship, string endorsement", //schema string
+    //           "0x0000000000000000000000000000000000000000", // resolver address
+    //           true // revocable or not
+    //       ],
+    //       chain:
+    //         process.env.VERCEL_ENV !== "production"
+    //           ?  optimismSepolia as Chain
+    //           : optimism as Chain,
+    //       account: client?.account,
+    //     }
+    //     const  { abi, ...contractParamNoABI } = contractParams;
+    //     const { request, result } = await publicClient.simulateContract(contractParams);
+    //     const txHash = await client?.writeContract(request);
+    //     console.log(`Result: ${JSON.stringify(result)}\ntx hash: ${txHash}\nRegistering address: ${client?.account.address}`)
+    //     // if result and txhash, exist, then schema is registered. need to save schemaUID and txHash to supabase
+    //     const schemaRes = await fetch(`/api/users/save-endorsement-schema`, {
+    //       method: "POST",
+    //       cache: "no-store",
+    //       headers: {
+    //         "Content-type": "application/json",
+    //         Authorization: `Bearer ${accessToken}`,
+    //       },
+    //       body: JSON.stringify({
+    //         schema_uid: result,
+    //         schema_tx_hash: txHash,
+    //         privy_did: user?.id,
+    //       }),
+    //     });
+    //     const schemaSuccess = (await schemaRes.json()).success;
+    //     return {
+    //       success: resData.success,
+    //       profile: resData.profile,
+    //       schema_success: schemaSuccess,
+    //     }
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // }
+    return resData as {
+      success: boolean;
+      profile: any;
+      schema_success: false;
+    };
+  };
+
   useEffect(() => {
     if (searchParams.get("editMode")) {
       setOpen(true);
@@ -174,7 +258,6 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
       onOpenChange={async (open) => {
         setOpen(open);
         if (!open) {
-          // Remove the editMode param on close
           const params = new URLSearchParams(searchParams.toString());
           params.delete("editMode"); // Removes editMode parameter
           router.replace(pathname + "?" + params.toString());
@@ -190,26 +273,16 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
               View profile
             </Link>
           </DropdownMenuItem>
-          <DialogTrigger
-            asChild
-            onClick={() => {
-              // add a editMode url param to the profile page
-              // this will allow the profile page to know that it should be in edit mode
-              // and display the edit form
-              // Get a new searchParams string by merging the current
-              // searchParams with a provided key/value pair
-              router.replace(
-                pathname + "?" + createQueryString("editMode", "true")
-              );
-            }}
-          >
+          <DialogTrigger asChild>
             <DropdownMenuItem className='text-gray-500 text-sm font-medium font-body leading-[21px]'>
               Edit profile
             </DropdownMenuItem>
           </DialogTrigger>
-          <DropdownMenuItem className='text-gray-500 text-sm font-medium font-body leading-[21px]'>
-            Settings
-          </DropdownMenuItem>
+          <DialogTrigger asChild>
+            <DropdownMenuItem className='text-gray-500 text-sm font-medium font-body leading-[21px]'>
+              Settings
+            </DropdownMenuItem>
+          </DialogTrigger>
           <DropdownMenuSeparator />
           <DropdownMenuItem>
             <Button
@@ -222,14 +295,14 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <DialogContent className='sm:max-w-[425px] h-full bg-[#e1effe] font-body m-auto py-8 overflow-scroll'>
+      <DialogContent className='sm:max-w-[425px] h-full bg-[#e1effe] font-body w-full py-8 overflow-scroll'>
         <DialogHeader className='flex flex-col gap-3'>
           <DialogTitle className='text-2xl font-bold font-heading text-center mt-4'>
             EDIT PROFILE
           </DialogTitle>
           <div
             className='
-          text-gray-700 text-sm font-semibold font-body leading-[21px]'
+          text-gray-700 text-sm font-semibold font-body leading-[21px] text-center'
           >
             We ask that you please confirm your identity by connecting at least
             one social authenticator.
@@ -248,12 +321,8 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
               bestProfile: string;
               tempPhotoUrl: string | null;
             }) => {
-              await handleSubmitForm(formDetails);
+              await handleSubmitEditForm(formDetails);
               setOpen(false);
-              // Remove the editMode param on close
-              const params = new URLSearchParams(searchParams.toString());
-              params.delete("editMode"); // Removes editMode parameter
-              router.replace(pathname + "?" + params.toString());
               await refetchUserProfile(); // Refresh the user profile after dialog is closed
             }}
             isEditMode
