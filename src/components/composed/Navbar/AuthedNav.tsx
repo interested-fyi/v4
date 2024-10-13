@@ -25,6 +25,7 @@ import { LoaderIcon } from "lucide-react";
 import { UserCombinedProfile } from "@/types/return_types";
 import { fetchUserProfile } from "@/lib/api/helpers";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ProfileSettings } from "../profile/ProfileSettings";
 
 interface AuthedNavProps {
   user: User | null;
@@ -94,7 +95,8 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
     },
     [searchParams]
   );
-  const isEditMode = searchParams.get("editMode") === "true";
+
+  const [dialogMode, setDialogMode] = useState<"edit" | "settings">("edit");
 
   const {
     data: userProfileData,
@@ -273,12 +275,12 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
               View profile
             </Link>
           </DropdownMenuItem>
-          <DialogTrigger asChild>
+          <DialogTrigger asChild onClick={() => setDialogMode("edit")}>
             <DropdownMenuItem className='text-gray-500 text-sm font-medium font-body leading-[21px]'>
               Edit profile
             </DropdownMenuItem>
           </DialogTrigger>
-          <DialogTrigger asChild>
+          <DialogTrigger asChild onClick={() => setDialogMode("settings")}>
             <DropdownMenuItem className='text-gray-500 text-sm font-medium font-body leading-[21px]'>
               Settings
             </DropdownMenuItem>
@@ -295,40 +297,64 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <DialogContent className='sm:max-w-[425px] h-full bg-[#e1effe] font-body w-full py-8 overflow-scroll'>
-        <DialogHeader className='flex flex-col gap-3'>
-          <DialogTitle className='text-2xl font-bold font-heading text-center mt-4'>
-            EDIT PROFILE
-          </DialogTitle>
-          <div
-            className='
+      {dialogMode === "edit" ? (
+        <DialogContent className='sm:max-w-[425px] h-full bg-[#e1effe] font-body w-full py-8 overflow-scroll'>
+          <DialogHeader className='flex flex-col gap-3'>
+            <DialogTitle className='text-2xl font-bold font-heading text-center mt-4'>
+              EDIT PROFILE
+            </DialogTitle>
+            <div
+              className='
           text-gray-700 text-sm font-semibold font-body leading-[21px] text-center'
-          >
-            We ask that you please confirm your identity by connecting at least
-            one social authenticator.
-          </div>
-        </DialogHeader>
-        {(!userProfileData && !userProfileError) || userProfileDataLoading ? (
-          <>
-            <LoaderIcon className='w-10 h-10 m-auto animate-spin' />
-          </>
-        ) : (
-          <ProfileEditForm
-            onSubmit={async (formDetails: {
-              name: string;
-              email: string;
-              bio: string;
-              bestProfile: string;
-              tempPhotoUrl: string | null;
-            }) => {
-              await handleSubmitEditForm(formDetails);
-              setOpen(false);
-              await refetchUserProfile(); // Refresh the user profile after dialog is closed
-            }}
-            isEditMode
-          />
-        )}
-      </DialogContent>
+            >
+              We ask that you please confirm your identity by connecting at
+              least one social authenticator.
+            </div>
+          </DialogHeader>
+          {(!userProfileData && !userProfileError) || userProfileDataLoading ? (
+            <>
+              <LoaderIcon className='w-10 h-10 m-auto animate-spin' />
+            </>
+          ) : (
+            <ProfileEditForm
+              onSubmit={async (formDetails: {
+                name: string;
+                email: string;
+                bio: string;
+                bestProfile: string;
+                tempPhotoUrl: string | null;
+              }) => {
+                await handleSubmitEditForm(formDetails);
+                setOpen(false);
+                await refetchUserProfile(); // Refresh the user profile after dialog is closed
+              }}
+              isEditMode
+            />
+          )}
+        </DialogContent>
+      ) : dialogMode === "settings" ? (
+        <DialogContent className='sm:max-w-[425px] h-auto bg-[#e1effe] font-body w-full py-8 overflow-scroll'>
+          <DialogHeader className='flex flex-col gap-3'>
+            <DialogTitle className='text-2xl font-bold font-heading text-center mt-4'>
+              Settings
+            </DialogTitle>
+          </DialogHeader>
+          {(!userProfileData && !userProfileError) || userProfileDataLoading ? (
+            <>
+              <LoaderIcon className='w-10 h-10 m-auto animate-spin' />
+            </>
+          ) : (
+            <ProfileSettings
+              onSubmit={async (formDetails) => {
+                await handleSubmitForm(formDetails);
+                setOpen(false);
+              }}
+              onClose={() => setOpen(false)}
+              isSettingsMode
+            />
+          )}
+        </DialogContent>
+      ) : null}{" "}
     </Dialog>
   );
 };
