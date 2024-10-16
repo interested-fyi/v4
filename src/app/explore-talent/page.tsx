@@ -1,15 +1,45 @@
 // app/talent/ExploreTalentPage.tsx
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import TalentFilter from "@/components/composed/talent/TalentFilter";
 import TalentGrid from "@/components/composed/talent/TalentGrid";
+import { fetchTalent } from "@/lib/api/helpers";
+import { useQuery } from "@tanstack/react-query";
 
 export default function ExploreTalentPage() {
+  const [filter, setFilter] = useState("");
+  const [limit, setLimit] = useState(10);
+
+  const {
+    data,
+    isLoading,
+    isError,
+    isRefetching,
+    isRefetchError,
+    isLoadingError,
+  } = useQuery({
+    queryKey: ["talent", filter, limit],
+    queryFn: () => fetchTalent({ filter, limit }),
+    retry(failureCount, error) {
+      return failureCount < 1;
+    },
+  });
   return (
     <div className='flex flex-col gap-0'>
       <PageHeader />
-      <div className='lg:px-16 sm:px-32 md:px-20 xl:px-32 bg-[#e1effe]'>
-        <TalentFilter />
-        <TalentGrid />
+      <div className='flex flex-col lg:px-16 sm:px-32 md:px-20 xl:px-32 bg-[#e1effe]'>
+        <TalentFilter
+          onValueChange={setFilter}
+          value={filter}
+          setLimit={setLimit}
+          limit={limit}
+        />
+        <TalentGrid
+          data={data}
+          isError={isError || isRefetchError || isLoadingError}
+          isLoading={isLoading || isRefetching}
+          resetFilter={() => setFilter("")}
+        />
       </div>
     </div>
   );

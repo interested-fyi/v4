@@ -8,7 +8,7 @@ import { UserProps } from "./TalentGrid";
 export function UserCard({ user }: { user: UserProps }) {
   const userURL = `/profile/${user.privy_did?.replace("did:privy:", "")}`;
   return (
-    <Link href={`${userURL}`} className='relative z-0'>
+    <Link href={`${userURL}`} className='relative z-0 h-fit'>
       <Card className='w-full max-w-full mx-auto overflow-hidden bg-white rounded-lg shadow border border-[#c3ddfd]'>
         <CardContent className='p-5 flex flex-col items-center text-center gap-3'>
           <Avatar className='w-16 h-16'>
@@ -27,7 +27,7 @@ export function UserCard({ user }: { user: UserProps }) {
               {user.name || "John Sample"}
             </h2>
             <p className='text-center text-gray-500 text-xs font-medium font-body leading-[18px]'>
-              Frontend developer
+              {user.position || "Software Engineer"}
             </p>
           </div>
           <div className='h-[22px] min-w-[132px] px-2.5 py-0.5 bg-gray-100 rounded-md justify-center items-center gap-1 inline-flex'>

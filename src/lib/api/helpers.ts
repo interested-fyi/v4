@@ -1,8 +1,27 @@
 import { UserCombinedProfile } from "@/types/return_types";
 
 // lib/api/fetchTalent.ts
-export async function fetchTalent() {
-  const response = await fetch("/api/talent/get-all-talent");
+export async function fetchTalent({
+  filter,
+  limit,
+}: {
+  filter?: string;
+  limit?: number;
+}) {
+  let query = "";
+  if (filter) {
+    query = `filter=${filter}`;
+  }
+  if (limit) {
+    query = `${query}&limit=${limit}`;
+  }
+
+  const response = await fetch(`/api/talent/get-all-talent?${query}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }

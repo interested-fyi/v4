@@ -6,16 +6,25 @@ export async function GET(req: NextRequest, res: NextResponse) {
     const url = new URL(req.url);
     const page = parseInt(url.searchParams.get("page") || "1");
     const limit = parseInt(url.searchParams.get("limit") || "10");
+    const filter = url.searchParams.get("filter"); // position filter
 
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
 
-    // Fetch users where 'available' is TRUE
-    const { data: userData, error: userError } = await supabase
+    // Build the query
+    let query = supabase
       .from("user_profile_combined")
       .select("*")
       .eq("available", true)
-      .range(startIndex, endIndex - 1); // Pagination with range
+      .range(startIndex, endIndex - 1);
+
+    // Apply the filter if provided
+    if (filter) {
+      query = query.contains("position", [filter]); // Checks if the position array contains the filter string
+    }
+
+    // Fetch users
+    const { data: userData, error: userError } = await query;
 
     if (userError) {
       throw new Error(`Error fetching user data: ${userError.message}`);
