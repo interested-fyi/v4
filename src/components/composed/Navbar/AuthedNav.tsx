@@ -190,7 +190,7 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
         unlock_calendar_fee: formToSubmit.fee,
         booking_description: formToSubmit.bookingDescription,
         available: formToSubmit.isAvailable,
-        position: formToSubmit.position,
+        position: [formToSubmit.position],
         privy_did: user?.id,
       }),
     });
