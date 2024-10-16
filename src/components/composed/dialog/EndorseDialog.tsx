@@ -82,6 +82,11 @@ export default function EndorseDialog({
               : (optimism as Chain),
           account: client?.account,
         };
+        console.log(`Vercel ENV: ${process.env.VERCEL_ENV}`);
+        console.log(`EAS Contract Address: ${process.env.NEXT_PUBLIC_EAS_CONTRACT_ADDRESS}`);
+        console.log(`Endorsement Schema UID: ${process.env.NEXT_PUBLIC_ENDORSEMENT_SCHEMA_UID}`);
+        console.log(`Recipient Address: ${user?.smart_wallet_address}`);
+        console.log(`Contract Params: ${JSON.stringify(contractParams)}`);
         const { request, result } = await publicClient.simulateContract(
           contractParams
         );
