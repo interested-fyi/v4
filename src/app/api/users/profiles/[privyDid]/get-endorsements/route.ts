@@ -13,10 +13,10 @@ export async function GET(
 ) {
   const recipient_address = req.nextUrl.searchParams.get("recipient_address");
 
-  const endpoint = process.env.VERCEL_ENV !== "production" ? "https://optimism-sepolia.easscan.org/graphql" : "https://optimism.easscan.org/graphql";
+  const endpoint = process.env.NEXT_PUBLIC_VERCEL_ENV !== "production" ? "https://optimism-sepolia.easscan.org/graphql" : "https://optimism.easscan.org/graphql";
   const query = `
     query EndorsementsQuery {
-        schema(where: { id: "${process.env.VERCEL_ENV !== "production" ? process.env.NEXT_PUBLIC_SEPOLIA_ENDORSEMENT_SCHEMA_UID : process.env.NEXT_PUBLIC_ENDORSEMENT_SCHEMA_UID}" }) {
+        schema(where: { id: "${process.env.NEXT_PUBLIC_VERCEL_ENV !== "production" ? process.env.NEXT_PUBLIC_SEPOLIA_ENDORSEMENT_SCHEMA_UID : process.env.NEXT_PUBLIC_ENDORSEMENT_SCHEMA_UID}" }) {
             attestations(where: { recipient: { equals: "${recipient_address}" }}) {
                 attester,
                 id,
