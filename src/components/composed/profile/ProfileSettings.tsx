@@ -9,6 +9,16 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Textarea } from "@/components/ui/textarea";
 import { UserCombinedProfile } from "@/types/return_types";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { jobPositions } from "@/lib/constants";
 
 interface ProfileSettingsProps {
   onSubmit: (formDetails: {
@@ -162,13 +172,29 @@ export const ProfileSettings = ({
           <Label className='text-sm font-medium' htmlFor='position'>
             Job title
           </Label>
-          <Input
-            className='rounded-lg'
-            id='position'
-            onChange={(e) =>
-              setForm({ ...form, position: e.target.value.trim() })
-            }
-          />
+          <Select
+            onValueChange={(val) => {
+              setForm({ ...form, position: val });
+            }}
+          >
+            <SelectTrigger className='w-full'>
+              <SelectValue placeholder='Select a position' />
+            </SelectTrigger>
+            <SelectContent>
+              {jobPositions.map((position) =>
+                Object.entries(position).map(([key, value]) => (
+                  <SelectGroup key={key}>
+                    <SelectLabel>{key}</SelectLabel>
+                    {value.map((item: string) => (
+                      <SelectItem value={item} key={item}>
+                        {item}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                ))
+              )}
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <Label className='text-sm font-medium' htmlFor='calendar'>
