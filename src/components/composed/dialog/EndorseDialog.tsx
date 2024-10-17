@@ -63,7 +63,7 @@ export default function EndorseDialog({
           args: [
             {
               schema:
-                process.env.VERCEL_ENV !== "production"
+                process.env.NEXT_PUBLIC_VERCEL_ENV !== "production"
                   ? process.env.NEXT_PUBLIC_SEPOLIA_ENDORSEMENT_SCHEMA_UID
                   : process.env.NEXT_PUBLIC_ENDORSEMENT_SCHEMA_UID, // schema uid
               data: {
@@ -77,11 +77,12 @@ export default function EndorseDialog({
             },
           ],
           chain:
-            process.env.VERCEL_ENV !== "production"
+            process.env.NEXT_PUBLIC_VERCEL_ENV !== "production"
               ? (optimismSepolia as Chain)
               : (optimism as Chain),
           account: client?.account,
         };
+
         const { request, result } = await publicClient.simulateContract(
           contractParams
         );
