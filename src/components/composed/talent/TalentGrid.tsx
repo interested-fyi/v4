@@ -31,7 +31,7 @@ export default function TalentGrid({
           No Talent Found
         </h2>
         <p className='text-md text-gray-600 mb-4'>
-          We couldn't find any talent matching your criteria. Try adjusting the
+          We couldn&apos;t find any talent matching your criteria. Try adjusting the
           filter and search again.
         </p>
         <button
