@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { z } from "zod";
 import Image from "next/image";
+import { camelToSnakeCase } from "@/lib/utils";
 
 // Zod schema for validation
 const postJobSchema = z.object({
@@ -82,12 +83,16 @@ export function PostAJob() {
 
     setLoading(true);
     try {
+      const snakeCaseFormData = Object.fromEntries(
+        Object.entries(formData).map(([key, value]) => [camelToSnakeCase(key), value])
+      );
+      
       const response = await fetch("/api/create-company", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ company: formData }),
+        body: JSON.stringify({ company: snakeCaseFormData }),
       });
 
       if (!response.ok) {
