@@ -148,7 +148,7 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
       },
       body: JSON.stringify({
         name: formToSubmit.name,
-        photo_source: tempPhotoUrl,
+        photo_source: tempPhotoUrl ?? userProfileData?.profile?.photo_source,
         preferred_profile: formToSubmit.bestProfile,
         bio: formToSubmit.bio,
         privy_did: user?.id,
@@ -192,10 +192,15 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
         available: formToSubmit.isAvailable,
         position: [formToSubmit.position],
         privy_did: user?.id,
+        name: userProfileData?.profile?.name,
+        photo_source: userProfileData?.profile?.photo_source,
+        preferred_profile: userProfileData?.profile?.preferred_profile,
+        bio: userProfileData?.profile?.bio,
+        smart_wallet_address: userProfileData?.profile?.smart_wallet_address,
       }),
     });
     const resData = await res.json();
-    
+
     return resData as {
       success: boolean;
       profile: any;
