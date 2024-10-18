@@ -42,24 +42,27 @@ export async function POST(req: NextRequest) {
   } else {
     preferredProfile = preferred_profile;
   }
+
+  const profileData = {
+    privy_did: privyDid,
+    name: name,
+    photo_source: photo_source,
+    available: available,
+    preferred_profile: preferredProfile,
+    bio: bio,
+    position: position,
+    calendly_link: calendly_link,
+    unlock_calendar_fee: unlock_calendar_fee,
+    booking_description: booking_description,
+    smart_wallet_address: smart_wallet_address,
+  };
+  const filteredProfileData = Object.fromEntries(
+    Object.entries(profileData).filter(([_, value]) => value !== undefined)
+  );
   const { data, error } = await supabase
     .from("user_profiles")
     .upsert(
-      [
-        {
-          privy_did: privyDid,
-          name: name,
-          photo_source: photo_source,
-          available: available,
-          preferred_profile: preferredProfile,
-          bio: bio,
-          position: position,
-          calendly_link: calendly_link,
-          unlock_calendar_fee: unlock_calendar_fee,
-          booking_description: booking_description,
-          smart_wallet_address: smart_wallet_address,
-        },
-      ],
+      [filteredProfileData],
       { onConflict: "privy_did" }
     )
     .select()
