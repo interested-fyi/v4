@@ -13,9 +13,7 @@ export function UserCard({ user }: { user: UserProps }) {
         <CardContent className='p-5 flex flex-col items-center text-center gap-3'>
           <Avatar className='w-16 h-16'>
             <AvatarImage
-              src={
-                user.photo_source ?? user.preferred_photo ?? "/placeholder.svg"
-              }
+              src={user.photo_source ?? "/placeholder.svg"}
               alt='Profile picture'
             />
             <AvatarFallback>

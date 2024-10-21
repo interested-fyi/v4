@@ -146,11 +146,7 @@ export default function ProfilePage() {
         <div className='relative px-4 pb-4 bg-[#e1effe]'>
           <Avatar className='w-[140px] h-[140px] border-4 border-white rounded-full absolute -top-[100px] left-1/2 transform -translate-x-1/2'>
             <AvatarImage
-              src={
-                userProfileData?.profile?.photo_source ??
-                userProfileData?.profile?.preferred_photo ??
-                ""
-              }
+              src={userProfileData?.profile?.photo_source ?? ""}
               alt='Profile picture'
             />
             <AvatarFallback>
@@ -167,9 +163,7 @@ export default function ProfilePage() {
                 "Short bio here? Do we have this in the profile editing flow somewhere - yes we do"}
             </p>
             <div className='absolute -top-28 right-0'>
-              {user?.id === userProfileData?.profile?.privy_did ? //   /> //     width={16} //     height={16} //     alt='edit' //     src='/svg/pencil.svg' //   <Image // <Button className='h-8 pl-[11px] pr-3 py-2 bg-[#919cf4] hover:bg-[#919cf4] hover:bg-opacity-90 rounded-lg justify-center items-center gap-2 inline-flex'>
-              // </Button>
-              null : (
+              {user?.id === userProfileData?.profile?.privy_did ? null : ( // </Button> //   /> //     width={16} //     height={16} //     alt='edit' //     src='/svg/pencil.svg' //   <Image // <Button className='h-8 pl-[11px] pr-3 py-2 bg-[#919cf4] hover:bg-[#919cf4] hover:bg-opacity-90 rounded-lg justify-center items-center gap-2 inline-flex'>
                 <Button
                   onClick={handleCopyToClipboard}
                   className='h-8 pl-[11px] pr-3 py-2 bg-[#919cf4] hover:bg-[#919cf4] hover:bg-opacity-90 rounded-lg justify-center items-center gap-2 inline-flex'
@@ -286,7 +280,6 @@ export default function ProfilePage() {
                   <Avatar>
                     <AvatarImage
                       src={
-                        endorsement.endorserData?.preferred_photo ??
                         endorsement.endorserData?.photo_source ??
                         "/placeholder.svg?height=40&width=40"
                       }

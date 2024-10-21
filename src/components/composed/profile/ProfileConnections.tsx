@@ -39,7 +39,7 @@ export const ProfileConnections = ({
 }: {
   setTempPhotoUrl: (photo_url: string) => void;
   userProfileData: { success: boolean; profile: any } | undefined;
-  onSetBestProfile?: (profile: string) => void;
+  onSetBestProfile?: (profile: string, imageURL?: string) => void;
   onSetProfile?: (profile: string) => void;
   onHandleLink?: (profile: string) => void;
 }) => {
@@ -286,7 +286,25 @@ export const ProfileConnections = ({
         setBestProfile(profile);
       }
       if (onSetBestProfile && profile) {
-        onSetBestProfile(profile);
+        const image =
+          profile === "twitter" || profile === "x"
+            ? user?.linkedAccounts.find(
+                (account) => account.type === "twitter_oauth"
+              )?.profilePictureUrl
+            : profile === "farcaster"
+            ? user?.linkedAccounts.find(
+                (account) => account.type === "farcaster"
+              )?.pfp
+            : profile === "telegram"
+            ? user?.linkedAccounts.find(
+                (account) => account.type === "telegram"
+              )?.photoUrl
+            : null;
+        if (image) {
+          onSetBestProfile(profile, image);
+        } else {
+          onSetBestProfile(profile);
+        }
       }
     }
   }, [userProfileData]);

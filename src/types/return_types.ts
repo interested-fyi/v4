@@ -2,7 +2,6 @@ export interface UserCombinedProfile {
   privy_did: string | null;
   name: string | null;
   photo_source: string | null;
-  preferred_photo: string | null;
   preferred_profile: string | null;
   available: boolean | null;
   position: string | null;

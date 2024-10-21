@@ -14,7 +14,6 @@ import { Label } from "@/components/ui/label";
 import { usePrivy } from "@privy-io/react-auth";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import Image from "next/image";
 import { ProfileConnections } from "../profile/ProfileConnections";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader } from "lucide-react";
@@ -101,12 +100,7 @@ export const ProfileEditForm = ({ isEditMode, onSubmit }: Props) => {
       <div className='flex flex-col items-center gap-0 mb-0'>
         <Avatar className='w-24 h-24 border-blue-700 border-2'>
           <AvatarImage
-            src={
-              tempPhotoUrl ??
-              userProfileData?.profile?.photo_source ??
-              userProfileData?.profile?.preferred_photo ??
-              ""
-            }
+            src={tempPhotoUrl ?? userProfileData?.profile?.photo_source ?? ""}
           />
           <AvatarFallback>
             {userProfileData?.profile?.name?.slice(0, 2) ??
@@ -114,7 +108,7 @@ export const ProfileEditForm = ({ isEditMode, onSubmit }: Props) => {
           </AvatarFallback>
         </Avatar>
 
-        <Dialog>
+        {/* <Dialog>
           <DialogTrigger asChild>
             <Button variant='link' className='text-blue-700 focus:border-0'>
               Change photo
@@ -126,10 +120,11 @@ export const ProfileEditForm = ({ isEditMode, onSubmit }: Props) => {
                 Select a photo from your linked accounts
               </DialogTitle>
 
-              <div className='flex flex-1'>
+              <div className='flex flex-1 gap-2'>
                 {user?.linkedAccounts?.map(
                   (linkedAccount: any, idx: number) => {
-                    const image = linkedAccount.profilePictureUrl;
+                    const image =
+                      linkedAccount.profilePictureUrl ?? linkedAccount.pfp;
                     if (!image) return;
                     return (
                       <div className='flex flex-col gap-2' key={idx}>
@@ -164,7 +159,7 @@ export const ProfileEditForm = ({ isEditMode, onSubmit }: Props) => {
               />
             </DialogHeader>
           </DialogContent>
-        </Dialog>
+        </Dialog> */}
       </div>
       <div className='grid gap-4'>
         <div>
@@ -209,9 +204,12 @@ export const ProfileEditForm = ({ isEditMode, onSubmit }: Props) => {
       <ProfileConnections
         setTempPhotoUrl={setTempPhotoUrl}
         userProfileData={userProfileData}
-        onSetBestProfile={(bestProfile) =>
-          setForm({ ...form, bestProfile: bestProfile })
-        }
+        onSetBestProfile={(bestProfile, image) => {
+          setForm({ ...form, bestProfile: bestProfile });
+          if (image) {
+            setTempPhotoUrl(image);
+          }
+        }}
         onHandleLink={() => {
           // url encode all the current form data and push it to the path
           let params;
@@ -237,6 +235,16 @@ export const ProfileEditForm = ({ isEditMode, onSubmit }: Props) => {
         onClick={async () => {
           setIsLoading(true);
           try {
+            let params;
+            if (tempPhotoUrl) {
+              params = new URLSearchParams({ ...form, tempPhotoUrl });
+            } else {
+              params = new URLSearchParams(form);
+            }
+
+            const formData = params.toString();
+            const path = pathname + "?" + formData;
+            router.push(path);
             await onSubmit({ ...form, tempPhotoUrl });
           } catch (e) {
             console.error(e);

@@ -52,13 +52,7 @@ const AuthedNav = ({ user, logout, getAccessToken }: AuthedNavProps) => {
       <AvatarMenu
         avatar={
           <Avatar className='h-8 w-8'>
-            <AvatarImage
-              src={
-                data?.profile?.photo_source ??
-                data?.profile?.preferred_photo ??
-                undefined
-              }
-            />
+            <AvatarImage src={data?.profile?.photo_source ?? undefined} />
             <AvatarFallback>{user?.google?.name?.slice(0, 2)}</AvatarFallback>
           </Avatar>
         }
@@ -75,27 +69,10 @@ interface AvatarMenuProps {
 }
 export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
   const [open, setOpen] = useState(false);
-  const [tempPhotoUrl, setTempPhotoUrl] = useState<string | null>(null);
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    bio: "",
-    bestProfile: "",
-  });
   const { user, getAccessToken } = usePrivy();
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set(name, value);
-
-      return params.toString();
-    },
-    [searchParams]
-  );
-
   const [dialogMode, setDialogMode] = useState<"edit" | "settings">("edit");
 
   const {
@@ -139,6 +116,20 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
         value === "" ? null : value,
       ])
     );
+    const image =
+      form.bestProfile === "twitter" || form.bestProfile === "x"
+        ? user?.linkedAccounts.find(
+            (account) => account.type === "twitter_oauth"
+          )?.profilePictureUrl
+        : form.bestProfile === "farcaster"
+        ? user?.linkedAccounts.find((account) => account.type === "farcaster")
+            ?.pfp
+        : form.bestProfile === "telegram"
+        ? user?.linkedAccounts.find((account) => account.type === "telegram")
+            ?.photoUrl
+        : null;
+    console.log("🚀 ~ AvatarMenu ~ image:", image);
+
     const res = await fetch(`/api/users/save-user-profile`, {
       method: "POST",
       cache: "no-store",
@@ -148,7 +139,7 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
       },
       body: JSON.stringify({
         name: formToSubmit.name,
-        photo_source: tempPhotoUrl ?? userProfileData?.profile?.photo_source,
+        photo_source: image ?? userProfileData?.profile?.photo_source,
         preferred_profile: formToSubmit.bestProfile,
         bio: formToSubmit.bio,
         privy_did: user?.id,
@@ -193,6 +184,7 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
         position: [formToSubmit.position],
         privy_did: user?.id,
         name: userProfileData?.profile?.name,
+
         photo_source: userProfileData?.profile?.photo_source,
         preferred_profile: userProfileData?.profile?.preferred_profile,
         bio: userProfileData?.profile?.bio,
