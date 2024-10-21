@@ -87,7 +87,6 @@ export function PostAJob() {
         Object.entries(formData).map(([key, value]) => [camelToSnakeCase(key), value])
       );
       
-      console.log(snakeCaseFormData);
       const response = await fetch("/api/create-company", {
         method: "POST",
         headers: {
