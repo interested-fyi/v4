@@ -265,6 +265,7 @@ export function PostAJob() {
                   </Label>
                   <Input
                     placeholder='@telegram'
+                    id="telegram-handle"
                     name='telegramHandle'
                     value={formData.telegramHandle}
                     onChange={handleInputChange}
