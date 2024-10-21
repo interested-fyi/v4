@@ -184,7 +184,6 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
         position: [formToSubmit.position],
         privy_did: user?.id,
         name: userProfileData?.profile?.name,
-
         photo_source: userProfileData?.profile?.photo_source,
         preferred_profile: userProfileData?.profile?.preferred_profile,
         bio: userProfileData?.profile?.bio,
