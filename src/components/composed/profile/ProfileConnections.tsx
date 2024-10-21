@@ -311,7 +311,7 @@ export const ProfileConnections = ({
 
   const handleLink = async (linkMethod: string) => {
     onHandleLink && (await onHandleLink(linkMethod));
-    await new Promise((resolve) => setTimeout(resolve, 250));
+    await new Promise((resolve) => setTimeout(resolve, 750));
     setAddProfile(false);
     switch (linkMethod) {
       case "github":

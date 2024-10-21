@@ -41,6 +41,7 @@ export default function AuthDialog({
     data: userProfileData,
     isLoading: userProfileLoading,
     isError: userProfileError,
+    refetch: refetchUserProfile,
   } = useQuery({
     enabled: !!user,
     queryKey: ["user", user?.id.replace("did:privy:", "")],
@@ -156,6 +157,7 @@ export default function AuthDialog({
                   ...form,
                   ...formDetails,
                 });
+                await refetchUserProfile();
               }}
               onClose={() => onClose()}
               isSettingsMode={false}
