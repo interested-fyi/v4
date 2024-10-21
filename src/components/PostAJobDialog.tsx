@@ -20,7 +20,7 @@ import { camelToSnakeCase } from "@/lib/utils";
 const postJobSchema = z.object({
   companyName: z.string().min(1, "Company name is required"),
   careersPageUrl: z.string().url("Invalid URL"),
-  email: z.string().email("Invalid email address"),
+  creatorEmail: z.string().email("Invalid email address"),
   telegramHandle: z.string().optional(),
 });
 
@@ -28,7 +28,7 @@ export function PostAJob() {
   const [formData, setFormData] = useState({
     companyName: "",
     careersPageUrl: "",
-    email: "",
+    creatorEmail: "",
     telegramHandle: "",
     recruitingHelp: false,
     hostBounty: false,
@@ -38,7 +38,7 @@ export function PostAJob() {
   const [errors, setErrors] = useState<{
     companyName?: { _errors: string[] };
     careersPageUrl?: { _errors: string[] };
-    email?: { _errors: string[] };
+    creatorEmail?: { _errors: string[] };
     telegramHandle?: { _errors: string[] };
   } | null>(null);
   const [loading, setLoading] = useState(false);
@@ -87,6 +87,7 @@ export function PostAJob() {
         Object.entries(formData).map(([key, value]) => [camelToSnakeCase(key), value])
       );
       
+      console.log(snakeCaseFormData);
       const response = await fetch("/api/create-company", {
         method: "POST",
         headers: {
@@ -192,16 +193,16 @@ export function PostAJob() {
                   Your email
                 </Label>
                 <Input
-                  id='email'
-                  name='email'
+                  id='creatorEmail'
+                  name='creatorEmail'
                   type='email'
                   placeholder='name@example.com'
-                  value={formData.email}
+                  value={formData.creatorEmail}
                   onChange={handleInputChange}
                 />
-                {errors?.email && (
+                {errors?.creatorEmail && (
                   <p className='text-red-700 font-bold text-xs -top-1 relative'>
-                    {errors?.email._errors[0]}
+                    {errors?.creatorEmail._errors[0]}
                   </p>
                 )}
               </div>
@@ -286,7 +287,7 @@ export function PostAJob() {
                   loading ||
                   !formData.companyName ||
                   !formData.careersPageUrl ||
-                  !formData.email
+                  !formData.creatorEmail
                 }
               >
                 {loading ? (
