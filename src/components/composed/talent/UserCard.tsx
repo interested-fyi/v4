@@ -23,11 +23,11 @@ export function UserCard({ user }: { user: UserProps }) {
             </AvatarFallback>
           </Avatar>
           <div>
-            <h2 className='text-center text-black text-base font-semibold font-body leading-normal'>
-              {user.name || "John Sample"}
+            <h2 className='text-center text-black text-base font-semibold font-body leading-normal min-h-5'>
+              {user.name || ""}
             </h2>
-            <p className='text-center text-gray-500 text-xs font-medium font-body leading-[18px]'>
-              {user.position || "Software Engineer"}
+            <p className='text-center text-gray-500 text-xs font-medium font-body leading-[18px] min-h-5'>
+              {user.position || ""}
             </p>
           </div>
           <div className='h-[22px] min-w-[132px] px-2.5 py-0.5 bg-gray-100 rounded-md justify-center items-center gap-1 inline-flex'>
