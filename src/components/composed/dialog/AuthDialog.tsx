@@ -59,7 +59,7 @@ export default function AuthDialog({
     calendar: string;
     fee: string;
     position: string[];
-    employmentType: string;
+    employmentType: string[];
     bookingDescription: string;
     isAvailable: boolean;
   }) => {
