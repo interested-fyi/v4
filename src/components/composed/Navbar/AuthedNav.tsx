@@ -286,7 +286,7 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
           )}
         </DialogContent>
       ) : dialogMode === "settings" ? (
-        <DialogContent className='sm:max-w-[425px] h-auto bg-[#e1effe] font-body w-full py-8 overflow-scroll'>
+        <DialogContent className='sm:max-w-[425px] h-full bg-[#e1effe] font-body w-full py-8 overflow-scroll'>
           <DialogHeader className='flex flex-col gap-3'>
             <DialogTitle className='text-2xl font-bold font-heading text-center mt-4'>
               Settings
