@@ -167,7 +167,7 @@ export const ProfileSettings = ({
             Job title(s)
           </Label>
           {form.position?.map((job) => (
-            <div className='flex gap-2'>
+            <div className='flex gap-2' key={job}>
               <JobSelect
                 value={job}
                 onValueChange={(val) => {
