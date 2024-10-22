@@ -160,7 +160,8 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
     fee: string;
     bookingDescription: string;
     isAvailable: boolean;
-    position: string;
+    position: string[];
+    employmentType: string;
   }) => {
     const accessToken = await getAccessToken();
     const formToSubmit = Object.fromEntries(
@@ -181,7 +182,8 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
         unlock_calendar_fee: formToSubmit.fee,
         booking_description: formToSubmit.bookingDescription,
         available: formToSubmit.isAvailable,
-        position: [formToSubmit.position],
+        position: formToSubmit.position,
+        employment_type: [formToSubmit.employmentType],
         privy_did: user?.id,
         name: userProfileData?.profile?.name,
         photo_source: userProfileData?.profile?.photo_source,

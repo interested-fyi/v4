@@ -58,7 +58,8 @@ export default function AuthDialog({
     bestProfile: string;
     calendar: string;
     fee: string;
-    position: string;
+    position: string[];
+    employmentType: string;
     bookingDescription: string;
     isAvailable: boolean;
   }) => {
@@ -84,7 +85,8 @@ export default function AuthDialog({
         bio: formToSubmit.bio,
         calendly_link: formToSubmit.calendar,
         unlock_calendar_fee: formToSubmit.fee,
-        position: [formToSubmit.position],
+        position: formToSubmit.position,
+        employment_type: [formToSubmit.employmentType],
         booking_description: formToSubmit.bookingDescription,
         smart_wallet_address: user?.smartWallet?.address,
         privy_did: user?.id,
