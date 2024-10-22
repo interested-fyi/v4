@@ -3,7 +3,7 @@ import { JobSelect } from "./../inputs/JobSelect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LoaderIcon } from "lucide-react";
+import { LoaderIcon, TrashIcon } from "lucide-react";
 import { usePrivy } from "@privy-io/react-auth";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -17,7 +17,7 @@ interface ProfileSettingsProps {
     calendar: string;
     fee: string;
     bookingDescription: string;
-    position: string;
+    position: string[];
     employmentType: string;
   }) => Promise<void>;
   onClose: () => void;
@@ -33,11 +33,11 @@ export const ProfileSettings = ({
     fee: "",
     bookingDescription: "",
     isAvailable: true,
-    position: "",
+    position: [""],
     employmentType: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-
+  const [addPosition, setAddPosition] = useState(false);
   const { user, getAccessToken } = usePrivy();
 
   const {
@@ -74,8 +74,8 @@ export const ProfileSettings = ({
         fee: userProfileData.profile?.unlock_calendar_fee ?? "",
         bookingDescription: userProfileData.profile?.booking_description ?? "",
         isAvailable: userProfileData.profile?.available ?? true,
-        position: userProfileData.profile?.position ?? "",
-        employmentType: userProfileData.profile?.employment_type ?? "",
+        position: userProfileData.profile?.position ?? [""],
+        employmentType: userProfileData.profile?.employment_type?.[0] ?? "",
       });
     }
   }, [userProfileData]);
@@ -162,17 +162,64 @@ export const ProfileSettings = ({
         </div>
       ) : null}
       <div className='grid gap-4'>
-        <div>
+        <div className='flex flex-col gap-2'>
           <Label className='text-sm font-medium' htmlFor='position'>
-            Job title
+            Job title(s)
           </Label>
-          <JobSelect
-            value={form.position}
-            onValueChange={(val) => {
-              setForm({ ...form, position: val });
-            }}
-          />
+          {form.position?.map((job) => (
+            <div className='flex gap-2'>
+              <JobSelect
+                value={job}
+                onValueChange={(val) => {
+                  // set the first position in the array without changing the rest
+                  setForm({
+                    ...form,
+                    position: [val, ...form.position.slice(1)],
+                  });
+                }}
+              />
+              <Button
+                variant='link'
+                className='text-red-700 p-2'
+                onClick={() => {
+                  setForm({
+                    ...form,
+                    position: form.position.filter(
+                      (position) => position !== job
+                    ),
+                  });
+                }}
+              >
+                <TrashIcon className='w-4 h-4 p-0' />
+              </Button>
+            </div>
+          ))}
+          {addPosition && (
+            <JobSelect
+              value={form.position[-1]}
+              onValueChange={(val) => {
+                const newPositions = [...form.position, val];
+                // set the first position in the array without changing the rest
+                setForm({
+                  ...form,
+                  position: newPositions,
+                });
+                setAddPosition(false);
+              }}
+            />
+          )}
         </div>
+        {
+          <Button
+            variant='link'
+            className='w-full mt-0 text-blue-700'
+            onClick={() => {
+              setAddPosition(true);
+            }}
+          >
+            + Add another
+          </Button>
+        }
         <div>
           <Label className='text-sm font-medium' htmlFor='position'>
             Employment type

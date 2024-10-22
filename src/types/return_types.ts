@@ -4,7 +4,7 @@ export interface UserCombinedProfile {
   photo_source: string | null;
   preferred_profile: string | null;
   available: boolean | null;
-  position: string | null;
+  position: string[] | null;
   employment_type: string | null;
   bio: string | null;
   booking_description: string | null;
