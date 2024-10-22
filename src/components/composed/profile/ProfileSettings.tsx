@@ -18,7 +18,7 @@ interface ProfileSettingsProps {
     fee: string;
     bookingDescription: string;
     position: string[];
-    employmentType: string;
+    employmentType: string[];
   }) => Promise<void>;
   onClose: () => void;
   isSettingsMode: boolean;
@@ -34,10 +34,11 @@ export const ProfileSettings = ({
     bookingDescription: "",
     isAvailable: true,
     position: [""],
-    employmentType: "",
+    employmentType: [""],
   });
   const [isLoading, setIsLoading] = useState(false);
   const [addPosition, setAddPosition] = useState(false);
+  const [addEmploymentType, setAddEmploymentType] = useState(false);
   const { user, getAccessToken } = usePrivy();
 
   const {
@@ -75,7 +76,7 @@ export const ProfileSettings = ({
         bookingDescription: userProfileData.profile?.booking_description ?? "",
         isAvailable: userProfileData.profile?.available ?? true,
         position: userProfileData.profile?.position ?? [""],
-        employmentType: userProfileData.profile?.employment_type?.[0] ?? "",
+        employmentType: userProfileData.profile?.employment_type ?? [""],
       });
     }
   }, [userProfileData]);
@@ -220,17 +221,56 @@ export const ProfileSettings = ({
             + Add another
           </Button>
         }
-        <div>
+        <div className='flex flex-col gap-2'>
           <Label className='text-sm font-medium' htmlFor='position'>
-            Employment type
+            Seeking
           </Label>
-          <JobTypeSelect
-            value={form.employmentType}
-            onValueChange={(val) => {
-              setForm({ ...form, employmentType: val });
-            }}
-          />
+          {form.employmentType?.map((type) => (
+            <div className='flex gap-2' key={type}>
+              <JobTypeSelect
+                value={type}
+                onValueChange={(val) => {
+                  setForm({ ...form, employmentType: [val, ...form.employmentType.slice(1)]});
+                }}
+              />
+              <Button
+                variant='link'
+                className='text-red-700 p-2'
+                onClick={() => {
+                  setForm({
+                    ...form,
+                    position: form.position.filter(
+                      (position) => position !== type
+                    ),
+                  });
+                }}
+              >
+                <TrashIcon className='w-4 h-4 p-0' />
+              </Button>
+            </div>
+          ))}
+          {addEmploymentType && (
+            <JobTypeSelect
+              value={form.employmentType[-1]}
+              onValueChange={(val) => {
+                const newTypes = [...form.employmentType, val];
+                setForm({ ...form, employmentType: newTypes});
+                setAddEmploymentType(false);
+              }}
+            />
+          )}
         </div>
+        {
+          <Button
+            variant='link'
+            className='w-full mt-0 text-blue-700'
+            onClick={() => {
+              setAddEmploymentType(true);
+            }}
+          >
+            + Add another
+          </Button>
+        }
         <div>
           <Label className='text-sm font-medium' htmlFor='calendar'>
             Scheduling link (Calendly, etc)

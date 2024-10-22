@@ -306,7 +306,8 @@ export const jobTypes = [
   "Part-Time",
   "Freelance/Contract",
   "Cofounder/Partner",
-  "Remote",
   "Advisory/Consulting",
   "Project-Based",
+  "Endorsements",
+  "Hackathon Teammates"
 ]
