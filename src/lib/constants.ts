@@ -300,3 +300,13 @@ export const jobPositions = [
     ],
   },
 ];
+
+export const jobTypes = [
+  "Full-Time",
+  "Part-Time",
+  "Freelance/Contract",
+  "Cofounder/Partner",
+  "Remote",
+  "Advisory/Consulting",
+  "Project-Based",
+]

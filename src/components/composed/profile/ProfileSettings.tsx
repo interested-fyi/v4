@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Textarea } from "@/components/ui/textarea";
 import { UserCombinedProfile } from "@/types/return_types";
+import { JobTypeSelect } from "../inputs/JobTypeSelect";
 
 interface ProfileSettingsProps {
   onSubmit: (formDetails: {
@@ -17,6 +18,7 @@ interface ProfileSettingsProps {
     fee: string;
     bookingDescription: string;
     position: string;
+    employmentType: string;
   }) => Promise<void>;
   onClose: () => void;
   isSettingsMode: boolean;
@@ -32,6 +34,7 @@ export const ProfileSettings = ({
     bookingDescription: "",
     isAvailable: true,
     position: "",
+    employmentType: "",
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -72,6 +75,7 @@ export const ProfileSettings = ({
         bookingDescription: userProfileData.profile?.booking_description ?? "",
         isAvailable: userProfileData.profile?.available ?? true,
         position: userProfileData.profile?.position ?? "",
+        employmentType: userProfileData.profile?.employment_type ?? "",
       });
     }
   }, [userProfileData]);
@@ -166,6 +170,17 @@ export const ProfileSettings = ({
             value={form.position}
             onValueChange={(val) => {
               setForm({ ...form, position: val });
+            }}
+          />
+        </div>
+        <div>
+          <Label className='text-sm font-medium' htmlFor='position'>
+            Employment type
+          </Label>
+          <JobTypeSelect
+            value={form.employmentType}
+            onValueChange={(val) => {
+              setForm({ ...form, employmentType: val });
             }}
           />
         </div>
