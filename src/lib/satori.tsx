@@ -2,7 +2,7 @@ import { UserCombinedProfile } from "@/types/return_types";
 import React from "react";
 import satori from "satori";
 
-async function generateProfileImage({ user }: { user: UserCombinedProfile }) {
+export async function generateProfileImage({ user }: { user: UserCombinedProfile }) {
   const { name, bio, position, photo_source } = user;
   const ImageContent = (
     <div
@@ -29,15 +29,19 @@ async function generateProfileImage({ user }: { user: UserCombinedProfile }) {
           flexShrink: 0,
         }}
       >
-        <img
-          src={photo_source ?? ""}
-          alt={name ?? "Profile picture"}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-          }}
-        />
+        {
+          photo_source && (
+            <img
+              src={photo_source ?? ""}
+              alt={name ?? "Profile picture"}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
+            />
+          )
+        }
       </div>
       <div
         style={{
