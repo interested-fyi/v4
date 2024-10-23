@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
 
             //send to X
         }
-
+        return NextResponse.json('Success', { status: 200 });
     } catch (error) {
         console.error('Error sending talent profiles:', error);
         return NextResponse.json('Internal server error', { status: 500 });
