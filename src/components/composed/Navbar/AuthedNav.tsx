@@ -161,7 +161,7 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
     bookingDescription: string;
     isAvailable: boolean;
     position: string[];
-    employmentType: string;
+    employmentType: string[];
   }) => {
     const accessToken = await getAccessToken();
     const formToSubmit = Object.fromEntries(
