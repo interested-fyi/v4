@@ -1,4 +1,6 @@
 import { UserCombinedProfile } from "@/types/return_types";
+import fs from "fs";
+import path from "path";
 import React from "react";
 import satori from "satori";
 
@@ -86,10 +88,24 @@ async function generateProfileImage({ user }: { user: UserCombinedProfile }) {
     </div>
   );
   // Satori configuration
+  const fontPath = path.join(
+    process.cwd(),
+    "public/fonts/Inter/static/Inter_18pt-Black.ttf"
+  );
+  const fontData = fs.readFileSync(fontPath);
+
   const svg = await satori(ImageContent, {
     width: 800,
     height: 400,
-    fonts: [],
+    fonts: [
+      {
+        name: "Roboto",
+        // Use `fs` (Node.js only) or `fetch` to read the font as Buffer/ArrayBuffer and provide `data` here.
+        data: fontData,
+        weight: 400,
+        style: "normal",
+      },
+    ],
   });
 
   return svg; // Returns the SVG image
