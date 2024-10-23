@@ -99,7 +99,7 @@ async function generateProfileImage({ user }: { user: UserCombinedProfile }) {
     height: 400,
     fonts: [
       {
-        name: "Roboto",
+        name: "Inter",
         // Use `fs` (Node.js only) or `fetch` to read the font as Buffer/ArrayBuffer and provide `data` here.
         data: fontData,
         weight: 400,
