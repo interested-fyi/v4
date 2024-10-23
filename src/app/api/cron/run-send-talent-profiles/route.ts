@@ -30,8 +30,16 @@ export async function GET(req: NextRequest) {
             console.log(imageBuffer);
             //send to telegram
             const inputImage = new InputFile(imageBuffer);
-            const summary = `<b>👋 Meet ${typedTalent.name}!</b>
-                ${typedTalent.name} is a ${typedTalent.position} and is looking for ${typedTalent.employment_type}.`;
+
+            const secondLine = typedTalent.position && typedTalent.employment_type
+                ? `${typedTalent.name} is a <b>${typedTalent.position}</b> and is seeking <b>${typedTalent.employment_type}</b>.\n\n`
+                : typedTalent.position
+                ? `${typedTalent.name} is a <b>${typedTalent.position}</b>.\n\n`
+                : typedTalent.employment_type
+                ? `${typedTalent.name} is seeking <b>${typedTalent.employment_type}</b>.\n\n`
+                : '\n';
+
+            const summary = `<b>👋 Meet ${typedTalent.name}!</b>\n${secondLine}${typedTalent.bio}\n\n<a href="${process.env.NEXT_PUBLIC_BASE_URL}/profile/${typedTalent.privy_did?.replace('did:privy:', '')}">View Profile</a>`;
             console.log(`sending telegram message: ${typedTalent.name} (${typedTalent.privy_did})`);
             const { message_id } = await bot.api.sendPhoto(
                 process.env.TELEGRAM_CHANNEL_ID ?? "",
