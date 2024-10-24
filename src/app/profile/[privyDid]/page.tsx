@@ -95,7 +95,8 @@ export default function ProfilePage() {
               <div className='mt-20 text-center'>
                 {/* Name skeleton */}
                 <Skeleton className='h-8 w-48 mx-auto mb-2' />
-                <Skeleton className='h-4 w-64 mx-auto mb-4' />
+                <Skeleton className='h-4 w-64 mx-auto mb-2' />
+                <Skeleton className='h-4 w-80 mx-auto mb-6' />
 
                 {/* Button skeleton */}
                 <Button
