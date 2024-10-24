@@ -224,6 +224,18 @@ export default function ProfilePage() {
                 </Button>
               )}
             </div>
+            <div className='inline-flex items-center justify-center space-x-2'>
+              <div className='inline-flex items-center justify-center bg-blue-100 rounded-lg px-3 py-1'>
+                <span className='text-sm font-medium text-blue-800'>
+                  {userProfileData?.profile?.employment_type?.[0]}
+                </span>
+              </div>
+              <div className='inline-flex items-center justify-center bg-blue-100 rounded-lg px-3 py-1'>
+                <span className='text-sm font-medium text-blue-800'>
+                  {userProfileData?.profile?.position?.[0]}
+                </span>
+              </div>
+            </div>
           </div>
           <div className='flex justify-center gap-2 mt-8 max-w-[343px] mx-auto'>
             {/* <Button
