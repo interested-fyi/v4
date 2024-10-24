@@ -11,7 +11,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import EndorseDialog from "@/components/composed/dialog/EndorseDialog";
 import { useState } from "react";
-import { Loader } from "lucide-react";
+import { Loader, SearchIcon } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { fetchUserProfile } from "@/lib/api/helpers";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -225,6 +225,9 @@ export default function ProfilePage() {
               )}
             </div>
             <div className='inline-flex items-center justify-center space-x-2'>
+              <div className='inline-flex items-center justify-center  rounded-lg px-3 py-1'>
+                <SearchIcon className='w-5 h-5 stroke-blue-600' />
+              </div>
               <div className='inline-flex items-center justify-center bg-blue-100 rounded-lg px-3 py-1'>
                 <span className='text-sm font-medium text-blue-800'>
                   {userProfileData?.profile?.employment_type?.[0]}
