@@ -41,14 +41,14 @@ export async function GET(req: NextRequest) {
 
             const summary = `<b>👋 Meet ${typedTalent.name}!</b>\n${secondLine}${typedTalent.bio}\n\n<a href="${process.env.NEXT_PUBLIC_BASE_URL}/profile/${typedTalent.privy_did?.replace('did:privy:', '')}">View Profile</a>`;
             console.log(`sending telegram message: ${typedTalent.name} (${typedTalent.privy_did})`);
-            /* const { message_id } = await bot.api.sendPhoto(
+            const { message_id } = await bot.api.sendPhoto(
                 process.env.TELEGRAM_CHANNEL_ID ?? "",
                 inputImage, 
                 {
                     caption: summary,
                     parse_mode: "HTML"
                 }
-            ) */
+            )
 
             //send  to farcaster
             const signerUUID = process.env.SIGNER_UUID ?? "";
@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
                 },
                 body: JSON.stringify({
                     signer_uuid: signerUUID,
-                    text: `👋 Meet ${typedTalent.name}!\n${secondLine}${typedTalent.bio}\n\n${process.env.NEXT_PUBLIC_BASE_URL}/profile/${typedTalent.privy_did?.replace('did:privy:', '')}`,
+                    text: `👋 Meet ${typedTalent.name}!\n${secondLine.replace(/<b>/g, '').replace(/<\/b>/g, '')}${typedTalent.bio}\n\nView ${typedTalent.name}'s Profile:${process.env.NEXT_PUBLIC_BASE_URL}/profile/${typedTalent.privy_did?.replace('did:privy:', '')}`,
                     embeds: [
                         {
                             url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/farcaster/profile-image?${params.toString()}`
