@@ -54,10 +54,7 @@ export async function GET(req: NextRequest) {
             const signerUUID = process.env.SIGNER_UUID ?? "";
             const url = "https://api.neynar.com/v2/farcaster/cast";
             const params = new URLSearchParams({
-                name: typedTalent.name ?? '',
-                bio: typedTalent.bio ?? '',
-                position: typedTalent.position?.toString() ?? '',
-                photo_source: typedTalent.photo_source ?? ''
+                privy_did: typedTalent.privy_did?.replace('did:privy:', '') ?? ''
             });
 
             const options = {
