@@ -41,16 +41,48 @@ export async function GET(req: NextRequest) {
 
             const summary = `<b>👋 Meet ${typedTalent.name}!</b>\n${secondLine}${typedTalent.bio}\n\n<a href="${process.env.NEXT_PUBLIC_BASE_URL}/profile/${typedTalent.privy_did?.replace('did:privy:', '')}">View Profile</a>`;
             console.log(`sending telegram message: ${typedTalent.name} (${typedTalent.privy_did})`);
-            const { message_id } = await bot.api.sendPhoto(
+            /* const { message_id } = await bot.api.sendPhoto(
                 process.env.TELEGRAM_CHANNEL_ID ?? "",
                 inputImage, 
                 {
                     caption: summary,
                     parse_mode: "HTML"
                 }
-            )
+            ) */
 
             //send  to farcaster
+            const signerUUID = process.env.SIGNER_UUID ?? "";
+            const url = "https://api.neynar.com/v2/farcaster/cast";
+            const params = new URLSearchParams({
+                name: typedTalent.name ?? '',
+                bio: typedTalent.bio ?? '',
+                position: typedTalent.position?.toString() ?? '',
+                photo_source: typedTalent.photo_source ?? ''
+            });
+
+            const options = {
+                method: "POST",
+                headers: {
+                    accept: "application/json",
+                    api_key: process.env.NEYNAR_API_KEY ?? "",
+                    "content-type": "application/json",
+                },
+                body: JSON.stringify({
+                    signer_uuid: signerUUID,
+                    text: `👋 Meet ${typedTalent.name}!\n${secondLine}${typedTalent.bio}\n\n${process.env.NEXT_PUBLIC_BASE_URL}/profile/${typedTalent.privy_did?.replace('did:privy:', '')}`,
+                    embeds: [
+                        {
+                            url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/farcaster/profile-image?${params.toString()}`
+                        },
+                    ],
+                    //channel_id: "jobs",
+                }),
+            };
+            console.log(options);
+            const response = await fetch(url, options);
+            const data = await response.json();
+
+            console.log(data);
 
             //send to X
         }
