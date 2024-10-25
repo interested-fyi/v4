@@ -4,13 +4,18 @@ import path from "path";
 import React from "react";
 import satori from "satori";
 
-async function generateProfileImage({ user }: { user: UserCombinedProfile }) {
+export async function generateProfileImage({
+  user,
+}: {
+  user: UserCombinedProfile;
+}) {
   const { name, bio, position, photo_source } = user;
+  const firstPosition = position?.[0];
   const ImageContent = (
     <div
       style={{
-        width: "300px",
-        height: "120px",
+        width: "100%",
+        height: "100%",
         backgroundColor: "#f0f4f8",
         borderRadius: "12px",
         padding: "16px",
@@ -29,20 +34,25 @@ async function generateProfileImage({ user }: { user: UserCombinedProfile }) {
           overflow: "hidden",
           marginRight: "16px",
           flexShrink: 0,
+          display: "flex",
         }}
       >
-        <img
-          src={photo_source ?? ""}
-          alt={name ?? "Profile picture"}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-          }}
-        />
+        {photo_source && (
+          <img
+            src={photo_source ?? ""}
+            alt={name ?? "Profile picture"}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+          />
+        )}
       </div>
       <div
         style={{
+          display: "flex",
+          flexDirection: "column",
           flexGrow: 1,
           overflow: "hidden",
         }}
@@ -50,11 +60,9 @@ async function generateProfileImage({ user }: { user: UserCombinedProfile }) {
         <h2
           style={{
             margin: "0 0 4px 0",
-            fontSize: "18px",
+            fontSize: "36px",
             fontWeight: 600,
             color: "#1a202c",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
             textOverflow: "ellipsis",
           }}
         >
@@ -63,17 +71,17 @@ async function generateProfileImage({ user }: { user: UserCombinedProfile }) {
         <p
           style={{
             margin: "0 0 4px 0",
-            fontSize: "14px",
+            fontSize: "24px",
             color: "#4a5568",
             fontWeight: 500,
           }}
         >
-          {position?.[0]}
+          {firstPosition}
         </p>
         <p
           style={{
             margin: 0,
-            fontSize: "12px",
+            fontSize: "18px",
             color: "#718096",
             lineHeight: 1.4,
             display: "-webkit-box",
