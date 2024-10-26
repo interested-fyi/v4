@@ -90,6 +90,7 @@ export const ProfileSettings = ({
       {" "}
       <div className='text-center text-[#1e1e1e] text-sm font-bold font-heading leading-[14px] m-0 scroll-m-0 max-w-[360px]'>
         <p className='mb-1'>READY TO APPEAR ON OUR TALENT PAGE?</p>
+        <p className='text-xs text-gray-500 mb-2'>(your profile will be shared on our socials!)</p>
         <div className='flex gap-4 relative max-w-full'>
           <Button
             size='lg'

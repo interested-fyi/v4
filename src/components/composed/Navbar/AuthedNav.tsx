@@ -183,7 +183,7 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
         booking_description: formToSubmit.bookingDescription,
         available: formToSubmit.isAvailable,
         position: formToSubmit.position,
-        employment_type: [formToSubmit.employmentType],
+        employment_type: typeof formToSubmit.employmentType === 'string' ? [formToSubmit.employmentType] : formToSubmit.employmentType,
         privy_did: user?.id,
         name: userProfileData?.profile?.name,
         photo_source: userProfileData?.profile?.photo_source,
