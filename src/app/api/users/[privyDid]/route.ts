@@ -6,13 +6,12 @@ export async function GET(
   { params }: { params: { privyDid: string } }
 ) {
   const { privyDid } = params;
-  console.log(privyDid);
   const { data, error } = await supabase
     .from("user_profile_combined")
     .select("*")
     .eq("privy_did", `did:privy:${privyDid}`)
     .maybeSingle();
-
+  
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

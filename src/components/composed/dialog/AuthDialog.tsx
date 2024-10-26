@@ -86,7 +86,7 @@ export default function AuthDialog({
         calendly_link: formToSubmit.calendar,
         unlock_calendar_fee: formToSubmit.fee,
         position: formToSubmit.position,
-        employment_type: [formToSubmit.employmentType],
+        employment_type: typeof formToSubmit.employmentType === 'string' ? [formToSubmit.employmentType] : formToSubmit.employmentType,
         booking_description: formToSubmit.bookingDescription,
         smart_wallet_address: user?.smartWallet?.address,
         privy_did: user?.id,

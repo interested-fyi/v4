@@ -23,19 +23,17 @@ const neynarMiddleware = neynarMiddle({
 // Uncomment to use Edge Runtime
 // export const runtime = 'edge'
 app.frame("/jobs/:id", neynarMiddleware, async (c) => {
-  console.log("🚀 ~ app.frame ~ c:", c);
   const { id } = c.req.param();
-  console.log("🚀 ~ app.frame ~ id:", id);
 
   const jobData = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/jobs/get-job-by-id/${id}`
   ).then((res) => res.json());
-  console.log("🚀 ~ app.frame ~ jobData:", jobData);
 
   const jobDetails = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/jobs/get-job-details-by-id/${id}`
   ).then((res) => res.json());
-  console.log("🚀 ~ app.frame ~ jobDetails:", jobDetails);
+
+  const summaryCharacterLimit = 535;
 
   return c.res({
     image: (
@@ -129,7 +127,7 @@ app.frame("/jobs/:id", neynarMiddleware, async (c) => {
             </p>
             <p>{jobData.job.location}</p>
           </div>
-          {jobDetails && (
+          {jobDetails && jobDetails?.job?.compensation && (
             <div
               style={{
                 display: "flex",
@@ -144,7 +142,7 @@ app.frame("/jobs/:id", neynarMiddleware, async (c) => {
             </div>
           )}
         </div>
-        {jobDetails && (
+        {jobDetails && jobDetails?.job?.summary && (
           <div
             style={{
               display: "flex",
@@ -154,9 +152,14 @@ app.frame("/jobs/:id", neynarMiddleware, async (c) => {
               padding: "28px",
               paddingTop: "16px",
               fontSize: "20px",
+              overflow: "hidden",
             }}
           >
-            <p>{jobDetails?.job?.summary}</p>
+            <p>
+              {jobDetails?.job.summary.length > summaryCharacterLimit
+                ? jobDetails.job.summary.slice(0, summaryCharacterLimit) + "..."
+                : jobDetails.job.summary}
+            </p>
           </div>
         )}
       </div>
