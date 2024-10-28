@@ -26,3 +26,34 @@ export interface UserCombinedProfile {
   x_username: string | null;
   x_photo: string | null;
 }
+
+interface Embed {
+  url: string;
+}
+
+interface CastAddBody {
+  embedsDeprecated: any[]; // Use a more specific type if you know what the deprecated embeds look like
+  mentions: number[];
+  parentUrl: string;
+  text: string;
+  mentionsPositions: number[];
+  embeds: Embed[];
+  type: string; // Consider making this a literal type if "CAST" is the only possible value
+}
+
+interface MessageData {
+  type: string; // e.g., "MESSAGE_TYPE_CAST_ADD"
+  fid: number;
+  timestamp: number;
+  network: string; // e.g., "FARCASTER_NETWORK_MAINNET"
+  castAddBody: CastAddBody;
+}
+
+export interface WarpcastResponseObject {
+  data: MessageData;
+  hash: string;
+  hashScheme: string; // e.g., "HASH_SCHEME_BLAKE3"
+  signature: string;
+  signatureScheme: string; // e.g., "SIGNATURE_SCHEME_ED25519"
+  signer: string;
+}

@@ -6,18 +6,26 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { usePrivy } from "@privy-io/react-auth";
-import { UserCombinedProfile } from "@/types/return_types";
+import {
+  UserCombinedProfile,
+  WarpcastResponseObject,
+} from "@/types/return_types";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import EndorseDialog from "@/components/composed/dialog/EndorseDialog";
-import { useState } from "react";
+import { act, useState } from "react";
 import { Loader, SearchIcon } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { fetchUserProfile } from "@/lib/api/helpers";
+import {
+  fetchUserFarcasterActivity,
+  fetchUserProfile,
+} from "@/lib/api/helpers";
 import { Skeleton } from "@/components/ui/skeleton";
+import SwitchButtonGroup from "@/components/composed/buttons/SwitchButtonGroup";
 
 export default function ProfilePage() {
   const [endorseDialogOpen, setEndorseDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("activity");
 
   const { user } = usePrivy();
   const params = useParams();
@@ -67,6 +75,17 @@ export default function ProfilePage() {
       };
     },
   });
+
+  const { data: warpcastActivity, isLoading: warpcastActivityLoading } =
+    useQuery({
+      queryKey: ["warpcastActivity", userProfileData?.profile?.farcaster_fid],
+      queryFn: async () => {
+        return fetchUserFarcasterActivity({
+          fid: `${userProfileData?.profile?.farcaster_fid}`,
+        });
+      },
+    });
+
   const handleCopyToClipboard = async () => {
     if (navigator.clipboard) {
       await navigator.clipboard.writeText(
@@ -225,7 +244,7 @@ export default function ProfilePage() {
                 </Button>
               )}
             </div>
-            <div className='inline-flex items-center justify-center space-x-2'>
+            <div className='w-full inline-flex items-center justify-center space-x-2'>
               <div className='inline-flex items-center justify-center  rounded-lg px-3 py-1'>
                 <SearchIcon className='w-5 h-5 stroke-blue-600' />
               </div>
@@ -322,52 +341,146 @@ export default function ProfilePage() {
               </Button>
             ) : null}
           </div>
-          {/* <div className='mt-8'>
+          <div className='mt-8'>
             <SwitchButtonGroup
               buttons={[
-                { text: "ACTIVITY", onClick: () => {}, isActive: true },
-                { text: "ENDORSEMENTS", onClick: () => {}, isActive: false },
+                {
+                  text: "ACTIVITY",
+                  onClick: () => {
+                    setActiveTab("activity");
+                  },
+                  isActive: activeTab === "activity",
+                },
+                {
+                  text: "ENDORSEMENTS",
+                  onClick: () => {
+                    setActiveTab("endorsements");
+                  },
+                  isActive: activeTab === "endorsements",
+                },
               ]}
-              svgOnClick={() => {}}
+              svgOnClick={() => {
+                if (activeTab === "activity") {
+                  setActiveTab("endorsements");
+                } else {
+                  setActiveTab("activity");
+                }
+              }}
             />
-          </div> */}
-          <h2 className='text-gray-600 text-xl font-bold font-body text-center mt-7 mb-6'>
-            Endorsements
-          </h2>
-          {endorsementsLoading || !endorsements ? (
-            <Loader className='animate-spin mt-6 text-blue-700' />
-          ) : (
-            endorsements?.endorsements?.map((endorsement, index) => (
-              <Card key={index} className='mb-4 p-4'>
-                <div className='flex items-start gap-4'>
-                  <Avatar>
-                    <AvatarImage
-                      src={
-                        endorsement.endorserData?.photo_source ??
-                        "/placeholder.svg?height=40&width=40"
-                      }
-                      alt={endorsement.endorserData?.name ?? "Endorser"}
-                    />
-                    <AvatarFallback>TH</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className='font-semibold text-[#2640eb]'>
-                      {endorsement.endorserData?.name}
-                    </h3>
-                    <p className='text-sm text-gray-500 font-medium font-body'>
-                      {new Date(endorsement.timeCreated).toLocaleString()}
-                    </p>
-                    <p className='text-sm font-medium font-body leading-[21px] mt-1 text-gray-600'>
-                      {endorsement.relationship}
-                    </p>
-                    <p className='text-xs text-gray-600 font-medium font-body leading-[18px] mt-2'>
-                      {endorsement.endorsement}
-                    </p>
+          </div>
+          <div>
+            <h2 className='text-gray-600 text-xl font-bold font-body text-center mt-7 mb-6'>
+              {activeTab === "activity" ? "Activity" : "Endorsements"}
+            </h2>
+            {activeTab === "endorsements" &&
+            endorsementsLoading &&
+            !endorsements ? (
+              <Loader className='animate-spin mt-6 text-blue-700' />
+            ) : (
+              endorsements?.endorsements?.map((endorsement, index) => (
+                <Card key={index} className='mb-4 p-4'>
+                  <div className='flex items-start gap-4'>
+                    <Avatar>
+                      <AvatarImage
+                        src={
+                          endorsement.endorserData?.photo_source ??
+                          "/placeholder.svg?height=40&width=40"
+                        }
+                        alt={endorsement.endorserData?.name ?? "Endorser"}
+                      />
+                      <AvatarFallback>TH</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className='font-semibold text-[#2640eb]'>
+                        {endorsement.endorserData?.name}
+                      </h3>
+                      <p className='text-sm text-gray-500 font-medium font-body'>
+                        {new Date(endorsement.timeCreated).toLocaleString()}
+                      </p>
+                      <p className='text-sm font-medium font-body leading-[21px] mt-1 text-gray-600'>
+                        {endorsement.relationship}
+                      </p>
+                      <p className='text-xs text-gray-600 font-medium font-body leading-[18px] mt-2'>
+                        {endorsement.endorsement}
+                      </p>
+                    </div>
                   </div>
+                </Card>
+              ))
+            )}
+            {activeTab === "activity" && warpcastActivityLoading ? (
+              <Loader className='animate-spin mt-6 text-blue-700' />
+            ) : activeTab === "activity" && warpcastActivity ? (
+              <Card className='mt-6 p-4'>
+                <div className='flex flex-col gap-4'>
+                  {warpcastActivity?.messages?.map(
+                    (activity: WarpcastResponseObject, index: number) => {
+                      const castAddBody = activity.data.castAddBody;
+                      console.log(
+                        "🚀 ~ ProfilePage ~ castAddBody:",
+                        castAddBody
+                      );
+                      return (
+                        <Card key={index} className='p-4'>
+                          <div className='flex items-start gap-4'>
+                            <div>
+                              <div className='flex gap-2'>
+                                <Avatar>
+                                  <AvatarImage
+                                    src={
+                                      userProfileData?.profile
+                                        ?.farcaster_photo ??
+                                      "/placeholder.svg?height=40&width=40"
+                                    }
+                                    alt={
+                                      userProfileData?.profile?.name ?? "User"
+                                    }
+                                  />
+                                  <AvatarFallback>
+                                    {userProfileData?.profile?.farcaster_username?.slice(
+                                      0,
+                                      2
+                                    ) ??
+                                      userProfileData?.profile?.name?.slice(
+                                        0,
+                                        2
+                                      )}
+                                  </AvatarFallback>
+                                </Avatar>
+
+                                <h3 className='font-semibold text-[#2640eb]'>
+                                  {userProfileData?.profile?.name}
+                                </h3>
+                              </div>
+                              <p className='text-sm text-gray-500 font-medium font-body'>
+                                {new Date(
+                                  activity.data.timestamp * 1000
+                                ).toLocaleString()}
+                              </p>
+                              <p className='text-sm font-medium font-body leading-[21px] mt-1 text-gray-600 max-w-72 sm:max-w-[500px] md:max-w-fit w-full mx-auto text-ellipsis overflow-hidden'>
+                                {castAddBody.text}
+                              </p>
+
+                              {castAddBody.embeds.length > 0 && (
+                                <a
+                                  href={castAddBody.embeds[0].url}
+                                  target='_blank'
+                                  rel='noopener noreferrer'
+                                  className='text-blue-600 text-sm underline mt-1 block'
+                                >
+                                  View Embedded Link
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        </Card>
+                      );
+                    }
+                  )}
                 </div>
               </Card>
-            ))
-          )}
+            ) : null}
+          </div>
         </div>
       </div>
     </div>

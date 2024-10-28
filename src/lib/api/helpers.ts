@@ -1,4 +1,7 @@
-import { UserCombinedProfile } from "@/types/return_types";
+import {
+  UserCombinedProfile,
+  WarpcastResponseObject,
+} from "@/types/return_types";
 
 // lib/api/fetchTalent.ts
 export async function fetchTalent({
@@ -64,5 +67,34 @@ export async function fetchUserProfile({
   return (await res.json()) as {
     success: boolean;
     profile: UserCombinedProfile;
+  };
+}
+
+export async function fetchUserFarcasterActivity({
+  fid,
+}: {
+  fid: string | undefined;
+}) {
+  if (!fid) throw new Error("User ID is required");
+
+  let headers;
+
+  headers = {
+    "Content-type": "application/json",
+  };
+
+  const res = await fetch(`/api/farcaster/get-cast-by-fid?fid=${fid}`, {
+    method: "GET",
+    cache: "no-store",
+    headers: headers,
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch user warpcast activity");
+  }
+
+  return (await res.json()) as {
+    messages: WarpcastResponseObject[];
+    nextPageToken: string;
   };
 }
