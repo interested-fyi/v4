@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
                             url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/farcaster/profile-image?${params.toString()}`
                         },
                     ],
-                    //channel_id: "jobs",
+                    channel_id: "jobs",
                 }),
             };
             console.log(`sending farcaster profile: ${typedTalent.name} (${typedTalent.privy_did})`);
@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
                 farcaster_sent: !!data.message_id
             }).select('*').single();
         }
-        
+
         return NextResponse.json('Success', { status: 200 });
     } catch (error) {
         console.error('Error sending talent profiles:', error);
