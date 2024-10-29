@@ -9,7 +9,7 @@ export function EmptyActivityFeedComponent() {
       </div>
       <h2 className='text-2xl font-bold text-gray-800 mb-4'>No Activity Yet</h2>
       <p className='text-gray-600 mb-6 max-w-md'>
-        It looks like there isn't anything posted yet
+        It looks like there isn&apos;t anything posted yet
       </p>
     </div>
   );

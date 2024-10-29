@@ -21,9 +21,9 @@ export function EmptyEndorsementsFeedComponent({
         No Endorsements Yet
       </h2>
       <p className='text-gray-600 mb-6 max-w-md'>
-        {userProfileData?.profile?.name} hasn't received any endorsements yet.
-        If you've worked with them, consider being the first to endorse their
-        skills!
+        {userProfileData?.profile?.name} hasn&apos;t received any endorsements
+        yet. If you&apos;ve worked with them, consider being the first to
+        endorse their skills!
       </p>
       <Button
         onClick={() => setEndorseDialogOpen(true)}
