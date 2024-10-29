@@ -1,31 +1,30 @@
 "use client";
-
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { usePrivy } from "@privy-io/react-auth";
-import {
-  UserCombinedProfile,
-  WarpcastResponseObject,
-} from "@/types/return_types";
-import Link from "next/link";
+import { UserCombinedProfile } from "@/types/return_types";
 import { useParams } from "next/navigation";
 import EndorseDialog from "@/components/composed/dialog/EndorseDialog";
-import { act, useState } from "react";
-import { Loader, SearchIcon } from "lucide-react";
+import { useState } from "react";
+import { SearchIcon } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  fetchUserFarcasterActivity,
-  fetchUserProfile,
-} from "@/lib/api/helpers";
-import { Skeleton } from "@/components/ui/skeleton";
+import { fetchUserProfile } from "@/lib/api/helpers";
 import SwitchButtonGroup from "@/components/composed/buttons/SwitchButtonGroup";
+import ProfileSkeleton from "@/components/composed/profile/ProfileSkeleton";
+import SocialLinks from "@/components/composed/profile/SocialLinks";
+import ActivityTab from "@/components/composed/profile/ActivityTab";
+import EndorementsTab from "@/components/composed/profile/EndorsementsTab";
+
+enum TAB {
+  ACTIVITY,
+  ENDORSEMENT,
+}
 
 export default function ProfilePage() {
   const [endorseDialogOpen, setEndorseDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("activity");
+  const [activeTab, setActiveTab] = useState<TAB>(TAB.ACTIVITY);
 
   const { user } = usePrivy();
   const params = useParams();
@@ -37,54 +36,6 @@ export default function ProfilePage() {
     queryKey: ["user", privyDid.replace("did:privy:", "")],
     queryFn: async () => fetchUserProfile({ userId: privyDid }),
   });
-
-  const { data: endorsements, isLoading: endorsementsLoading } = useQuery({
-    enabled: true,
-    queryKey: [
-      "endorsements",
-      privyDid.replace("did:privy:", ""),
-      userProfileData?.profile?.smart_wallet_address,
-    ],
-    queryFn: async () => {
-      if (!userProfileData?.profile?.smart_wallet_address) {
-        return {
-          success: false,
-          endorsements: [],
-        };
-      }
-
-      const res = await fetch(
-        `/api/users/profiles/${privyDid.replace(
-          "did:privy:",
-          ""
-        )}/get-endorsements?recipient_address=${
-          userProfileData?.profile?.smart_wallet_address
-        }`,
-        {
-          method: "GET",
-          cache: "no-store",
-          headers: {
-            "Content-type": "application/json",
-          },
-        }
-      );
-      const endorsementData = await res.json();
-      return endorsementData as {
-        success: boolean;
-        endorsements: any[];
-      };
-    },
-  });
-
-  const { data: warpcastActivity, isLoading: warpcastActivityLoading } =
-    useQuery({
-      queryKey: ["warpcastActivity", userProfileData?.profile?.farcaster_fid],
-      queryFn: async () => {
-        return fetchUserFarcasterActivity({
-          fid: `${userProfileData?.profile?.farcaster_fid}`,
-        });
-      },
-    });
 
   const handleCopyToClipboard = async () => {
     if (navigator.clipboard) {
@@ -99,66 +50,7 @@ export default function ProfilePage() {
   };
 
   if (userProfileLoading) {
-    return (
-      <div className='flex flex-col items-center justify-start min-h-screen bg-[#2640eb] text-white p-4 md:p-8'>
-        {/* Outer container with the background header */}
-        <div className='relative w-full min-w-6xl bg-[#e1effe] rounded-lg overflow-hidden'>
-          {/* Profile container */}
-          <div className='min-h-screen bg-[#2640eb] flex items-center justify-center p-4'>
-            <div className='bg-[#e1effe]  shadow-lg w-full max-w-5xl p-6 relative'>
-              {/* Profile image skeleton */}
-              <div className='absolute -top-20 left-1/2 transform -translate-x-1/2 border-white border-4 rounded-full'>
-                <Skeleton className='w-32 h-32 rounded-full' />
-              </div>
-
-              <div className='mt-20 text-center'>
-                {/* Name skeleton */}
-                <Skeleton className='h-8 w-48 mx-auto mb-2' />
-                <Skeleton className='h-4 w-64 mx-auto mb-2' />
-                <Skeleton className='h-4 w-80 mx-auto mb-6' />
-
-                {/* Button skeleton */}
-                <Button
-                  variant='outline'
-                  className='w-full max-w-xs mb-4'
-                  disabled
-                >
-                  <Skeleton className='h-4 w-16' />
-                </Button>
-
-                {/* Social icons skeleton */}
-                <div className='flex max-w-80 mx-auto justify-start space-x-4 mb-8'>
-                  {[1, 2, 3].map((i) => (
-                    <Skeleton key={i} className='w-8 h-8 rounded' />
-                  ))}
-                </div>
-
-                {/* Section title skeleton */}
-                <Skeleton className='h-6 w-32 mx-auto mb-4' />
-
-                {/* Endorsements skeleton */}
-                {[1, 2].map((endorsement) => (
-                  <div
-                    key={endorsement}
-                    className='bg-gray-50 rounded-lg p-4 mb-4'
-                  >
-                    <div className='flex items-center mb-2'>
-                      <Skeleton className='w-12 h-12 rounded-full mr-4' />
-                      <div>
-                        <Skeleton className='h-4 w-24 mb-2' />
-                        <Skeleton className='h-3 w-32' />
-                      </div>
-                    </div>
-                    <Skeleton className='h-4 w-full mb-2' />
-                    <Skeleton className='h-4 w-full' />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <ProfileSkeleton />;
   }
 
   const socialLinks = [
@@ -274,19 +166,7 @@ export default function ProfilePage() {
                 width={16}
               />
             </Button> */}
-            <Button
-              className='flex-1 bg-white border border-black text-gray-700 text-xs font-medium font-body leading-[18px] hover:bg-[#2640eb] hover:text-yellow-200'
-              onClick={() => setEndorseDialogOpen(true)}
-            >
-              Endorse
-              <Image
-                className='ml-2'
-                src={"/svg/hand.svg"}
-                alt='hand'
-                height={16}
-                width={16}
-              />
-            </Button>
+            <EndorseButton setEndorseDialogOpen={setEndorseDialogOpen} />
             {endorseDialogOpen && userProfileData?.profile && (
               <EndorseDialog
                 isOpen={endorseDialogOpen}
@@ -311,178 +191,72 @@ export default function ProfilePage() {
               </Button>
             </div>
           </div> */}
-          <div className='flex justify-start max-w-[343px] mx-auto gap-4 mt-8'>
-            {connectedSocials.length > 0 ? (
-              connectedSocials.map((social, index) => (
-                <Link key={index} target={"_blank"} href={social.url || "#"}>
-                  <Button className='bg-[#919cf4] bg-opacity-30 hover:bg-opacity-90 hover:bg-[#919cf4] w-[55px] h-8'>
-                    <Image
-                      src={social.image}
-                      alt={social.alt}
-                      height={16}
-                      width={16}
-                    />
-                  </Button>
-                </Link>
-              ))
-            ) : user?.id === userProfileData?.profile?.privy_did ? (
-              <Button
-                className='flex-1 bg-white border border-black text-gray-700 text-xs font-medium font-body leading-[18px] hover:bg-[#2640eb] hover:text-yellow-200'
-                onClick={() => console.log("Link accounts clicked")}
-              >
-                Link Accounts
-                <Image
-                  className='ml-2'
-                  src={"/svg/link.svg"}
-                  alt='link'
-                  height={16}
-                  width={16}
-                />
-              </Button>
-            ) : null}
-          </div>
+          <SocialLinks connectedSocials={connectedSocials} />
           <div className='mt-8'>
             <SwitchButtonGroup
               buttons={[
                 {
                   text: "ACTIVITY",
                   onClick: () => {
-                    setActiveTab("activity");
+                    setActiveTab(TAB.ACTIVITY);
                   },
-                  isActive: activeTab === "activity",
+                  isActive: activeTab === TAB.ACTIVITY,
                 },
                 {
                   text: "ENDORSEMENTS",
                   onClick: () => {
-                    setActiveTab("endorsements");
+                    setActiveTab(TAB.ENDORSEMENT);
                   },
-                  isActive: activeTab === "endorsements",
+                  isActive: activeTab === TAB.ENDORSEMENT,
                 },
               ]}
               svgOnClick={() => {
-                if (activeTab === "activity") {
-                  setActiveTab("endorsements");
+                if (activeTab === TAB.ACTIVITY) {
+                  setActiveTab(TAB.ENDORSEMENT);
                 } else {
-                  setActiveTab("activity");
+                  setActiveTab(TAB.ACTIVITY);
                 }
               }}
             />
           </div>
           <div>
             <h2 className='text-gray-600 text-xl font-bold font-body text-center mt-7 mb-6'>
-              {activeTab === "activity" ? "Activity" : "Endorsements"}
+              {activeTab === TAB.ACTIVITY ? "Activity" : "Endorsements"}
             </h2>
-            {activeTab === "endorsements" &&
-            endorsementsLoading &&
-            !endorsements ? (
-              <Loader className='animate-spin mt-6 text-blue-700' />
-            ) : (
-              endorsements?.endorsements?.map((endorsement, index) => (
-                <Card key={index} className='mb-4 p-4'>
-                  <div className='flex items-start gap-4'>
-                    <Avatar>
-                      <AvatarImage
-                        src={
-                          endorsement.endorserData?.photo_source ??
-                          "/placeholder.svg?height=40&width=40"
-                        }
-                        alt={endorsement.endorserData?.name ?? "Endorser"}
-                      />
-                      <AvatarFallback>TH</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h3 className='font-semibold text-[#2640eb]'>
-                        {endorsement.endorserData?.name}
-                      </h3>
-                      <p className='text-sm text-gray-500 font-medium font-body'>
-                        {new Date(endorsement.timeCreated).toLocaleString()}
-                      </p>
-                      <p className='text-sm font-medium font-body leading-[21px] mt-1 text-gray-600'>
-                        {endorsement.relationship}
-                      </p>
-                      <p className='text-xs text-gray-600 font-medium font-body leading-[18px] mt-2'>
-                        {endorsement.endorsement}
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-              ))
+            {activeTab === TAB.ENDORSEMENT && (
+              <EndorementsTab
+                userProfileData={userProfileData}
+                privyDid={privyDid}
+              />
             )}
-            {activeTab === "activity" && warpcastActivityLoading ? (
-              <Loader className='animate-spin mt-6 text-blue-700' />
-            ) : activeTab === "activity" && warpcastActivity ? (
-              <Card className='mt-6 p-4'>
-                <div className='flex flex-col gap-4'>
-                  {warpcastActivity?.messages?.map(
-                    (activity: WarpcastResponseObject, index: number) => {
-                      const castAddBody = activity.data.castAddBody;
-                      console.log(
-                        "🚀 ~ ProfilePage ~ castAddBody:",
-                        castAddBody
-                      );
-                      return (
-                        <Card key={index} className='p-4'>
-                          <div className='flex items-start gap-4'>
-                            <div>
-                              <div className='flex gap-2'>
-                                <Avatar>
-                                  <AvatarImage
-                                    src={
-                                      userProfileData?.profile
-                                        ?.farcaster_photo ??
-                                      "/placeholder.svg?height=40&width=40"
-                                    }
-                                    alt={
-                                      userProfileData?.profile?.name ?? "User"
-                                    }
-                                  />
-                                  <AvatarFallback>
-                                    {userProfileData?.profile?.farcaster_username?.slice(
-                                      0,
-                                      2
-                                    ) ??
-                                      userProfileData?.profile?.name?.slice(
-                                        0,
-                                        2
-                                      )}
-                                  </AvatarFallback>
-                                </Avatar>
-
-                                <h3 className='font-semibold text-[#2640eb]'>
-                                  {userProfileData?.profile?.name}
-                                </h3>
-                              </div>
-                              <p className='text-sm text-gray-500 font-medium font-body'>
-                                {new Date(
-                                  activity.data.timestamp * 1000
-                                ).toLocaleString()}
-                              </p>
-                              <p className='text-sm font-medium font-body leading-[21px] mt-1 text-gray-600 max-w-72 sm:max-w-[500px] md:max-w-fit w-full mx-auto text-ellipsis overflow-hidden'>
-                                {castAddBody.text}
-                              </p>
-
-                              {castAddBody.embeds.length > 0 && (
-                                <a
-                                  href={castAddBody.embeds[0].url}
-                                  target='_blank'
-                                  rel='noopener noreferrer'
-                                  className='text-blue-600 text-sm underline mt-1 block'
-                                >
-                                  View Embedded Link
-                                </a>
-                              )}
-                            </div>
-                          </div>
-                        </Card>
-                      );
-                    }
-                  )}
-                </div>
-              </Card>
+            {activeTab === TAB.ACTIVITY ? (
+              <ActivityTab userProfileData={userProfileData} />
             ) : null}
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+function EndorseButton({
+  setEndorseDialogOpen,
+}: {
+  setEndorseDialogOpen: (val: boolean) => void;
+}) {
+  return (
+    <Button
+      className='flex-1 bg-white border border-black text-gray-700 text-xs font-medium font-body leading-[18px] hover:bg-[#2640eb] hover:text-yellow-200'
+      onClick={() => setEndorseDialogOpen(true)}
+    >
+      Endorse
+      <Image
+        className='ml-2'
+        src={"/svg/hand.svg"}
+        alt='hand'
+        height={16}
+        width={16}
+      />
+    </Button>
   );
 }
