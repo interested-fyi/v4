@@ -57,7 +57,7 @@ export default function EndorementsTab({
   });
 
   if (endorsementsLoading) {
-    return <Loader className='animate-spin mt-6 text-blue-700' />;
+    return <Loader className='w-full animate-spin mt-6 text-blue-700' />;
   }
 
   if (!endorsements?.success) {

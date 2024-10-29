@@ -28,7 +28,7 @@ export default function ActivityTab({
     },
   });
   if (warpcastActivityLoading) {
-    return <Loader className='animate-spin mt-6 text-blue-700' />;
+    return <Loader className='w-full animate-spin mt-6 text-blue-700' />;
   }
 
   if (warpCastError) {
