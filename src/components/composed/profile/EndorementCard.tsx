@@ -5,26 +5,38 @@ interface EndorsementCardProps {
   endorserName: string;
   photoSource?: string;
   timeCreated: string;
+  endorserData: {
+    name: string;
+    photo_source: string;
+  };
   relationship: string;
-  endorsementText: string;
+  endorsement: string;
 }
 
 export function EndorsementCard({
   endorserName,
-  photoSource = "/placeholder.svg?height=40&width=40",
   timeCreated,
   relationship,
-  endorsementText,
+  endorserData,
+  endorsement,
 }: EndorsementCardProps) {
   return (
     <Card className='mb-4 p-4'>
       <div className='flex items-start gap-4'>
         <Avatar>
-          <AvatarImage src={photoSource} alt={endorserName} />
+          <AvatarImage
+            src={
+              endorserData?.photo_source ??
+              "/placeholder.svg?height=40&width=40"
+            }
+            alt={endorserData?.name ?? "Endorser"}
+          />
           <AvatarFallback>{endorserName?.slice(0, 2)}</AvatarFallback>
         </Avatar>
         <div>
-          <h3 className='font-semibold text-[#2640eb]'>{endorserName}</h3>
+          <h3 className='font-semibold text-[#2640eb]'>
+            {endorserData?.name ?? "Endorser"}
+          </h3>
           <p className='text-sm text-gray-500 font-medium font-body'>
             {new Date(timeCreated).toLocaleString()}
           </p>
@@ -32,7 +44,7 @@ export function EndorsementCard({
             {relationship}
           </p>
           <p className='text-xs text-gray-600 font-medium font-body leading-[18px] mt-2'>
-            {endorsementText}
+            {endorsement}
           </p>
         </div>
       </div>
