@@ -12,7 +12,7 @@ import {
 import ActivityCard from "./ActivityCard";
 import { EmptyActivityFeedComponent } from "./EmptyActivityFeed";
 import GitHubActivityCard from "./GithubActivityCard";
-import { SOCIALFEED } from "@/app/profile/[privyDid]/page";
+import { SOCIALFEED } from "@/types/feeds";
 
 export default function ActivityTab({
   userProfileData,

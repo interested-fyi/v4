@@ -23,12 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-export enum SOCIALFEED {
-  GITHUB = "github",
-  FARCASTER = "farcaster",
-}
-
+import { SOCIALFEED } from "@/types/feeds";
 enum TAB {
   ACTIVITY,
   ENDORSEMENT,
