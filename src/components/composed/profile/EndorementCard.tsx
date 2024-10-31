@@ -21,7 +21,7 @@ export function EndorsementCard({
       <div className='flex items-start gap-4'>
         <Avatar>
           <AvatarImage src={photoSource} alt={endorserName} />
-          <AvatarFallback>{endorserName.slice(0, 2)}</AvatarFallback>
+          <AvatarFallback>{endorserName?.slice(0, 2)}</AvatarFallback>
         </Avatar>
         <div>
           <h3 className='font-semibold text-[#2640eb]'>{endorserName}</h3>
