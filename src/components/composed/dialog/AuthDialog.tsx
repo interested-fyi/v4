@@ -10,7 +10,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { usePrivy } from "@privy-io/react-auth";
-import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 import { useState } from "react";
 import { LoaderIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -35,7 +34,6 @@ export default function AuthDialog({
   const [step, setStep] = useState(0);
 
   const { user, getAccessToken } = usePrivy();
-  const { client } = useSmartWallets();
 
   const {
     data: userProfileData,
@@ -86,7 +84,10 @@ export default function AuthDialog({
         calendly_link: formToSubmit.calendar,
         unlock_calendar_fee: formToSubmit.fee,
         position: formToSubmit.position,
-        employment_type: typeof formToSubmit.employmentType === 'string' ? [formToSubmit.employmentType] : formToSubmit.employmentType,
+        employment_type:
+          typeof formToSubmit.employmentType === "string"
+            ? [formToSubmit.employmentType]
+            : formToSubmit.employmentType,
         booking_description: formToSubmit.bookingDescription,
         smart_wallet_address: user?.smartWallet?.address,
         privy_did: user?.id,

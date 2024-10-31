@@ -5,6 +5,7 @@ import {
   UserCombinedProfile,
   WarpcastResponseObject,
 } from "@/types/return_types";
+import Image from "next/image";
 export default function ActivityCard({
   message,
   userProfileData,
@@ -21,10 +22,10 @@ export default function ActivityCard({
     customEpochDate + timestamp
   ).toLocaleString();
   return (
-    <Card className='p-4 w-full'>
-      <div className='flex items-start gap-4'>
-        <div className='w-full'>
-          <div className='flex gap-2'>
+    <Card className='p-4 sm:p-8 w-full'>
+      <div className='flex items-start gap-2'>
+        <div className='flex flex-col gap-2 w-full'>
+          <div className='flex gap-2 items-center'>
             <Avatar>
               <AvatarImage
                 src={
@@ -38,17 +39,30 @@ export default function ActivityCard({
                   userProfileData?.profile?.name?.slice(0, 2)}
               </AvatarFallback>
             </Avatar>
-
-            <h3 className='font-semibold text-[#2640eb]'>
-              {userProfileData?.profile?.name}
-            </h3>
+            <div className='flex flex-col gap-0 justify-center items-start'>
+              <div className='flex gap-2 items-center'>
+                <h3 className='font-semibold text-[#2640eb]'>
+                  {userProfileData?.profile?.name}
+                </h3>
+                <Image
+                  src={"/svg/warpcast.svg"}
+                  alt='Warpcast'
+                  width={14}
+                  height={14}
+                />
+              </div>
+              <p className='text-xs text-gray-500 font-medium font-body'>
+                {dateFromCustomEpoch}
+              </p>
+            </div>
           </div>
-          <p className='text-sm text-gray-500 font-medium font-body'>
-            {dateFromCustomEpoch}
-          </p>
-          <p className='text-sm font-medium font-body leading-[21px] mt-1 text-gray-600 max-w-72 sm:max-w-[500px] md:max-w-fit w-full text-ellipsis overflow-hidden'>
-            {castAddBody.text}
-          </p>
+          <div className='flex flex-col gap-0'>
+            {castAddBody && castAddBody?.text ? (
+              <p className='text-sm font-medium font-body leading-[21px] mt-1 text-gray-600 max-w-72 sm:max-w-[500px] md:max-w-fit w-full text-ellipsis overflow-hidden'>
+                {castAddBody?.text}
+              </p>
+            ) : null}
+          </div>
 
           {castAddBody.embeds.length > 0 && (
             <a

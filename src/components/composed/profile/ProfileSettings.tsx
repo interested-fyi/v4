@@ -90,7 +90,9 @@ export const ProfileSettings = ({
       {" "}
       <div className='text-center text-[#1e1e1e] text-sm font-bold font-heading leading-[14px] m-0 scroll-m-0 max-w-[360px]'>
         <p className='mb-1'>READY TO APPEAR ON OUR TALENT PAGE?</p>
-        <p className='text-xs text-gray-500 mb-2'>(your profile will be shared on our socials!)</p>
+        <p className='text-xs text-gray-500 mb-2'>
+          (your profile will be shared on our socials!)
+        </p>
         <div className='flex gap-4 relative max-w-full'>
           <Button
             size='lg'
@@ -176,7 +178,7 @@ export const ProfileSettings = ({
                   // set the first position in the array without changing the rest
                   setForm({
                     ...form,
-                    position: [val, ...form.position.slice(1)],
+                    position: [val, ...form.position?.slice(1)],
                   });
                 }}
               />
@@ -231,7 +233,10 @@ export const ProfileSettings = ({
               <JobTypeSelect
                 value={type}
                 onValueChange={(val) => {
-                  setForm({ ...form, employmentType: [val, ...form.employmentType.slice(1)]});
+                  setForm({
+                    ...form,
+                    employmentType: [val, ...form.employmentType?.slice(1)],
+                  });
                 }}
               />
               <Button
@@ -255,7 +260,7 @@ export const ProfileSettings = ({
               value={form.employmentType[-1]}
               onValueChange={(val) => {
                 const newTypes = [...form.employmentType, val];
-                setForm({ ...form, employmentType: newTypes});
+                setForm({ ...form, employmentType: newTypes });
                 setAddEmploymentType(false);
               }}
             />

@@ -98,3 +98,17 @@ export async function fetchUserFarcasterActivity({
     nextPageToken: string;
   };
 }
+
+export async function fetchGitHubActivity(username: string) {
+  const response = await fetch(
+    `/api/github/get-github-activity?username=${username}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  if (!response.ok) throw new Error("Failed to fetch activity");
+  return response.json();
+}

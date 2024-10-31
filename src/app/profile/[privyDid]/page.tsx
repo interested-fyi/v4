@@ -16,6 +16,18 @@ import ProfileSkeleton from "@/components/composed/profile/ProfileSkeleton";
 import SocialLinks from "@/components/composed/profile/SocialLinks";
 import ActivityTab from "@/components/composed/profile/ActivityTab";
 import EndorementsTab from "@/components/composed/profile/EndorsementsTab";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+export enum SOCIALFEED {
+  GITHUB = "github",
+  FARCASTER = "farcaster",
+}
 
 enum TAB {
   ACTIVITY,
@@ -25,6 +37,9 @@ enum TAB {
 export default function ProfilePage() {
   const [endorseDialogOpen, setEndorseDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TAB>(TAB.ACTIVITY);
+  const [activityFeed, setActivityFeed] = useState<SOCIALFEED>(
+    SOCIALFEED.FARCASTER
+  );
 
   const { user } = usePrivy();
   const params = useParams();
@@ -230,7 +245,43 @@ export default function ProfilePage() {
               />
             )}
             {activeTab === TAB.ACTIVITY ? (
-              <ActivityTab userProfileData={userProfileData} />
+              <>
+                <Select
+                  onValueChange={(value) =>
+                    setActivityFeed(value as SOCIALFEED)
+                  }
+                >
+                  <SelectTrigger className='w-[180px] mb-2 text-black placeholder:text-gray-700'>
+                    <SelectValue
+                      className='text-black placeholder:text-black'
+                      placeholder='Select a feed'
+                    />
+                  </SelectTrigger>
+                  <SelectContent className='text-body text-black'>
+                    {/* display github and X as options is github and twitter are connected as socials */}
+                    {userProfileData?.profile?.github_username && (
+                      <SelectItem
+                        className='text-black'
+                        value={SOCIALFEED.GITHUB}
+                      >
+                        Github
+                      </SelectItem>
+                    )}
+                    {userProfileData?.profile?.x_username && (
+                      <SelectItem
+                        className='text-black'
+                        value={SOCIALFEED.FARCASTER}
+                      >
+                        Farcaster
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+                <ActivityTab
+                  userProfileData={userProfileData}
+                  activeFeed={activityFeed}
+                />
+              </>
             ) : null}
           </div>
         </div>
