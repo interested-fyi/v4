@@ -60,7 +60,7 @@ export default function EndorementsTab({
     return <Loader className='w-full animate-spin mt-6 text-blue-700' />;
   }
 
-  if (!endorsements?.success) {
+  if (!endorsements?.success || endorsements?.endorsements?.length === 0) {
     return <EmptyEndorsementsFeedComponent userProfileData={userProfileData} />;
   }
 
