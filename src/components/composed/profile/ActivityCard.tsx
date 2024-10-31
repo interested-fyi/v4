@@ -64,16 +64,18 @@ export default function ActivityCard({
             ) : null}
           </div>
 
-          {castAddBody.embeds.length > 0 && (
-            <a
-              href={castAddBody.embeds[0].url}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='text-blue-600 text-sm underline mt-1 block'
-            >
-              View Embedded Link
-            </a>
-          )}
+          {castAddBody &&
+            castAddBody?.embeds &&
+            castAddBody?.embeds?.length > 0 && (
+              <a
+                href={castAddBody.embeds[0].url}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='text-blue-600 text-sm underline mt-1 block'
+              >
+                View Embedded Link
+              </a>
+            )}
         </div>
       </div>
     </Card>

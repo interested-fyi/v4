@@ -241,37 +241,40 @@ export default function ProfilePage() {
             )}
             {activeTab === TAB.ACTIVITY ? (
               <>
-                <Select
-                  onValueChange={(value) =>
-                    setActivityFeed(value as SOCIALFEED)
-                  }
-                >
-                  <SelectTrigger className='w-[180px] mb-2 text-black placeholder:text-gray-700'>
-                    <SelectValue
-                      className='text-black placeholder:text-black'
-                      placeholder='Select a feed'
-                    />
-                  </SelectTrigger>
-                  <SelectContent className='text-body text-black'>
-                    {/* display github and X as options is github and twitter are connected as socials */}
-                    {userProfileData?.profile?.github_username && (
-                      <SelectItem
-                        className='text-black'
-                        value={SOCIALFEED.GITHUB}
-                      >
-                        Github
-                      </SelectItem>
-                    )}
-                    {userProfileData?.profile?.x_username && (
-                      <SelectItem
-                        className='text-black'
-                        value={SOCIALFEED.FARCASTER}
-                      >
-                        Farcaster
-                      </SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
+                {userProfileData?.profile?.farcaster_name ||
+                userProfileData?.profile?.github_username ? (
+                  <Select
+                    onValueChange={(value) =>
+                      setActivityFeed(value as SOCIALFEED)
+                    }
+                  >
+                    <SelectTrigger className='w-[180px] mb-2 text-black placeholder:text-gray-700'>
+                      <SelectValue
+                        className='text-black placeholder:text-black'
+                        placeholder='Select a feed'
+                      />
+                    </SelectTrigger>
+                    <SelectContent className='text-body text-black'>
+                      {/* display github and X as options is github and twitter are connected as socials */}
+                      {userProfileData?.profile?.github_username && (
+                        <SelectItem
+                          className='text-black'
+                          value={SOCIALFEED.GITHUB}
+                        >
+                          Github
+                        </SelectItem>
+                      )}
+                      {userProfileData?.profile?.farcaster_name && (
+                        <SelectItem
+                          className='text-black'
+                          value={SOCIALFEED.FARCASTER}
+                        >
+                          Farcaster
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                ) : null}
                 <ActivityTab
                   userProfileData={userProfileData}
                   activeFeed={activityFeed}
