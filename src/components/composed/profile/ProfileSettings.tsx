@@ -41,11 +41,7 @@ export const ProfileSettings = ({
   const [addEmploymentType, setAddEmploymentType] = useState(false);
   const { user, getAccessToken } = usePrivy();
 
-  const {
-    data: userProfileData,
-    isLoading: userProfileDataLoading,
-    error: userProfileError,
-  } = useQuery({
+  const { data: userProfileData } = useQuery({
     enabled: !!user,
     queryKey: ["user", user?.id?.replace("did:privy:", "")],
     queryFn: async () => {
@@ -323,6 +319,10 @@ export const ProfileSettings = ({
       </div>
       <Button
         className='w-full text-sm font-body font-medium leading-[21px] mt-4 bg-[#2640eb]'
+        disabled={
+          isLoading ||
+          (form.isAvailable && (!form.position[0] || !form.employmentType[0]))
+        }
         onClick={async () => {
           setIsLoading(true);
           try {
