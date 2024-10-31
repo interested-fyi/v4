@@ -7,13 +7,18 @@ import {
 export async function fetchTalent({
   filter,
   limit,
+  page,
 }: {
   filter?: string;
   limit?: number;
+  page?: number;
 }) {
   let query = "";
   if (filter) {
     query = `filter=${filter}`;
+  }
+  if (page) {
+    query = `${query}&page=${page}`;
   }
   if (limit) {
     query = `${query}&limit=${limit}`;

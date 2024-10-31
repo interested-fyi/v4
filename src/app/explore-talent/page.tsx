@@ -1,45 +1,77 @@
 // app/talent/ExploreTalentPage.tsx
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import TalentFilter from "@/components/composed/talent/TalentFilter";
-import TalentGrid from "@/components/composed/talent/TalentGrid";
+import TalentGrid, { UserProps } from "@/components/composed/talent/TalentGrid";
 import { fetchTalent } from "@/lib/api/helpers";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 export default function ExploreTalentPage() {
   const [filter, setFilter] = useState("");
-  const [limit, setLimit] = useState(10);
+  const limit = 10; // fixed limit for infinite scroll
+  const observerElem = useRef<HTMLDivElement | null>(null);
 
   const {
     data,
     isLoading,
     isError,
-    isRefetching,
-    isRefetchError,
-    isLoadingError,
-  } = useQuery({
-    queryKey: ["talent", filter, limit],
-    queryFn: () => fetchTalent({ filter, limit }),
-    retry(failureCount, error) {
-      return failureCount < 1;
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["talent", filter],
+    initialPageParam: 1,
+    queryFn: ({ pageParam = 1 }) =>
+      fetchTalent({ filter, limit, page: pageParam }),
+    getNextPageParam: (lastPage, pages) => {
+      return lastPage.currentPage < lastPage.totalPages
+        ? lastPage.currentPage + 1
+        : undefined;
     },
+    retry: 1,
   });
+
+  // Intersection Observer for infinite scroll trigger
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchNextPage();
+        }
+      },
+      {
+        root: null,
+        rootMargin: "200px", // Trigger 200px before element comes into view
+        threshold: 0.1,
+      }
+    );
+
+    if (observerElem.current) observer.observe(observerElem.current);
+    // Cleanup observer on component unmount or when dependencies change
+    return () => {
+      if (observerElem.current) observer.unobserve(observerElem.current);
+    };
+  }, [fetchNextPage, hasNextPage]);
   return (
     <div className='flex flex-col gap-0'>
       <PageHeader />
       <div className='flex flex-col lg:px-16 sm:px-32 md:px-20 xl:px-32 bg-[#e1effe]'>
-        <TalentFilter
-          onValueChange={setFilter}
-          value={filter}
-          setLimit={setLimit}
-          limit={limit}
-        />
+        <TalentFilter onValueChange={setFilter} value={filter} />
         <TalentGrid
-          data={data}
-          isError={isError || isRefetchError || isLoadingError}
-          isLoading={isLoading || isRefetching}
+          data={{
+            users: data?.pages?.flatMap((page) => page.users) as UserProps[],
+          }}
+          isLoading={isLoading}
+          isError={isError}
           resetFilter={() => setFilter("")}
         />
+        {/* Loading indicator for infinite scroll */}
+        <div
+          ref={observerElem}
+          className='w-full h-16 flex items-center justify-center text-gray-500'
+        >
+          {isFetchingNextPage && <p>Loading more talent...</p>}
+        </div>
       </div>
     </div>
   );

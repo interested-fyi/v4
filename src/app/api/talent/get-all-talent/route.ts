@@ -48,6 +48,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         return {
           ...user,
           attestation_count: attestationCount || 0, // Add the count of attestations
+          nextCursor: page + 1,
         };
       })
     );

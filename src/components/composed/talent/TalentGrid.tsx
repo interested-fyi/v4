@@ -1,9 +1,7 @@
 // components/composed/talent/TalentGrid.tsx
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import { UserCard } from "@/components/composed/talent/UserCard";
-import { fetchTalent } from "@/lib/api/helpers";
 import { UserCombinedProfile } from "@/types/return_types";
 import { Loader } from "lucide-react";
 
@@ -31,8 +29,8 @@ export default function TalentGrid({
           No Talent Found
         </h2>
         <p className='text-md text-gray-600 mb-4'>
-          We couldn&apos;t find any talent matching your criteria. Try adjusting the
-          filter and search again.
+          We couldn&apos;t find any talent matching your criteria. Try adjusting
+          the filter and search again.
         </p>
         <button
           onClick={() => resetFilter()}
@@ -54,7 +52,7 @@ export default function TalentGrid({
 
   return (
     <div className='bg-[#e1effe] w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-8 p-4 min-h-screen grid-rows-4'>
-      {data?.users.map((user: UserProps) => (
+      {data?.users?.map((user: UserProps) => (
         <UserCard key={user.privy_did} user={user} />
       ))}
     </div>
