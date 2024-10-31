@@ -143,7 +143,7 @@ export const jobPositions = [
       "Technical Writer",
       "Technical Trainer",
       "UX Content Designer",
-      "Developer Ralations Manager",
+      "Developer Relations Manager",
       "Consultant",
       "Standards Architect",
     ],
@@ -309,5 +309,5 @@ export const jobTypes = [
   "Advisory/Consulting",
   "Project-Based",
   "Endorsements",
-  "Hackathon Teammates"
-]
+  "Hackathon Teammates",
+];
