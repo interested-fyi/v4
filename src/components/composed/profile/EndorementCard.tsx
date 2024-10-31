@@ -21,7 +21,7 @@ export function EndorsementCard({
   endorsement,
 }: EndorsementCardProps) {
   return (
-    <Card className='mb-4 p-4'>
+    <Card className='p-4'>
       <div className='flex items-start gap-4'>
         <Avatar>
           <AvatarImage
