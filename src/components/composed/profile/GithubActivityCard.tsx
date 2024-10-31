@@ -1,9 +1,6 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { useQuery } from "@tanstack/react-query";
-import { fetchGitHubActivity } from "@/lib/api/helpers";
-import { GithubIcon } from "lucide-react";
 import Image from "next/image";
 
 type GitHubEvent = {
