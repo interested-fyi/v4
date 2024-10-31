@@ -147,19 +147,26 @@ export default function ProfilePage() {
               )}
             </div>
             <div className='w-full inline-flex items-center justify-center space-x-2'>
-              <div className='inline-flex items-center justify-center  rounded-lg px-3 py-1'>
-                <SearchIcon className='w-5 h-5 stroke-blue-600' />
-              </div>
-              <div className='inline-flex items-center justify-center bg-blue-100 rounded-lg px-3 py-1'>
-                <span className='text-sm font-medium text-blue-800'>
-                  {userProfileData?.profile?.employment_type?.[0]}
-                </span>
-              </div>
-              <div className='inline-flex items-center justify-center bg-blue-100 rounded-lg px-3 py-1'>
-                <span className='text-sm font-medium text-blue-800'>
-                  {userProfileData?.profile?.position?.[0]}
-                </span>
-              </div>
+              {userProfileData?.profile?.position ||
+              userProfileData?.profile?.employment_type ? (
+                <div className='inline-flex items-center justify-center  rounded-lg px-3 py-1'>
+                  <SearchIcon className='w-5 h-5 stroke-blue-600' />
+                </div>
+              ) : null}
+              {userProfileData?.profile?.employment_type ? (
+                <div className='inline-flex items-center justify-center bg-blue-100 rounded-lg px-3 py-1'>
+                  <span className='text-sm font-medium text-blue-800'>
+                    {userProfileData?.profile?.employment_type?.[0]}
+                  </span>
+                </div>
+              ) : null}
+              {userProfileData?.profile?.position ? (
+                <div className='inline-flex items-center justify-center bg-blue-100 rounded-lg px-3 py-1'>
+                  <span className='text-sm font-medium text-blue-800'>
+                    {userProfileData?.profile?.position?.[0]}
+                  </span>
+                </div>
+              ) : null}
             </div>
           </div>
           <div className='flex justify-center gap-2 mt-8 max-w-[343px] mx-auto'>
