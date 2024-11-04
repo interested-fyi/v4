@@ -117,3 +117,17 @@ export async function fetchGitHubActivity(username: string) {
   if (!response.ok) throw new Error("Failed to fetch activity");
   return response.json();
 }
+
+export async function fetchEthAddresses(fids: number[]) {
+  const response = await fetch(
+    `/api/farcaster/get-connected-eth-wallets?fid=${fids.join(",")}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  if (!response.ok) throw new Error("Failed to fetch eth addresses");
+  return response.json();
+}

@@ -10,6 +10,7 @@ import QueryProvider from "@/context/QueryProvider";
 import dynamic from "next/dynamic";
 import { PHProvider } from "@/context/PostHogProvider";
 import { Footer } from "@/components/footer";
+import { Web3Provider } from "../context/WagmiProvider";
 
 const PostHogPageView = dynamic(() => import("../components/PostHogPageView"), {
   ssr: false,
@@ -47,15 +48,17 @@ export default function RootLayout({
             fontBody.variable
           )}
         >
-          <PrivyProviderWrapper>
-            <QueryProvider>
-              <Navbar />
-              <PostHogPageView />
-              {children}
-              <Toaster />
-              <Footer />
-            </QueryProvider>
-          </PrivyProviderWrapper>
+          <Web3Provider>
+            <PrivyProviderWrapper>
+              <QueryProvider>
+                <Navbar />
+                <PostHogPageView />
+                {children}
+                <Toaster />
+                <Footer />
+              </QueryProvider>
+            </PrivyProviderWrapper>
+          </Web3Provider>
         </body>
       </PHProvider>
     </html>

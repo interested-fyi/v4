@@ -7,10 +7,10 @@ import { usePrivy } from "@privy-io/react-auth";
 import { UserCombinedProfile } from "@/types/return_types";
 import { useParams } from "next/navigation";
 import EndorseDialog from "@/components/composed/dialog/EndorseDialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SearchIcon } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { fetchUserProfile } from "@/lib/api/helpers";
+import { fetchEthAddresses, fetchUserProfile } from "@/lib/api/helpers";
 import SwitchButtonGroup from "@/components/composed/buttons/SwitchButtonGroup";
 import ProfileSkeleton from "@/components/composed/profile/ProfileSkeleton";
 import SocialLinks from "@/components/composed/profile/SocialLinks";
@@ -24,6 +24,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SOCIALFEED } from "@/types/feeds";
+import { getEnsName } from "@wagmi/core";
+import { wagmiConfig } from "@/lib/wagmiClient";
+import {
+  EthAddress,
+  EthAddresses,
+} from "@/components/composed/profile/EthAddresses";
+
 enum TAB {
   ACTIVITY,
   ENDORSEMENT,
@@ -35,6 +42,7 @@ export default function ProfilePage() {
   const [activityFeed, setActivityFeed] = useState<SOCIALFEED>(
     SOCIALFEED.FARCASTER
   );
+  const [addressData, setAddressData] = useState<EthAddress[] | null>(null);
 
   const { user } = usePrivy();
   const params = useParams();
@@ -46,6 +54,42 @@ export default function ProfilePage() {
     queryKey: ["user", privyDid.replace("did:privy:", "")],
     queryFn: async () => fetchUserProfile({ userId: privyDid }),
   });
+
+  const { data: ethAddresses, isLoading: ethAddressesLoading } = useQuery({
+    enabled: !!userProfileData?.profile.farcaster_fid,
+    queryKey: ["ethAddresses", privyDid.replace("did:privy:", "")],
+    queryFn: async () => {
+      if (userProfileData?.profile.farcaster_fid)
+        return fetchEthAddresses([userProfileData?.profile.farcaster_fid]);
+    },
+  });
+
+  useEffect(() => {
+    if (ethAddresses?.[0]?.ethAddresses.length > 0) {
+      // Create an async function to fetch ENS names
+      const fetchEnsNames = async () => {
+        try {
+          const ensData = (await Promise.all(
+            ethAddresses[0].ethAddresses.map(async (address: `0x${string}`) => {
+              try {
+                const ensName = await getEnsName(wagmiConfig, { address });
+                return { address, ensName };
+              } catch (err) {
+                console.error("Error fetching ENS name:", err);
+                return { address, ensName: null };
+              }
+            })
+          )) as EthAddress[];
+
+          setAddressData(ensData);
+        } catch (error) {
+          console.error("Error in fetching ENS names:", error);
+        }
+      };
+
+      fetchEnsNames();
+    }
+  }, [ethAddresses, wagmiConfig]);
 
   const handleCopyToClipboard = async () => {
     if (navigator.clipboard) {
@@ -192,6 +236,7 @@ export default function ProfilePage() {
               />
             )}
           </div>
+
           {/* <div className='w-full flex justify-center mt-4'>
             <div className='w-[343px] h-[34px] relative'>
               <div className='w-[343px] h-[34px] pl-3 pr-[11px] py-2 left-0 top-1 absolute opacity-40 bg-white rounded-lg border border-gray-700 blur-[3px] justify-center items-center gap-2 inline-flex'>
@@ -209,6 +254,7 @@ export default function ProfilePage() {
             </div>
           </div> */}
           <SocialLinks connectedSocials={connectedSocials} />
+          {addressData ? <EthAddresses addresses={addressData} /> : null}
           <div className='mt-8'>
             <SwitchButtonGroup
               buttons={[
