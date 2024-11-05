@@ -1,59 +1,79 @@
 import { NextRequest, NextResponse } from "next/server";
 import supabase from "@/lib/supabase";
 
-export async function GET(req: NextRequest, res: NextResponse) {
+interface UserProfile {
+  privy_did: string;
+  available: boolean;
+  position: string[];
+  [key: string]: any;
+}
+
+interface FetchTalentResponse {
+  success: boolean;
+  users: (UserProfile & { attestation_count: number })[];
+  totalUsers: number;
+  currentPage: number;
+  totalPages: number;
+}
+
+export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
     const url = new URL(req.url);
-    const page = parseInt(url.searchParams.get("page") || "1");
-    const limit = parseInt(url.searchParams.get("limit") || "10");
-    const filter = url.searchParams.get("filter"); // position filter
+    const page = parseInt(url.searchParams.get("page") || "1", 10);
+    const limit = parseInt(url.searchParams.get("limit") || "10", 10);
+    const filter = url.searchParams.get("filter") || "";
 
     const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
+    const endIndex = page * limit - 1;
 
-    // Build the query
     let query = supabase
       .from("user_profile_combined")
       .select("*")
       .eq("available", true)
-      .range(startIndex, endIndex - 1);
+      .order("privy_did", { ascending: true }) // Ensure consistent ordering
+      .range(startIndex, endIndex);
 
-    // Apply the filter if provided
     if (filter) {
-      query = query.contains("position", [filter]); // Checks if the position array contains the filter string
+      query = query.contains("position", [filter]);
     }
 
-    // Fetch users
     const { data: userData, error: userError } = await query;
 
-    if (userError) {
-      throw new Error(`Error fetching user data: ${userError.message}`);
+    if (userError || !userData) {
+      throw new Error(`Error fetching user data: ${userError?.message}`);
     }
 
-    // Fetch attestation count for each user
-    const usersWithAttestations = await Promise.all(
-      userData.map(async (user) => {
-        const { count: attestationCount, error: attestationError } =
-          await supabase
-            .from("attestations")
-            .select("*", { count: "exact" })
-            .eq("recipient", user.privy_did);
+    // Batch query for attestation counts
+    const { data: attestations, error: attestationsError } = await supabase
+      .from("attestations")
+      .select("recipient")
+      .in(
+        "recipient",
+        userData.map((user) => user.privy_did)
+      );
 
-        if (attestationError) {
-          throw new Error(
-            `Error fetching attestation count: ${attestationError.message}`
-          );
-        }
+    if (attestationsError) {
+      throw new Error(
+        `Error fetching attestation counts: ${attestationsError.message}`
+      );
+    }
 
-        return {
-          ...user,
-          attestation_count: attestationCount || 0, // Add the count of attestations
-          nextCursor: page + 1,
-        };
-      })
-    );
+    // Create a count map for attestations
+    const attestationCountMap = new Map<string, number>();
+    attestations?.forEach((attestation) => {
+      const recipient = attestation.recipient;
+      attestationCountMap.set(
+        recipient,
+        (attestationCountMap.get(recipient) || 0) + 1
+      );
+    });
 
-    // Count the total number of available users
+    // Map attestation counts back to user data
+    const usersWithAttestations = userData.map((user) => ({
+      ...user,
+      attestation_count: attestationCountMap.get(user.privy_did) || 0,
+    }));
+
     const { count: totalUsers, error: countError } = await supabase
       .from("user_profile_combined")
       .select("privy_did", { count: "exact" })
@@ -63,18 +83,17 @@ export async function GET(req: NextRequest, res: NextResponse) {
       throw new Error(`Error counting users: ${countError.message}`);
     }
 
-    // Return paginated users with metadata
-    return NextResponse.json(
-      {
-        success: true,
-        users: usersWithAttestations,
-        totalUsers,
-        currentPage: page,
-        totalPages: totalUsers ? Math.ceil(totalUsers / limit) : 0,
-      },
-      { status: 200 }
-    );
+    return NextResponse.json<FetchTalentResponse>({
+      success: true,
+      users: usersWithAttestations,
+      totalUsers: totalUsers || 0,
+      currentPage: page,
+      totalPages: totalUsers ? Math.ceil(totalUsers / limit) : 0,
+    });
   } catch (e) {
-    return NextResponse.json(`Error Fetching Users: ${e}`, { status: 401 });
+    return NextResponse.json(
+      { error: `Error Fetching Users: ${e}` },
+      { status: 500 }
+    );
   }
 }

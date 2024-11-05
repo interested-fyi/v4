@@ -23,7 +23,7 @@ export default function ExploreTalentPage() {
     initialPageParam: 1,
     queryFn: ({ pageParam = 1 }) =>
       fetchTalent({ filter, limit, page: pageParam }),
-    getNextPageParam: (lastPage, pages) => {
+    getNextPageParam: (lastPage) => {
       return lastPage.currentPage < lastPage.totalPages
         ? lastPage.currentPage + 1
         : undefined;
