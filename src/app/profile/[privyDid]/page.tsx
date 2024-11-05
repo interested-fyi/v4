@@ -30,6 +30,7 @@ import {
   EthAddress,
   EthAddresses,
 } from "@/components/composed/profile/EthAddresses";
+import POAPDisplay from "@/components/composed/profile/POAPDisplay";
 
 enum TAB {
   ACTIVITY,
@@ -254,7 +255,12 @@ export default function ProfilePage() {
             </div>
           </div> */}
           <SocialLinks connectedSocials={connectedSocials} />
+
           {addressData ? <EthAddresses addresses={addressData} /> : null}
+          {addressData?.[0].address ? (
+            <POAPDisplay address={addressData?.[0].address ?? ""} />
+          ) : null}
+
           <div className='mt-8'>
             <SwitchButtonGroup
               buttons={[

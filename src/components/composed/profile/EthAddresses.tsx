@@ -29,7 +29,7 @@ export function EthAddresses({ addresses }: { addresses: EthAddress[] }) {
   };
 
   return (
-    <Card className='mt-6 max-w-[343px] mx-auto'>
+    <Card className='mt-6 max-w-[343px]  w-full mx-auto'>
       <CardContent className='p-4'>
         <div className='space-y-2'>
           {addresses.map((item, index) => (
