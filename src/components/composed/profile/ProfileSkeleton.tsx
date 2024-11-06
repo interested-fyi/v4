@@ -6,9 +6,9 @@ export default function ProfileSkeleton() {
   return (
     <div className='flex flex-col items-center justify-start min-h-screen bg-[#2640eb] text-white p-4 md:p-8'>
       {/* Outer container with the background header */}
-      <div className='relative w-full min-w-6xl bg-[#e1effe] rounded-lg overflow-hidden'>
+      <div className='relative w-full min-w-6xl rounded-lg overflow-hidden bg-[#2640eb]'>
         {/* Profile container */}
-        <div className='min-h-screen bg-[#2640eb] flex items-center justify-center p-4'>
+        <div className='min-h-screen bg-[#2640eb] flex items-center justify-center p-0 mt-16'>
           <div className='bg-[#e1effe]  shadow-lg w-full max-w-5xl p-6 relative'>
             {/* Profile image skeleton */}
             <div className='absolute -top-20 left-1/2 transform -translate-x-1/2 border-white border-4 rounded-full'>
