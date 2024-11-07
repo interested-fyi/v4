@@ -31,6 +31,7 @@ import {
   EthAddresses,
 } from "@/components/composed/profile/EthAddresses";
 import POAPDisplay from "@/components/composed/profile/POAPDisplay";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 enum TAB {
   ACTIVITY,
@@ -257,8 +258,8 @@ export default function ProfilePage() {
           </div> */}
           <SocialLinks connectedSocials={connectedSocials} />
         </div>
-        <div className='w-full flex flex-col md:items-center md:justify-center md:gap-4 md:mt-4 px-2'>
-          <div className='mt-8'>
+        <div className='w-full flex flex-col md:items-center md:justify-start md:gap-4 md:mt-4 px-2'>
+          {/* <div className='mt-8'>
             <SwitchButtonGroup
               buttons={[
                 {
@@ -311,7 +312,6 @@ export default function ProfilePage() {
                       />
                     </SelectTrigger>
                     <SelectContent className='text-body text-black'>
-                      {/* display github and X as options is github and twitter are connected as socials */}
                       {userProfileData?.profile?.github_username && (
                         <SelectItem
                           className='text-black'
@@ -337,7 +337,79 @@ export default function ProfilePage() {
                 />
               </>
             ) : null}
-          </div>
+          </div> */}
+          <Tabs defaultValue='activity' className='w-full '>
+            <TabsList className='h-14 sm:h-10 my-2 md:my-0'>
+              <TabsTrigger className='h-12 sm:h-8' value='activity'>
+                activity
+              </TabsTrigger>
+              <TabsTrigger className='h-12 sm:h-8' value='onchain'>
+                onchain
+              </TabsTrigger>
+              <TabsTrigger className='h-12 sm:h-8' value='endorsements'>
+                endorsements
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent
+              className='pb-4 h-full min-h-96 place-self-start w-full'
+              value='activity'
+            >
+              <>
+                {userProfileData?.profile?.farcaster_name ||
+                userProfileData?.profile?.github_username ? (
+                  <Select
+                    onValueChange={(value) =>
+                      setActivityFeed(value as SOCIALFEED)
+                    }
+                  >
+                    <SelectTrigger className='w-[180px] mb-2 text-black placeholder:text-gray-700'>
+                      <SelectValue
+                        className='text-black placeholder:text-black'
+                        placeholder='Select a feed'
+                      />
+                    </SelectTrigger>
+                    <SelectContent className='text-body text-black'>
+                      {userProfileData?.profile?.github_username && (
+                        <SelectItem
+                          className='text-black'
+                          value={SOCIALFEED.GITHUB}
+                        >
+                          Github
+                        </SelectItem>
+                      )}
+                      {userProfileData?.profile?.farcaster_name && (
+                        <SelectItem
+                          className='text-black'
+                          value={SOCIALFEED.FARCASTER}
+                        >
+                          Farcaster
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                ) : null}
+                <ActivityTab
+                  userProfileData={userProfileData}
+                  activeFeed={activityFeed}
+                />
+              </>
+            </TabsContent>
+            <TabsContent
+              className='pb-4 h-full min-h-96 place-self-start w-full'
+              value='onchain'
+            >
+              <POAPDisplay address={addressData?.[0].address ?? ""} />
+            </TabsContent>
+            <TabsContent
+              className='pb-4 h-full min-h-96 place-self-start w-full'
+              value='endorsements'
+            >
+              <EndorementsTab
+                userProfileData={userProfileData}
+                privyDid={privyDid}
+              />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

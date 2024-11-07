@@ -48,7 +48,7 @@ export default function POAPDisplay({ address }: { address: string }) {
   }
 
   return (
-    <Card className='mt-4 overflow-hidden max-w-[343px] max-h-[343px] overflow-y-scroll mx-auto '>
+    <Card className='mt-4 overflow-hidden w-full h-full overflow-y-scroll mx-auto '>
       <CardContent className='p-2 sm:p-3'>
         {isLoading ? (
           <div className='grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2'>
@@ -57,12 +57,12 @@ export default function POAPDisplay({ address }: { address: string }) {
             ))}
           </div>
         ) : poaps && poaps.length > 0 ? (
-          <div className='grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2'>
+          <div className='grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 space-y-4'>
             {poaps.map((poap) => (
               <TooltipProvider key={poap.id}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className='relative w-12 h-12 rounded-full overflow-hidden'>
+                    <div className='relative w-12 h-12 rounded-full overflow-hidden place-self-center'>
                       <Image
                         src={poap.event.image_url}
                         alt={poap.event.name}
