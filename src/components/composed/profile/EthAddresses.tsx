@@ -1,14 +1,19 @@
 "use client";
 
-import { Copy, ExternalLink } from "lucide-react";
+import { ChevronDown, Copy, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { useState } from "react";
 
 export interface EthAddress {
   address: string;
@@ -16,6 +21,7 @@ export interface EthAddress {
 }
 
 export function EthAddresses({ addresses }: { addresses: EthAddress[] }) {
+  const [isOpen, setIsOpen] = useState(false);
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -28,69 +34,88 @@ export function EthAddresses({ addresses }: { addresses: EthAddress[] }) {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
+  const AddressRow = ({ address, ensName }: EthAddress) => (
+    <div className='flex items-center justify-between rounded-lg bg-white p-2 py-1 shadow-sm md:w-full'>
+      <span
+        className={
+          ensName ? "text-blue-600 font-body" : "text-black font-mono text-sm"
+        }
+      >
+        {ensName || truncateAddress(address)}
+      </span>
+      <div className='flex gap-2'>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='h-8 w-8 text-black'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  copyToClipboard(address);
+                }}
+              >
+                <Copy className='h-4 w-4' />
+                <span className='sr-only'>Copy address</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Copy address</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='h-8 w-8 text-black'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(
+                    `https://etherscan.io/address/${address}`,
+                    "_blank"
+                  );
+                }}
+              >
+                <ExternalLink className='h-4 w-4' />
+                <span className='sr-only'>View on Etherscan</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>View on Etherscan</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+    </div>
+  );
+
+  if (!addresses || addresses.length === 0) {
+    return null;
+  }
+
   return (
-    <Card className='mt-6 max-w-[343px]  w-full mx-auto'>
-      <CardContent className='p-4'>
-        <div className='space-y-2'>
-          {addresses.map((item, index) => (
-            <div
-              key={index}
-              className='flex items-center justify-between rounded-lg border p-3 py-1 shadow-sm'
-            >
-              <div className='space-y-1'>
-                <p className='text-sm font-medium'>
-                  {item.ensName ? (
-                    <span className='text-blue-600 dark:text-blue-400'>
-                      {item.ensName}
-                    </span>
-                  ) : (
-                    truncateAddress(item.address)
-                  )}
-                </p>
-              </div>
-              <div className='flex gap-2'>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant='ghost'
-                        size='icon'
-                        className='h-8 w-8'
-                        onClick={() => copyToClipboard(item.address)}
-                      >
-                        <Copy className='h-4 w-4' />
-                        <span className='sr-only'>Copy address</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Copy address</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant='ghost'
-                        size='icon'
-                        className='h-8 w-8'
-                        onClick={() =>
-                          window.open(
-                            `https://etherscan.io/address/${item.address}`,
-                            "_blank"
-                          )
-                        }
-                      >
-                        <ExternalLink className='h-4 w-4' />
-                        <span className='sr-only'>View on Etherscan</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>View on Etherscan</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            </div>
-          ))}
+    <Collapsible
+      open={isOpen}
+      onOpenChange={setIsOpen}
+      className='md:w-full w-fit mx-auto'
+    >
+      <CollapsibleTrigger className='md:w-full'>
+        <div className='flex items-center justify-between md:w-full'>
+          <AddressRow {...addresses[0]} />
+          <ChevronDown
+            className={`h-6 w-6 ml-2 transition-transform stroke-black ${
+              isOpen ? "rotate-180" : ""
+            }`}
+          />
         </div>
-      </CardContent>
-    </Card>
+      </CollapsibleTrigger>
+      {addresses.length > 1 && (
+        <CollapsibleContent className='space-y-2 pt-2'>
+          {addresses.slice(1).map((address, index) => (
+            <AddressRow key={index} {...address} />
+          ))}
+        </CollapsibleContent>
+      )}
+    </Collapsible>
   );
 }

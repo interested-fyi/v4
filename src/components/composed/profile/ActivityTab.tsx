@@ -13,6 +13,7 @@ import ActivityCard from "./ActivityCard";
 import { EmptyActivityFeedComponent } from "./EmptyActivityFeed";
 import GitHubActivityCard from "./GithubActivityCard";
 import { SOCIALFEED } from "@/types/feeds";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ActivityTab({
   userProfileData,
@@ -47,7 +48,26 @@ export default function ActivityTab({
   });
 
   if (warpcastActivityLoading) {
-    return <Loader className='w-full animate-spin mt-6 text-blue-700' />;
+    return (
+      <div className='w-full flex flex-col min-h-96 items-center justify-center px-2'>
+        {[1, 2, 3].map((endorsement) => (
+          <div
+            key={endorsement}
+            className='w-full bg-gray-50 rounded-lg p-4 mb-4'
+          >
+            <div className='flex items-center mb-2'>
+              <Skeleton className='w-12 h-12 rounded-full mr-4' />
+              <div>
+                <Skeleton className='h-4 w-24 mb-2' />
+                <Skeleton className='h-3 w-32' />
+              </div>
+            </div>
+            <Skeleton className='h-4 w-full mb-2' />
+            <Skeleton className='h-4 w-full' />
+          </div>
+        ))}
+      </div>
+    );
   }
 
   if (warpCastError) {

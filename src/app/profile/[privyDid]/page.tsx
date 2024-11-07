@@ -155,10 +155,10 @@ export default function ProfilePage() {
 
   return (
     <div className='flex flex-col items-center min-h-screen bg-[#2640eb] text-white p-4 pt-0 px-0 md:p-8'>
-      <div className='relative w-full max-w-5xl bg-white overflow-hidden'>
+      <div className='relative flex md:flex-row flex-col w-full max-w-5xl bg-white overflow-hidden'>
         <div className='bg-[#2640eb] h-[135px]'></div>
-        <div className='relative px-4 pb-4 bg-[#e1effe]'>
-          <Avatar className='w-[140px] h-[140px] border-4 border-white rounded-full absolute -top-[100px] left-1/2 transform -translate-x-1/2'>
+        <div className='relative px-4 pb-4 md:pt-4 bg-[#e1effe]'>
+          <Avatar className='w-[140px] h-[140px] border-4 border-white rounded-full absolute -top-[100px] md:relative md:top-0 left-1/2 transform -translate-x-1/2'>
             <AvatarImage
               src={userProfileData?.profile?.photo_source ?? ""}
               alt='Profile picture'
@@ -168,10 +168,11 @@ export default function ProfilePage() {
                 user?.google?.name?.slice(0, 2)}
             </AvatarFallback>
           </Avatar>
-          <div className='pt-16 flex flex-col gap-2 text-center max-w-[343px] mx-auto'>
+          <div className='pt-16 md:pt-2 flex flex-col gap-2 text-center max-w-[343px] mx-auto'>
             <h1 className='text-[#2640eb] text-xl font-semibold font-body leading-[30px]'>
               {userProfileData?.profile?.name ?? "Chester LaCroix"}
             </h1>
+            {addressData ? <EthAddresses addresses={addressData} /> : null}
             <p className='text-gray-700 text-sm font-semibold font-body leading-[21px]'>
               {userProfileData?.profile?.bio ??
                 "Short bio here? Do we have this in the profile editing flow somewhere - yes we do"}
@@ -255,12 +256,8 @@ export default function ProfilePage() {
             </div>
           </div> */}
           <SocialLinks connectedSocials={connectedSocials} />
-
-          {addressData ? <EthAddresses addresses={addressData} /> : null}
-          {addressData?.[0].address ? (
-            <POAPDisplay address={addressData?.[0].address ?? ""} />
-          ) : null}
-
+        </div>
+        <div className='w-full flex flex-col md:items-center md:justify-center md:gap-4 md:mt-4 px-2'>
           <div className='mt-8'>
             <SwitchButtonGroup
               buttons={[
@@ -288,7 +285,7 @@ export default function ProfilePage() {
               }}
             />
           </div>
-          <div>
+          <div className='w-full flex flex-col'>
             <h2 className='text-gray-600 text-xl font-bold font-body text-center mt-7 mb-6'>
               {activeTab === TAB.ACTIVITY ? "Activity" : "Endorsements"}
             </h2>
