@@ -212,7 +212,7 @@ export const ProfileSettings = ({
         {
           <Button
             variant='link'
-            className='w-full mt-0 text-blue-700'
+            className='w-full my-0 py-0 text-blue-700'
             onClick={() => {
               setAddPosition(true);
             }}
@@ -265,7 +265,7 @@ export const ProfileSettings = ({
         {
           <Button
             variant='link'
-            className='w-full mt-0 text-blue-700'
+            className='w-full my-0 py-0 text-blue-700'
             onClick={() => {
               setAddEmploymentType(true);
             }}

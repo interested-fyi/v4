@@ -459,7 +459,7 @@ export const ProfileConnections = ({
         linkedAccounts?.length > 0 && (
           <Button
             variant='link'
-            className='w-full mt-2 text-blue-700'
+            className='w-full mt-0 pt-0 text-blue-700'
             onClick={() => {
               setAddProfile(true);
               setSelectedProfile(null);

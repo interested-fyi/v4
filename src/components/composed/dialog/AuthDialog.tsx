@@ -2,7 +2,6 @@
 
 import React from "react";
 import { ProfileEditForm } from "../profile/ProfileEdit";
-import { ProfileSettings } from "../profile/ProfileSettings";
 import {
   Dialog,
   DialogContent,
@@ -10,7 +9,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { usePrivy } from "@privy-io/react-auth";
-import { useState } from "react";
 import { LoaderIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import * as dotenv from "dotenv";
@@ -24,15 +22,6 @@ export default function AuthDialog({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const [tempPhotoUrl, setTempPhotoUrl] = useState<string | null>(null);
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    bio: "",
-    bestProfile: "",
-  });
-  const [step, setStep] = useState(0);
-
   const { user, getAccessToken } = usePrivy();
 
   const {
@@ -77,7 +66,7 @@ export default function AuthDialog({
       },
       body: JSON.stringify({
         name: formToSubmit.name,
-        photo_source: tempPhotoUrl,
+        photo_source: formToSubmit.tempPhotoUrl,
         available: formToSubmit.isAvailable,
         preferred_profile: formToSubmit.bestProfile,
         bio: formToSubmit.bio,
@@ -103,71 +92,46 @@ export default function AuthDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      {step === 0 ? (
-        <DialogContent className='sm:max-w-[425px] h-full bg-[#e1effe] font-body m-auto py-8 overflow-scroll'>
-          <DialogHeader className='flex flex-col gap-3'>
-            <DialogTitle className='text-2xl font-bold font-heading text-center mt-4'>
-              COMPLETE YOUR PROFILE
-            </DialogTitle>
-            <div
-              className='
+      <DialogContent className='sm:max-w-[425px] h-full bg-[#e1effe] font-body m-auto py-8 overflow-scroll'>
+        <DialogHeader className='flex flex-col gap-3'>
+          <DialogTitle className='text-2xl font-bold font-heading text-center mt-4'>
+            COMPLETE YOUR PROFILE
+          </DialogTitle>
+          <div
+            className='
           text-gray-700 text-sm font-semibold font-body leading-[21px] text-center'
-            >
-              We ask that you please confirm your identity by connecting at
-              least one social authenticator.
-            </div>
-          </DialogHeader>
-          {(!userProfileData && !userProfileError) || userProfileLoading ? (
-            <>
-              <LoaderIcon className='w-10 h-10 m-auto animate-spin' />
-            </>
-          ) : (
-            <ProfileEditForm
-              onSubmit={(formDetails: {
-                name: string;
-                email: string;
-                bio: string;
-                bestProfile: string;
-                tempPhotoUrl: string | null;
-              }) => {
-                setForm({
-                  ...form,
-                  name: formDetails.name,
-                  email: formDetails.email,
-                  bio: formDetails.bio,
-                  bestProfile: formDetails.bestProfile,
-                });
-                setTempPhotoUrl(formDetails.tempPhotoUrl);
-                setStep(1);
-              }}
-            />
-          )}
-        </DialogContent>
-      ) : (
-        <DialogContent className='sm:max-w-[425px] h-full bg-[#e1effe] font-body m-auto py-8 overflow-scroll'>
-          <DialogHeader className='flex flex-col gap-3'>
-            <DialogTitle className='text-2xl font-bold font-heading text-center mt-4'>
-              PROFILE COMPLETE
-            </DialogTitle>
-            <div className='text-center text-gray-700 text-sm font-semibold font-body leading-[21px]'>
-              Thanks for using Interested.FYI! You can edit and add more to your
-              profile later. Next, lets get you on the path to finding work that
-              interests you.
-            </div>
-            <ProfileSettings
-              onSubmit={async (formDetails) => {
-                await handleSubmitForm({
-                  ...form,
-                  ...formDetails,
-                });
-                await refetchUserProfile();
-              }}
-              onClose={() => onClose()}
-              isSettingsMode={false}
-            />
-          </DialogHeader>
-        </DialogContent>
-      )}
+          >
+            We ask that you please confirm your identity by connecting at least
+            one social authenticator.
+          </div>
+        </DialogHeader>
+        {(!userProfileData && !userProfileError) || userProfileLoading ? (
+          <>
+            <LoaderIcon className='w-10 h-10 m-auto animate-spin' />
+          </>
+        ) : (
+          <ProfileEditForm
+            onSubmit={async (formDetails: {
+              name: string;
+              email: string;
+              bio: string;
+              bestProfile: string;
+              tempPhotoUrl: string | null;
+              isAvailable: boolean;
+              calendar: string;
+              fee: string;
+              bookingDescription: string;
+              position: string[];
+              employmentType: string[];
+            }) => {
+              await handleSubmitForm({
+                ...formDetails,
+              });
+              await refetchUserProfile();
+            }}
+          />
+        )}
+      </DialogContent>
     </Dialog>
   );
 }

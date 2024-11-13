@@ -19,13 +19,12 @@ import {
 import { usePrivy, User } from "@privy-io/react-auth";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ProfileEditForm } from "../profile/ProfileEdit";
 import { LoaderIcon } from "lucide-react";
 import { UserCombinedProfile } from "@/types/return_types";
 import { fetchUserProfile } from "@/lib/api/helpers";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ProfileSettings } from "../profile/ProfileSettings";
 
 interface AuthedNavProps {
   user: User | null;
@@ -73,7 +72,6 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const [dialogMode, setDialogMode] = useState<"edit" | "settings">("edit");
 
   const {
     data: userProfileData,
@@ -108,6 +106,13 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
     email: string;
     bio: string;
     bestProfile: string;
+    calendar: string;
+    fee: string;
+    bookingDescription: string;
+    isAvailable: boolean;
+    position: string[];
+    employmentType: string[];
+    tempPhotoUrl: string | null;
   }) => {
     const accessToken = await getAccessToken();
     const formToSubmit = Object.fromEntries(
@@ -128,7 +133,6 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
         ? user?.linkedAccounts.find((account) => account.type === "telegram")
             ?.photoUrl
         : null;
-    console.log("🚀 ~ AvatarMenu ~ image:", image);
 
     const res = await fetch(`/api/users/save-user-profile`, {
       method: "POST",
@@ -142,54 +146,17 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
         photo_source: image ?? userProfileData?.profile?.photo_source,
         preferred_profile: formToSubmit.bestProfile,
         bio: formToSubmit.bio,
-        privy_did: user?.id,
-        smart_wallet_address: user?.smartWallet?.address,
-      }),
-    });
-    const resData = await res.json();
-
-    return resData as {
-      success: boolean;
-      profile: any;
-      schema_success: false;
-    };
-  };
-
-  const handleSubmitForm = async (form: {
-    calendar: string;
-    fee: string;
-    bookingDescription: string;
-    isAvailable: boolean;
-    position: string[];
-    employmentType: string[];
-  }) => {
-    const accessToken = await getAccessToken();
-    const formToSubmit = Object.fromEntries(
-      Object.entries(form).map(([key, value]) => [
-        key,
-        value === "" ? null : value,
-      ])
-    );
-    const res = await fetch(`/api/users/save-user-profile`, {
-      method: "POST",
-      cache: "no-store",
-      headers: {
-        "Content-type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({
         calendly_link: formToSubmit.calendar,
         unlock_calendar_fee: formToSubmit.fee,
         booking_description: formToSubmit.bookingDescription,
         available: formToSubmit.isAvailable,
         position: formToSubmit.position,
-        employment_type: typeof formToSubmit.employmentType === 'string' ? [formToSubmit.employmentType] : formToSubmit.employmentType,
+        employment_type:
+          typeof formToSubmit.employmentType === "string"
+            ? [formToSubmit.employmentType]
+            : formToSubmit.employmentType,
         privy_did: user?.id,
-        name: userProfileData?.profile?.name,
-        photo_source: userProfileData?.profile?.photo_source,
-        preferred_profile: userProfileData?.profile?.preferred_profile,
-        bio: userProfileData?.profile?.bio,
-        smart_wallet_address: userProfileData?.profile?.smart_wallet_address,
+        smart_wallet_address: user?.smartWallet?.address,
       }),
     });
     const resData = await res.json();
@@ -228,16 +195,12 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
               View profile
             </Link>
           </DropdownMenuItem>
-          <DialogTrigger asChild onClick={() => setDialogMode("edit")}>
+          <DialogTrigger asChild>
             <DropdownMenuItem className='text-gray-500 text-sm font-medium font-body leading-[21px]'>
               Edit profile
             </DropdownMenuItem>
           </DialogTrigger>
-          <DialogTrigger asChild onClick={() => setDialogMode("settings")}>
-            <DropdownMenuItem className='text-gray-500 text-sm font-medium font-body leading-[21px]'>
-              Settings
-            </DropdownMenuItem>
-          </DialogTrigger>
+
           <DropdownMenuSeparator />
           <DropdownMenuItem>
             <Button
@@ -250,64 +213,46 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      {dialogMode === "edit" ? (
-        <DialogContent className='sm:max-w-[425px] h-full bg-[#e1effe] font-body w-full py-8 overflow-scroll'>
-          <DialogHeader className='flex flex-col gap-3'>
-            <DialogTitle className='text-2xl font-bold font-heading text-center mt-4'>
-              EDIT PROFILE
-            </DialogTitle>
-            <div
-              className='
+      <DialogContent className='sm:max-w-[425px] h-full bg-[#e1effe] font-body w-full py-8 overflow-scroll'>
+        <DialogHeader className='flex flex-col gap-3'>
+          <DialogTitle className='text-2xl font-bold font-heading text-center mt-4'>
+            EDIT PROFILE
+          </DialogTitle>
+          <div
+            className='
           text-gray-700 text-sm font-semibold font-body leading-[21px] text-center'
-            >
-              We ask that you please confirm your identity by connecting at
-              least one social authenticator.
-            </div>
-          </DialogHeader>
-          {(!userProfileData && !userProfileError) || userProfileDataLoading ? (
-            <>
-              <LoaderIcon className='w-10 h-10 m-auto animate-spin' />
-            </>
-          ) : (
-            <ProfileEditForm
-              onSubmit={async (formDetails: {
-                name: string;
-                email: string;
-                bio: string;
-                bestProfile: string;
-                tempPhotoUrl: string | null;
-              }) => {
-                await handleSubmitEditForm(formDetails);
-                setOpen(false);
-                await refetchUserProfile(); // Refresh the user profile after dialog is closed
-              }}
-              isEditMode
-            />
-          )}
-        </DialogContent>
-      ) : dialogMode === "settings" ? (
-        <DialogContent className='sm:max-w-[425px] h-full bg-[#e1effe] font-body w-full py-8 overflow-scroll'>
-          <DialogHeader className='flex flex-col gap-3'>
-            <DialogTitle className='text-2xl font-bold font-heading text-center mt-4'>
-              Settings
-            </DialogTitle>
-          </DialogHeader>
-          {(!userProfileData && !userProfileError) || userProfileDataLoading ? (
-            <>
-              <LoaderIcon className='w-10 h-10 m-auto animate-spin' />
-            </>
-          ) : (
-            <ProfileSettings
-              onSubmit={async (formDetails) => {
-                await handleSubmitForm(formDetails);
-                setOpen(false);
-              }}
-              onClose={() => setOpen(false)}
-              isSettingsMode
-            />
-          )}
-        </DialogContent>
-      ) : null}{" "}
+          >
+            We ask that you please confirm your identity by connecting at least
+            one social authenticator.
+          </div>
+        </DialogHeader>
+        {(!userProfileData && !userProfileError) || userProfileDataLoading ? (
+          <>
+            <LoaderIcon className='w-10 h-10 m-auto animate-spin' />
+          </>
+        ) : (
+          <ProfileEditForm
+            onSubmit={async (formDetails: {
+              name: string;
+              email: string;
+              bio: string;
+              bestProfile: string;
+              calendar: string;
+              fee: string;
+              bookingDescription: string;
+              isAvailable: boolean;
+              position: string[];
+              employmentType: string[];
+              tempPhotoUrl: string | null;
+            }) => {
+              await handleSubmitEditForm(formDetails);
+              setOpen(false);
+              await refetchUserProfile(); // Refresh the user profile after dialog is closed
+            }}
+            isEditMode
+          />
+        )}
+      </DialogContent>
     </Dialog>
   );
 };
