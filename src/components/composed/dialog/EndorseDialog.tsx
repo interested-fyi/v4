@@ -5,7 +5,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { UserCombinedProfile } from "@/types/return_types";
@@ -14,11 +13,18 @@ import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 import easAbi from "@ethereum-attestation-service/eas-contracts/deployments/optimism/EAS.json";
 import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import { optimism, optimismSepolia } from "viem/chains";
-import { Chain, createPublicClient, http } from "viem";
+import { Chain } from "viem";
 import { publicClient } from "@/lib/viemClient";
 import { useState } from "react";
 import { getEndorsementUid } from "@/functions/general/get-endorsement-uid";
 import { LoaderIcon } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function EndorseDialog({
   isOpen,
@@ -83,9 +89,7 @@ export default function EndorseDialog({
           account: client?.account,
         };
 
-        const { request, result } = await publicClient.simulateContract(
-          contractParams
-        );
+        const { request } = await publicClient.simulateContract(contractParams);
         const txHash = await client?.writeContract(request);
         const uid = await getEndorsementUid(txHash);
         // if result and txhash, exist, then schema is registered. need to save schemaUID and txHash to supabase
@@ -139,15 +143,29 @@ export default function EndorseDialog({
             <Label className='text-sm font-medium' htmlFor='name'>
               Your relationship to {user?.name}:
             </Label>
-            <Input
-              className='rounded-lg mt-2 w-full'
-              id='relationship'
-              defaultValue={form?.relationship ?? ""}
-              onChange={(e) =>
-                setForm({ ...form, relationship: e.target.value })
-              }
-              placeholder='Coworker'
-            />
+            <Select
+              onValueChange={(val) => {
+                setForm({ ...form, relationship: val as string });
+              }}
+              value={form.relationship ?? ""}
+            >
+              <SelectTrigger className='w-full'>
+                <SelectValue placeholder='Select your relation' />
+              </SelectTrigger>
+              <SelectContent className='relative z-50 px-2'>
+                <SelectItem value={"coworker"}>Coworker</SelectItem>
+                <SelectItem value={"client"}>
+                  Client/Service Provider
+                </SelectItem>
+                <SelectItem value={"builder"}>Builder/Teammate</SelectItem>
+                <SelectItem value={"investor"}>Investor</SelectItem>
+                <SelectItem value={"peer"}>Peer</SelectItem>
+                <SelectItem value={"sherpa"}>Sherpa</SelectItem>
+                <SelectItem value={"connector"}>Connector</SelectItem>
+                <SelectItem value={"politician"}>Politician</SelectItem>
+                <SelectItem value={"tastemaker"}>Tastemaker</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className='mt-4 w-full'>
             <Label className='text-sm font-medium' htmlFor='name'>
