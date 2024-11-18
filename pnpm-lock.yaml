@@ -179,6 +179,9 @@ importers:
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@20.16.1)(typescript@5.5.4)
+      twitter-api-v2:
+        specifier: ^1.18.2
+        version: 1.18.2
       uuid:
         specifier: ^10.0.0
         version: 10.0.0
@@ -7791,6 +7794,9 @@ packages:
 
   tweetnacl@1.0.3:
     resolution: {integrity: sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==}
+
+  twitter-api-v2@1.18.2:
+    resolution: {integrity: sha512-ggImmoAeVgETYqrWeZy+nWnDpwgTP+IvFEc03Pitt1HcgMX+Yw17rP38Fb5FFTinuyNvS07EPtAfZ184uIyB0A==}
 
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
@@ -18425,6 +18431,8 @@ snapshots:
   tweetnacl-util@0.15.1: {}
 
   tweetnacl@1.0.3: {}
+
+  twitter-api-v2@1.18.2: {}
 
   type-check@0.4.0:
     dependencies:
