@@ -6,6 +6,7 @@ import { generateProfileImage } from "@/lib/satori";
 import { InputFile } from "grammy";
 import sharp from "sharp";
 import bot from "@/lib/telegram-bot";
+import { sendTweet } from "@/lib/twitter";
 
 export async function GET(req: NextRequest) {
     if (req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -47,6 +48,10 @@ export async function GET(req: NextRequest) {
                 }
             )
 
+            const text = `👋 Meet ${typedTalent.name}!\n${secondLine.replace(/<b>/g, '').replace(/<\/b>/g, '')}${typedTalent.bio}\n\nView ${typedTalent.name}'s Profile:\n${process.env.NEXT_PUBLIC_BASE_URL}/profile/${typedTalent.privy_did?.replace('did:privy:', '')}`
+            // send to x
+            const tweet = await sendTweet(text, imageBuffer);
+
             //send  to farcaster
             const signerUUID = process.env.SIGNER_UUID ?? "";
             const url = "https://api.neynar.com/v2/farcaster/cast";
@@ -63,7 +68,7 @@ export async function GET(req: NextRequest) {
                 },
                 body: JSON.stringify({
                     signer_uuid: signerUUID,
-                    text: `👋 Meet ${typedTalent.name}!\n${secondLine.replace(/<b>/g, '').replace(/<\/b>/g, '')}${typedTalent.bio}\n\nView ${typedTalent.name}'s Profile:\n${process.env.NEXT_PUBLIC_BASE_URL}/profile/${typedTalent.privy_did?.replace('did:privy:', '')}`,
+                    text: text,
                     embeds: [
                         {
                             url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/farcaster/profile-image?${params.toString()}`
