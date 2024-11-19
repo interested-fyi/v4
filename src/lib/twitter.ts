@@ -1,13 +1,25 @@
 import { TwitterApi } from "twitter-api-v2";
+import dotenv from "dotenv";
+dotenv.config();
 
-const client = new TwitterApi({
-    appKey: process.env.TWITTER_API_KEY ?? "",
-    appSecret: process.env.TWITTER_API_SECRET ?? "",
-    accessToken: process.env.TWITTER_ACCESS_TOKEN ?? "",
-    accessSecret: process.env.TWITTER_ACCESS_SECRET ?? "",
-  });
+console.log('TWITTER_API_KEY: ', process.env.TWITTER_API_KEY);
+console.log('TWITTER_API_SECRET: ', process.env.TWITTER_API_SECRET);
+console.log('TWITTER_ACCESS_TOKEN: ', process.env.TWITTER_ACCESS_TOKEN);
+console.log('TWITTER_ACCESS_TOKEN_SECRET: ', process.env.TWITTER_ACCESS_TOKEN_SECRET);
 
-export default client;
+const client = new TwitterApi(
+    //process.env.TWITTER_BEARER_TOKEN ?? "",
+    {
+        // clientId: process.env.TWITTER_CLIENT_ID ?? "",
+        // clientSecret: process.env.TWITTER_CLIENT_SECRET ?? "",
+        appKey: process.env.TWITTER_API_KEY ?? "",
+        appSecret: process.env.TWITTER_API_SECRET ?? "",
+        accessToken: process.env.TWITTER_ACCESS_TOKEN ?? "",
+        accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET ?? "",
+    }
+);
+
+export default client.readWrite;
 
 export const sendTweet = async (text: string, image?: Buffer): Promise<{ success: boolean, tweetText: string, tweetId?: string, tweetUrl?: string, error?: any }> => {
     try {
@@ -20,7 +32,7 @@ export const sendTweet = async (text: string, image?: Buffer): Promise<{ success
         // mediaIds is a string[], can be given to .tweet
         const tweet = await client.v2.tweet({
             text: text,
-            media: { media_ids: mediaId ? [mediaId] : undefined }
+            media: mediaId ? { media_ids: [mediaId] } : undefined
         });
     
         console.log('tweet sent: ', tweet);
