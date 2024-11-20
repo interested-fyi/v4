@@ -70,7 +70,7 @@ export default function ActivityTab({
     );
   }
 
-  if (warpCastError) {
+  if (!warpcastActivity && !GitHubActivityCard && !isLoading) {
     return <EmptyActivityFeedComponent />;
   }
 
