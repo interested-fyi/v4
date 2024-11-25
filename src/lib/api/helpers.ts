@@ -131,3 +131,17 @@ export async function fetchEthAddresses(fids: number[]) {
   if (!response.ok) throw new Error("Failed to fetch eth addresses");
   return response.json();
 }
+
+export async function fetchXTimeline(username: string) {
+  const response = await fetch(
+    `/api/twitter/get-user-timeline?username=${username}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  if (!response.ok) throw new Error("Failed to fetch activity");
+  return response.json();
+}

@@ -7,6 +7,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { fetchUserProfile } from "@/lib/api/helpers";
+import Banner from "@/components/composed/popups/Banner";
 
 export default function Home() {
   const { user } = usePrivy();
@@ -14,11 +15,12 @@ export default function Home() {
   const { data: userProfileData, isLoading: userProfileLoading } = useQuery({
     enabled: !!user,
     queryKey: ["user", user?.id.replace("did:privy:", "")],
-    queryFn: async () => await fetchUserProfile({userId: user?.id}),
+    queryFn: async () => await fetchUserProfile({ userId: user?.id }),
   });
 
   return (
     <main className='flex  min-h-screen flex-col gap-0 items-center justify-start '>
+      <Banner />
       <section className='w-full max-w-full bg-[#2640EB] py-24 sm:p-8 p-2 md:p-24'>
         <div className='flex relative lg:flex-row flex-col w-full'>
           <div className='flex flex-col gap-8 relative z-10'>
@@ -63,7 +65,10 @@ export default function Home() {
         {
           <AuthDialog
             isOpen={
-              !dialogClosed && !!user && !userProfileData?.profile && !userProfileLoading
+              !dialogClosed &&
+              !!user &&
+              !userProfileData?.profile &&
+              !userProfileLoading
             }
             onClose={() => {
               setDialogClosed(true);

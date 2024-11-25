@@ -385,6 +385,11 @@ export default function ProfilePage() {
                           Farcaster
                         </SelectItem>
                       )}
+                      {userProfileData?.profile?.x_username && (
+                        <SelectItem className='text-black' value={SOCIALFEED.X}>
+                          X
+                        </SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 ) : null}
