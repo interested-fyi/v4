@@ -58,11 +58,11 @@ export default function ProfilePage() {
   });
 
   const { data: ethAddresses, isLoading: ethAddressesLoading } = useQuery({
-    enabled: !!userProfileData?.profile.farcaster_fid,
+    enabled: !!userProfileData?.profile?.farcaster_fid,
     queryKey: ["ethAddresses", privyDid.replace("did:privy:", "")],
     queryFn: async () => {
-      if (userProfileData?.profile.farcaster_fid)
-        return fetchEthAddresses([userProfileData?.profile.farcaster_fid]);
+      if (userProfileData?.profile?.farcaster_fid)
+        return fetchEthAddresses([userProfileData?.profile?.farcaster_fid]);
     },
   });
 
