@@ -1,9 +1,10 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { usePrivy } from "@privy-io/react-auth";
 import { UserCombinedProfile } from "@/types/return_types";
+
 import Image from "next/image";
+import TweetStats from "./TweetStats";
 
 export type Tweet = {
   id: string;
@@ -22,6 +23,13 @@ export type Tweet = {
       end: number;
       start: number;
     }[];
+  };
+  public_metrics: {
+    like_count: number;
+    retweet_count: number;
+    reply_count: number;
+    quote_count: number;
+    bookmark_count: number;
   };
 };
 
@@ -123,10 +131,16 @@ export default function TweetActivityCard({
           </div>
         </div>
 
-        <div className='w-full flex flex-col gap-0'>
+        <div className='w-full flex flex-col gap-2'>
           <p className='text-sm font-medium text-gray-800 mt-1'>
             {renderTweetText(tweet.text, tweet.entities)}
           </p>
+          <TweetStats
+            likeCount={tweet.public_metrics.like_count}
+            retweetCount={tweet.public_metrics.retweet_count}
+            bookmarkCount={tweet.public_metrics.bookmark_count}
+            commentCount={tweet.public_metrics.reply_count}
+          />
         </div>
       </div>
     </Card>
