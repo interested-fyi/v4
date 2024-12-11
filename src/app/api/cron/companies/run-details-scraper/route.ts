@@ -32,13 +32,6 @@ export async function GET(req: NextRequest) {
         .eq("company_id", job.company_id)
         .single();
 
-      const { data: postDetails, error: postError } = await supabase
-        .from("job_postings_details")
-        .select("description, title, location, compensation, summary")
-        .eq("id", job.job_posting_id)
-        .single();
-      console.log("🚀 ~ GET ~ postDetails:", postDetails);
-
       const isNewJob = !job.last_scraped;
       console.log("🚀 ~ GET ~ isNewJob:", isNewJob);
       try {
@@ -55,15 +48,6 @@ export async function GET(req: NextRequest) {
               posting: {
                 ...job,
                 companyName: companyDetails?.company_name,
-                data: {
-                  descriptionPlain: postDetails?.description,
-                  title: postDetails?.title,
-                  location: postDetails?.location,
-                  compensation: {
-                    compensationTierSummary: postDetails?.compensation,
-                  },
-                  summary: postDetails?.summary,
-                },
               },
               isNewJob,
             }),
