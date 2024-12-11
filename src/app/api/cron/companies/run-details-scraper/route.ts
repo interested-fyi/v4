@@ -25,6 +25,7 @@ export async function GET(req: NextRequest) {
     const postingsSaved: { [key: string]: any } = {};
 
     for (const job of jobs) {
+      console.log("🚀 ~ GET ~ job:", job);
       const { data: companyDetails, error: companyError } = await supabase
         .from("companies")
         .select("company_name")
@@ -36,8 +37,10 @@ export async function GET(req: NextRequest) {
         .select("description, title, location, compensation, summary")
         .eq("id", job.job_posting_id)
         .single();
+      console.log("🚀 ~ GET ~ postDetails:", postDetails);
 
       const isNewJob = !job.last_scraped;
+      console.log("🚀 ~ GET ~ isNewJob:", isNewJob);
       try {
         // Initiate scrape job details request without awaiting
         fetch(
