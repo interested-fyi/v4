@@ -1,63 +1,270 @@
 import { NextRequest, NextResponse } from "next/server";
 import supabase from "@/lib/supabase";
-import User from "@/types/user";
-import Company from "@/types/company";
-import JobPosting from "@/types/job-posting";
-import extractJobBody from "@/functions/job-scraping/description_scraper/extract-job-body";
+import easAbi from "@ethereum-attestation-service/eas-contracts/deployments/optimism/EAS.json";
 import extractJobData from "@/functions/job-scraping/description_scraper/ai-description-scraper";
 import generateSummary from "@/functions/job-scraping/description_scraper/generate-summary";
+import { mnemonicToAccount } from "viem/accounts";
+import { createWalletClient, http } from "viem";
+import { optimism, optimismSepolia } from "viem/chains";
+import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
+import { publicClient } from "@/lib/viemClient";
+import { getEndorsementUid } from "@/functions/general/get-endorsement-uid";
 
 export async function POST(req: NextRequest, res: NextResponse) {
-    if (req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
-        return NextResponse.json('Unauthorized', { status: 401 });
+  console.log("Incoming request to scrape job details...");
+  if (
+    req.headers.get("Authorization") !== `Bearer ${process.env.CRON_SECRET}`
+  ) {
+    console.log("Unauthorized request.");
+    return NextResponse.json("Unauthorized", { status: 401 });
+  }
+
+  const { posting, isNewJob } = await req.json();
+  console.log("Request data received:", posting);
+
+  try {
+    if (posting.type === "ashby") {
+      console.log("Processing Ashby job posting...");
+      if (posting.data && posting.data.descriptionPlain && posting.data.title) {
+        console.log("Saving job details to Supabase...");
+        const summary = await generateSummary(posting.data.descriptionPlain);
+        const { data, error: detailsError } = await supabase.rpc(
+          "update_job_details_and_scraping",
+          {
+            p_job_posting_id: posting.id,
+            p_description: posting.data.descriptionPlain,
+            p_summary: summary?.content,
+            p_compensation: posting.data.compensation?.compensationTierSummary,
+            p_title: posting.data.title,
+            p_location: `${posting.data.location}${
+              posting.data.secondaryLocations.length > 0
+                ? ", " +
+                  posting.data.secondaryLocations
+                    .map((location: any) => location.location)
+                    .join(", ")
+                : ""
+            }`,
+          }
+        );
+
+        if (detailsError) {
+          throw new Error(
+            `Error saving job details for ${posting.posting_url} (${posting.id}): ${detailsError.message}`
+          );
+        }
+        if (isNewJob) {
+          console.log(
+            "Job details saved successfully, proceeding with on-chain operation..."
+          );
+          await saveDetailsOnchain({
+            ...posting,
+            compensation: posting.data.compensation?.compensationTierSummary,
+            location: `${posting.data.location}${
+              posting.data.secondaryLocations.length > 0
+                ? ", " +
+                  posting.data.secondaryLocations
+                    .map((location: any) => location.location)
+                    .join(", ")
+                : ""
+            }`,
+            summary: summary?.content,
+            description: posting.data.descriptionPlain,
+          });
+        }
+
+        return NextResponse.json(
+          { success: true, ids: data?.[0] },
+          { status: 200 }
+        );
+      } else {
+        throw new Error(
+          `Job Details Not Complete: ${posting.posting_url} (${posting.posting_id})`
+        );
+      }
     }
 
-    const { posting } = await req.json();
-
-    try {
-        if (posting.type === 'ashby') {
-            if (posting.data && posting.data.descriptionPlain && posting.data.title) {
-                const { data, error: detailsError } = await supabase.rpc('update_job_details_and_scraping', {
-                    p_job_posting_id: posting.id,
-                    p_description: posting.data.descriptionPlain,
-                    p_summary: (await generateSummary(posting.data.descriptionPlain))?.content, // generate summary off of description
-                    p_compensation: posting.data.compensation?.compensationTierSummary,
-                    p_title: posting.data.title,
-                    p_location: `${posting.data.location}${posting.data.secondaryLocations.length > 0 ? ', ' + posting.data.secondaryLocations.map((location: any) => location.location).join(', ') : ''}`
-                })
-    
-                if (detailsError) throw new Error(`Error saving job details for ${posting.posting_url} (${posting.id}): ${detailsError.message}`)
-    
-                return NextResponse.json({ success: true, ids: data?.[0] }, { status: 200 })
-            } else {
-                throw new Error(`Job Details Not Complete: ${posting.posting_url} (${posting.posting_id})`)
-            }
-        }
-
-        const jobData = await extractJobData(posting.posting_url);
-        if(!jobData) {
-            throw new Error(`Failed to scrape and parse job details for: ${posting.posting_url} (${posting.posting_id})`)
-        }
-        const enrichedData = jobData?.content;
-
-        if (enrichedData && enrichedData.description && enrichedData.title) {
-            const { data, error: detailsError } = await supabase.rpc('update_job_details_and_scraping', {
-                p_job_posting_id: posting.id,
-                p_description: enrichedData.description,
-                p_summary: enrichedData.summary,
-                p_compensation: enrichedData.compensation,
-                p_title: enrichedData.title,
-                p_location: enrichedData.location
-            })
-
-            if (detailsError) throw new Error(`Error saving job details for ${posting.posting_url} (${posting.id}): ${detailsError.message}`)
-
-            return NextResponse.json({ success: true, ids: data?.[0] }, { status: 200 })
-        } else {
-            throw new Error(`Job Details Not Complete: ${posting.posting_url} (${posting.posting_id})`)
-        }
-    } catch (e) {
-        console.log(`Error: ${e}`)
-        return NextResponse.json({ error: e }, { status: 500 });
+    console.log("Scraping job data from the provided URL...");
+    const jobData = await extractJobData(posting.posting_url);
+    if (!jobData) {
+      throw new Error(
+        `Failed to scrape and parse job details for: ${posting.posting_url} (${posting.posting_id})`
+      );
     }
+
+    const enrichedData = jobData?.content;
+    console.log("Enriched job data received:", enrichedData);
+
+    if (enrichedData && enrichedData.description && enrichedData.title) {
+      console.log("Saving enriched job details to Supabase...");
+      const { data, error: detailsError } = await supabase.rpc(
+        "update_job_details_and_scraping",
+        {
+          p_job_posting_id: posting.id,
+          p_description: enrichedData.description,
+          p_summary: enrichedData.summary,
+          p_compensation: enrichedData.compensation,
+          p_title: enrichedData.title,
+          p_location: enrichedData.location,
+        }
+      );
+
+      if (detailsError) {
+        throw new Error(
+          `Error saving job details for ${posting.posting_url} (${posting.id}): ${detailsError.message}`
+        );
+      }
+
+      if (isNewJob) {
+        console.log(
+          "Job details saved successfully, proceeding with on-chain operation..."
+        );
+        await saveDetailsOnchain({
+          ...posting,
+          compensation: enrichedData.compensation,
+          location: enrichedData.location,
+          summary: enrichedData.summary,
+          description: enrichedData.description,
+        });
+      }
+
+      return NextResponse.json(
+        { success: true, ids: data?.[0] },
+        { status: 200 }
+      );
+    } else {
+      throw new Error(
+        `Job Details Not Complete: ${posting.posting_url} (${posting.posting_id})`
+      );
+    }
+  } catch (e) {
+    console.error("Error processing job posting:", e);
+    return NextResponse.json({ error: e }, { status: 500 });
+  }
+}
+
+async function saveDetailsOnchain(job: any) {
+  console.log("🚀 ~ saveDetailsOnchain ~ job:", job);
+  console.log("Creating attestation for job posting on-chain...");
+  const account = mnemonicToAccount(process.env.ADMIN_MNEMONIC as string);
+  const client = createWalletClient({
+    account,
+    chain:
+      process.env.NEXT_PUBLIC_VERCEL_ENV !== "production"
+        ? optimismSepolia
+        : optimism,
+    transport: http(
+      "https://opt-sepolia.g.alchemy.com/v2/5VkHc9C6C81ouetdMCY5jawJzHELtDaQ"
+    ),
+  });
+
+  const schemaEncoder = new SchemaEncoder(
+    "uint256 id,uint256 created_at,uint256 company_id,string company_name,string department,string sub_department,string type,string role_title,string location,string posting_url,bool active,bytes data,string description,string summary,string compensation"
+  );
+
+  const encodedData = schemaEncoder.encodeData([
+    { name: "id", value: job.id?.toString(), type: "uint256" },
+    {
+      name: "created_at",
+      value: Math.floor(Date.now() / 1000).toString(),
+      type: "uint256",
+    },
+    {
+      name: "company_id",
+      value: job.company_id?.toString(),
+      type: "uint256",
+    },
+    {
+      name: "company_name",
+      value: job.company_name || "",
+      type: "string",
+    },
+    {
+      name: "department",
+      value: job.department || "",
+      type: "string",
+    },
+    {
+      name: "sub_department",
+      value: job.sub_department || "",
+      type: "string",
+    },
+    { name: "type", value: job.type || "", type: "string" },
+    {
+      name: "role_title",
+      value: job.role_title || "",
+      type: "string",
+    },
+    { name: "location", value: job.location || "", type: "string" },
+    {
+      name: "posting_url",
+      value: job.posting_url || "",
+      type: "string",
+    },
+    { name: "active", value: job.active, type: "bool" },
+    { name: "data", value: "0x", type: "bytes" },
+    { name: "description", value: job.description || "", type: "string" }, // todo: add description
+    { name: "summary", value: job.summary || "", type: "string" }, // todo: add summary
+    { name: "compensation", value: job.compensation || "", type: "string" }, // todo: add compensation
+  ]);
+
+  console.log("Encoded data for attestation:", encodedData);
+
+  // Attestation creation
+  const contractParams = {
+    address: process.env.NEXT_PUBLIC_EAS_CONTRACT_ADDRESS as `0x${string}`,
+    abi: easAbi.abi,
+    functionName: "attest",
+    args: [
+      {
+        schema:
+          process.env.NEXT_PUBLIC_VERCEL_ENV !== "production"
+            ? process.env.NEXT_PUBLIC_SEPOLIA_JOB_SCHEMA_UID
+            : process.env.NEXT_PUBLIC_JOB_SCHEMA_UID,
+        data: {
+          recipient: process.env.ATTESTATION_RECIPIENT_ADDRESS as `0x${string}`,
+          expirationTime: 0,
+          revocable: true,
+          refUID: "0x" + "00".repeat(32),
+          data: encodedData,
+          value: 0,
+        },
+      },
+    ],
+    chain:
+      process.env.NEXT_PUBLIC_VERCEL_ENV !== "production"
+        ? optimismSepolia
+        : optimism,
+    account: client.account.address,
+  };
+
+  try {
+    console.log("Simulating attestation contract call...");
+    const { request } = await publicClient.simulateContract(contractParams);
+    console.log("Simulated contract request:", request);
+
+    const txHash = await client.writeContract({
+      ...request,
+      account: client.account,
+    });
+
+    console.log("Attestation Transaction Hash:", txHash);
+    // Wait for transaction to be mined
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
+    console.log("Retrieving attestation UID...");
+    const uid = await getEndorsementUid(txHash);
+    console.log("Attestation UID retrieved:", uid);
+
+    console.log("Saving attestation UID to database...");
+    // Save attestation to database
+    await supabase.from("job_attestations").insert({
+      attestation_uid: uid,
+      job_posting_id: job.id,
+      recipient: process.env.ATTESTATION_RECIPIENT_ADDRESS,
+    });
+
+    console.log("Attestation saved successfully.");
+  } catch (err) {
+    console.error("Failed to create attestation:", err);
+  }
 }
