@@ -49,7 +49,19 @@ export async function GET(req: NextRequest) {
               Authorization: `Bearer ${process.env.CRON_SECRET}`,
             },
             body: JSON.stringify({
-              posting: { ...job, companyName: companyDetails?.company_name },
+              posting: {
+                ...job,
+                companyName: companyDetails?.company_name,
+                data: {
+                  descriptionPlain: postDetails?.description,
+                  title: postDetails?.title,
+                  location: postDetails?.location,
+                  compensation: {
+                    compensationTierSummary: postDetails?.compensation,
+                  },
+                  summary: postDetails?.summary,
+                },
+              },
               isNewJob,
             }),
           }

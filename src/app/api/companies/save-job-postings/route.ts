@@ -39,7 +39,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${process.env.CRON_SECRET}`
                     },
-                    body: JSON.stringify({ posting: posting })
+                    body: JSON.stringify({ posting: posting, isNewPosting: true })
                 });
             }
         }
