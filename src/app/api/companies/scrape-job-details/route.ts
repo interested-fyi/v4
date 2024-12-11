@@ -12,22 +12,29 @@ import { getEndorsementUid } from "@/functions/general/get-endorsement-uid";
 
 export async function POST(req: NextRequest, res: NextResponse) {
   console.log("Incoming request to scrape job details...");
+
+  // Log request headers for debugging
+  console.log("Request Headers:", req.headers);
+
   if (
     req.headers.get("Authorization") !== `Bearer ${process.env.CRON_SECRET}`
   ) {
-    console.log("Unauthorized request.");
+    console.log("Unauthorized request. Authorization header does not match.");
     return NextResponse.json("Unauthorized", { status: 401 });
   }
 
   const { posting, isNewJob } = await req.json();
-  console.log("Request data received:", posting);
+  console.log("Request body parsed. Posting:", posting, "isNewJob:", isNewJob);
 
   try {
     if (posting.type === "ashby") {
-      console.log("Processing Ashby job posting...");
+      console.log("Detected Ashby job posting...");
       if (posting.data && posting.data.descriptionPlain && posting.data.title) {
-        console.log("Saving job details to Supabase...");
+        console.log("Generating job summary...");
         const summary = await generateSummary(posting.data.descriptionPlain);
+        console.log("Generated summary:", summary);
+
+        console.log("Updating job details in Supabase...");
         const { data, error: detailsError } = await supabase.rpc(
           "update_job_details_and_scraping",
           {
@@ -48,13 +55,18 @@ export async function POST(req: NextRequest, res: NextResponse) {
         );
 
         if (detailsError) {
-          throw new Error(
-            `Error saving job details for ${posting.posting_url} (${posting.id}): ${detailsError.message}`
+          console.error(
+            `Error updating job details in Supabase for ${posting.posting_url} (${posting.id}):`,
+            detailsError
           );
+          throw new Error(detailsError.message);
         }
+
+        console.log("Job details updated successfully:", data);
+
         if (isNewJob) {
           console.log(
-            "Job details saved successfully, proceeding with on-chain operation..."
+            "New job detected. Proceeding to save details on-chain..."
           );
           await saveDetailsOnchain({
             ...posting,
@@ -77,22 +89,31 @@ export async function POST(req: NextRequest, res: NextResponse) {
           { status: 200 }
         );
       } else {
+        console.warn(
+          "Job details are incomplete. Missing required fields.",
+          posting
+        );
         throw new Error(
           `Job Details Not Complete: ${posting.posting_url} (${posting.posting_id})`
         );
       }
     }
 
-    console.log("Scraping job data from the provided URL...");
+    console.log("Scraping job data from URL:", posting.posting_url);
     const jobData = await extractJobData(posting.posting_url);
+
     if (!jobData) {
+      console.warn(
+        "Job scraping failed. No data returned for URL:",
+        posting.posting_url
+      );
       throw new Error(
         `Failed to scrape and parse job details for: ${posting.posting_url} (${posting.posting_id})`
       );
     }
 
     const enrichedData = jobData?.content;
-    console.log("Enriched job data received:", enrichedData);
+    console.log("Scraped job data successfully:", enrichedData);
 
     if (enrichedData && enrichedData.description && enrichedData.title) {
       console.log("Saving enriched job details to Supabase...");
@@ -109,22 +130,28 @@ export async function POST(req: NextRequest, res: NextResponse) {
       );
 
       if (detailsError) {
-        throw new Error(
-          `Error saving job details for ${posting.posting_url} (${posting.id}): ${detailsError.message}`
+        console.error(
+          `Error updating job details in Supabase for ${posting.posting_url} (${posting.id}):`,
+          detailsError
         );
+        throw new Error(detailsError.message);
       }
 
+      console.log("Job details updated successfully:", data);
+
       if (isNewJob) {
-        console.log(
-          "Job details saved successfully, proceeding with on-chain operation..."
-        );
-        await saveDetailsOnchain({
-          ...posting,
-          compensation: enrichedData.compensation,
-          location: enrichedData.location,
-          summary: enrichedData.summary,
-          description: enrichedData.description,
-        });
+        console.log("New job detected. Proceeding to save details on-chain...");
+        try {
+          await saveDetailsOnchain({
+            ...posting,
+            compensation: enrichedData.compensation,
+            location: enrichedData.location,
+            summary: enrichedData.summary,
+            description: enrichedData.description,
+          });
+        } catch (e) {
+          console.error("Error while saving job details on-chain:", e);
+        }
       }
 
       return NextResponse.json(
@@ -132,6 +159,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         { status: 200 }
       );
     } else {
+      console.warn("Enriched job details are incomplete.", enrichedData);
       throw new Error(
         `Job Details Not Complete: ${posting.posting_url} (${posting.posting_id})`
       );
