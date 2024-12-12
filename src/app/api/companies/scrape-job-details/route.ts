@@ -38,7 +38,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         const { data, error: detailsError } = await supabase.rpc(
           "update_job_details_and_scraping",
           {
-            p_job_posting_id: posting.id,
+            p_job_id: posting.id,
             p_description: posting.data.descriptionPlain,
             p_summary: summary?.content,
             p_compensation: posting.data.compensation?.compensationTierSummary,
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
           posting
         );
         throw new Error(
-          `Job Details Not Complete: ${posting.posting_url} (${posting.posting_id})`
+          `Job Details Not Complete: ${posting.posting_url} (${posting.id})`
         );
       }
     }
@@ -108,7 +108,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         posting.posting_url
       );
       throw new Error(
-        `Failed to scrape and parse job details for: ${posting.posting_url} (${posting.posting_id})`
+        `Failed to scrape and parse job details for: ${posting.posting_url} (${posting.id})`
       );
     }
 
@@ -120,7 +120,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       const { data, error: detailsError } = await supabase.rpc(
         "update_job_details_and_scraping",
         {
-          p_job_posting_id: posting.id,
+          p_job_id: posting.id,
           p_description: enrichedData.description,
           p_summary: enrichedData.summary,
           p_compensation: enrichedData.compensation,
@@ -161,7 +161,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     } else {
       console.warn("Enriched job details are incomplete.", enrichedData);
       throw new Error(
-        `Job Details Not Complete: ${posting.posting_url} (${posting.posting_id})`
+        `Job Details Not Complete: ${posting.posting_url} (${posting.id})`
       );
     }
   } catch (e) {
@@ -287,7 +287,7 @@ async function saveDetailsOnchain(job: any) {
     // Save attestation to database
     await supabase.from("job_attestations").insert({
       attestation_uid: uid,
-      job_posting_id: job.id,
+      job_id: job.id,
       recipient: process.env.ATTESTATION_RECIPIENT_ADDRESS,
     });
 
