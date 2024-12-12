@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import supabase from "@/lib/supabase";
 
 export async function GET(req: NextRequest) {
-  console.log("🚀 ~ GET ~ req:", req);
   if (
     req.headers.get("Authorization") !== `Bearer ${process.env.CRON_SECRET}`
   ) {
@@ -20,6 +19,7 @@ export async function GET(req: NextRequest) {
       .select("*")
       .eq("active", true)
       .or(`last_scraped.is.null,last_scraped.lt.${sevenDaysAgo}`);
+    console.log("🚀 ~ GET ~ jobs:", jobs);
 
     if (jobError) throw new Error(`Error fetching jobs: ${jobError.message}`);
 
