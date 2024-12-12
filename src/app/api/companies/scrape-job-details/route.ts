@@ -6,7 +6,7 @@ import generateSummary from "@/functions/job-scraping/description_scraper/genera
 import { mnemonicToAccount } from "viem/accounts";
 import { createWalletClient, http } from "viem";
 import { optimism, optimismSepolia } from "viem/chains";
-import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
+import { EAS, SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import { publicClient } from "@/lib/viemClient";
 import { getEndorsementUid } from "@/functions/general/get-endorsement-uid";
 
@@ -184,7 +184,9 @@ async function saveDetailsOnchain(job: any) {
       "https://opt-sepolia.g.alchemy.com/v2/5VkHc9C6C81ouetdMCY5jawJzHELtDaQ"
     ),
   });
-
+  const eas = new EAS(
+    process.env.NEXT_PUBLIC_EAS_CONTRACT_ADDRESS as `0x${string}`
+  );
   const schemaEncoder = new SchemaEncoder(
     "uint256 id,uint256 created_at,uint256 company_id,string company_name,string department,string sub_department,string type,string role_title,string location,string posting_url,bool active,bytes data,string description,string summary,string compensation"
   );
@@ -279,27 +281,41 @@ async function saveDetailsOnchain(job: any) {
   }
 
   try {
-    console.log("Simulating attestation contract call...");
-    const { request } = await publicClient.simulateContract(contractParams);
-    console.log("Simulated contract request:", request);
+    // console.log("Simulating attestation contract call...");
+    // const { request } = await publicClient.simulateContract(contractParams);
+    // console.log("Simulated contract request:", request);
 
-    const txHash = await client.writeContract({
-      ...request,
-      account: client.account,
+    // const txHash = await client.writeContract({
+    //   ...request,
+    //   account: client.account,
+    // });
+
+    // console.log("Attestation Transaction Hash:", txHash);
+    // // Wait for transaction to be mined
+    // await new Promise((resolve) => setTimeout(resolve, 5000));
+
+    // console.log("Retrieving attestation UID...");
+    // const uid = await getEndorsementUid(txHash);
+    // console.log("Attestation UID retrieved:", uid);
+    const tx = await eas.attest({
+      schema:
+        process.env.NEXT_PUBLIC_VERCEL_ENV !== "production"
+          ? process.env.NEXT_PUBLIC_SEPOLIA_JOB_SCHEMA_UID || ""
+          : process.env.NEXT_PUBLIC_JOB_SCHEMA_UID || "",
+      data: {
+        recipient: "0x0000000000000000000000000000000000000000",
+        expirationTime: BigInt(0),
+        revocable: true, // Be aware that if your schema is not revocable, this MUST be false
+        data: encodedData,
+      },
     });
-
-    console.log("Attestation Transaction Hash:", txHash);
-    // Wait for transaction to be mined
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-
-    console.log("Retrieving attestation UID...");
-    const uid = await getEndorsementUid(txHash);
-    console.log("Attestation UID retrieved:", uid);
+    const newAttestationUID = await tx.wait();
+    console.log("New attestation UID:", newAttestationUID);
 
     console.log("Saving attestation UID to database...");
     // Save attestation to database
     await supabase.from("job_attestations").insert({
-      attestation_uid: uid,
+      attestation_uid: newAttestationUID,
       job_id: job.id,
       recipient: process.env.ATTESTATION_RECIPIENT_ADDRESS,
     });
