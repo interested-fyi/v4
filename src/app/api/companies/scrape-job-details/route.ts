@@ -264,6 +264,7 @@ async function saveDetailsOnchain(job: any) {
         : optimism,
     account: client.account.address,
   };
+  console.log("🚀 ~ saveDetailsOnchain ~ contractParams:", contractParams);
 
   console.log("Checking account balance...");
   const balance = await publicClient.getBalance({
