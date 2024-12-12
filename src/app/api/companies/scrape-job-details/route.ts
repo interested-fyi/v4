@@ -8,8 +8,7 @@ import { createWalletClient, http } from "viem";
 import { optimism, optimismSepolia } from "viem/chains";
 import { EAS, SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import { publicClient } from "@/lib/viemClient";
-import { getEndorsementUid } from "@/functions/general/get-endorsement-uid";
-
+import { ethers } from "ethers";
 export async function POST(req: NextRequest, res: NextResponse) {
   console.log("Incoming request to scrape job details...");
 
@@ -187,6 +186,12 @@ async function saveDetailsOnchain(job: any) {
   const eas = new EAS(
     process.env.NEXT_PUBLIC_EAS_CONTRACT_ADDRESS as `0x${string}`
   );
+
+  const signer = ethers.Wallet.fromMnemonic(
+    process.env.ADMIN_MNEMONIC as string
+  );
+
+  await eas.connect(signer as any);
   const schemaEncoder = new SchemaEncoder(
     "uint256 id,uint256 created_at,uint256 company_id,string company_name,string department,string sub_department,string type,string role_title,string location,string posting_url,bool active,bytes data,string description,string summary,string compensation"
   );
