@@ -38,7 +38,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         const { data, error: detailsError } = await supabase.rpc(
           "update_job_details_and_scraping",
           {
-            p_job_id: posting.id,
+            p_job_posting_id: posting.id,
             p_description: posting.data.descriptionPlain,
             p_summary: summary?.content,
             p_compensation: posting.data.compensation?.compensationTierSummary,
@@ -120,7 +120,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       const { data, error: detailsError } = await supabase.rpc(
         "update_job_details_and_scraping",
         {
-          p_job_id: posting.id,
+          p_job_posting_id: posting.id,
           p_description: enrichedData.description,
           p_summary: enrichedData.summary,
           p_compensation: enrichedData.compensation,
