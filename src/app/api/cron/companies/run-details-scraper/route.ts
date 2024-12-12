@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import supabase from "@/lib/supabase";
 
 export async function GET(req: NextRequest) {
+  console.log("🚀 ~ GET ~ req:", req);
   if (
     req.headers.get("Authorization") !== `Bearer ${process.env.CRON_SECRET}`
   ) {
