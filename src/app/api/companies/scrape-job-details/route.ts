@@ -265,6 +265,18 @@ async function saveDetailsOnchain(job: any) {
     account: client.account.address,
   };
 
+  console.log("Checking account balance...");
+  const balance = await publicClient.getBalance({
+    address: client.account.address,
+  });
+
+  console.log("Account balance:", balance.toString());
+  if (BigInt(balance) === BigInt(0)) {
+    throw new Error(
+      "Account has insufficient funds to perform this transaction."
+    );
+  }
+
   try {
     console.log("Simulating attestation contract call...");
     const { request } = await publicClient.simulateContract(contractParams);
