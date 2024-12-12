@@ -6,14 +6,12 @@ import generateSummary from "@/functions/job-scraping/description_scraper/genera
 import { mnemonicToAccount } from "viem/accounts";
 import { createWalletClient, http } from "viem";
 import { optimism, optimismSepolia } from "viem/chains";
-import { EAS, SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
+import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import { publicClient } from "@/lib/viemClient";
-import { ethers } from "ethers";
+import { getEndorsementUid } from "@/functions/general/get-endorsement-uid";
+
 export async function POST(req: NextRequest, res: NextResponse) {
   console.log("Incoming request to scrape job details...");
-
-  // Log request headers for debugging
-  console.log("Request Headers:", req.headers);
 
   if (
     req.headers.get("Authorization") !== `Bearer ${process.env.CRON_SECRET}`
@@ -23,7 +21,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
   }
 
   const { posting, isNewJob } = await req.json();
-  console.log("Request body parsed. Posting:", posting, "isNewJob:", isNewJob);
 
   try {
     if (posting.type === "ashby") {
@@ -31,7 +28,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       if (posting.data && posting.data.descriptionPlain && posting.data.title) {
         console.log("Generating job summary...");
         const summary = await generateSummary(posting.data.descriptionPlain);
-        console.log("Generated summary:", summary);
 
         console.log("Updating job details in Supabase...");
         const { data, error: detailsError } = await supabase.rpc(
@@ -67,20 +63,22 @@ export async function POST(req: NextRequest, res: NextResponse) {
           console.log(
             "New job detected. Proceeding to save details on-chain..."
           );
-          await saveDetailsOnchain({
-            ...posting,
-            compensation: posting.data.compensation?.compensationTierSummary,
-            location: `${posting.data.location}${
-              posting.data.secondaryLocations.length > 0
-                ? ", " +
-                  posting.data.secondaryLocations
-                    .map((location: any) => location.location)
-                    .join(", ")
-                : ""
-            }`,
-            summary: summary?.content,
-            description: posting.data.descriptionPlain,
-          });
+          await setTimeout(async () => {
+            await saveDetailsOnchain({
+              ...posting,
+              compensation: posting.data.compensation?.compensationTierSummary,
+              location: `${posting.data.location}${
+                posting.data.secondaryLocations.length > 0
+                  ? ", " +
+                    posting.data.secondaryLocations
+                      .map((location: any) => location.location)
+                      .join(", ")
+                  : ""
+              }`,
+              summary: summary?.content,
+              description: posting.data.descriptionPlain,
+            });
+          }, 5000);
         }
 
         return NextResponse.json(
@@ -141,13 +139,17 @@ export async function POST(req: NextRequest, res: NextResponse) {
       if (isNewJob) {
         console.log("New job detected. Proceeding to save details on-chain...");
         try {
-          await saveDetailsOnchain({
-            ...posting,
-            compensation: enrichedData.compensation,
-            location: enrichedData.location,
-            summary: enrichedData.summary,
-            description: enrichedData.description,
-          });
+          await setTimeout(
+            async () =>
+              await saveDetailsOnchain({
+                ...posting,
+                compensation: enrichedData.compensation,
+                location: enrichedData.location,
+                summary: enrichedData.summary,
+                description: enrichedData.description,
+              }),
+            5000
+          );
         } catch (e) {
           console.error("Error while saving job details on-chain:", e);
         }
@@ -183,15 +185,7 @@ async function saveDetailsOnchain(job: any) {
       "https://opt-sepolia.g.alchemy.com/v2/5VkHc9C6C81ouetdMCY5jawJzHELtDaQ"
     ),
   });
-  const eas = new EAS(
-    process.env.NEXT_PUBLIC_EAS_CONTRACT_ADDRESS as `0x${string}`
-  );
 
-  const signer = ethers.Wallet.fromMnemonic(
-    process.env.ADMIN_MNEMONIC as string
-  );
-
-  await eas.connect(signer as any);
   const schemaEncoder = new SchemaEncoder(
     "uint256 id,uint256 created_at,uint256 company_id,string company_name,string department,string sub_department,string type,string role_title,string location,string posting_url,bool active,bytes data,string description,string summary,string compensation"
   );
@@ -242,8 +236,6 @@ async function saveDetailsOnchain(job: any) {
     { name: "compensation", value: job.compensation || "", type: "string" }, // todo: add compensation
   ]);
 
-  console.log("Encoded data for attestation:", encodedData);
-
   // Attestation creation
   const contractParams = {
     address: process.env.NEXT_PUBLIC_EAS_CONTRACT_ADDRESS as `0x${string}`,
@@ -271,7 +263,6 @@ async function saveDetailsOnchain(job: any) {
         : optimism,
     account: client.account.address,
   };
-  console.log("🚀 ~ saveDetailsOnchain ~ contractParams:", contractParams);
 
   console.log("Checking account balance...");
   const balance = await publicClient.getBalance({
@@ -286,47 +277,33 @@ async function saveDetailsOnchain(job: any) {
   }
 
   try {
-    // console.log("Simulating attestation contract call...");
-    // const { request } = await publicClient.simulateContract(contractParams);
+    console.log("Simulating attestation contract call...");
+    const { request } = await publicClient.simulateContract(contractParams);
     // console.log("Simulated contract request:", request);
 
-    // const txHash = await client.writeContract({
-    //   ...request,
-    //   account: client.account,
-    // });
-
-    // console.log("Attestation Transaction Hash:", txHash);
-    // // Wait for transaction to be mined
-    // await new Promise((resolve) => setTimeout(resolve, 5000));
-
-    // console.log("Retrieving attestation UID...");
-    // const uid = await getEndorsementUid(txHash);
-    // console.log("Attestation UID retrieved:", uid);
-    const tx = await eas.attest({
-      schema:
-        process.env.NEXT_PUBLIC_VERCEL_ENV !== "production"
-          ? process.env.NEXT_PUBLIC_SEPOLIA_JOB_SCHEMA_UID || ""
-          : process.env.NEXT_PUBLIC_JOB_SCHEMA_UID || "",
-      data: {
-        recipient: "0x0000000000000000000000000000000000000000",
-        expirationTime: BigInt(0),
-        revocable: true, // Be aware that if your schema is not revocable, this MUST be false
-        data: encodedData,
-      },
+    const txHash = await client.writeContract({
+      ...request,
+      account: client.account,
     });
-    const newAttestationUID = await tx.wait();
-    console.log("New attestation UID:", newAttestationUID);
+
+    console.log("Attestation Transaction Hash:", txHash);
+    // Wait for transaction to be mined
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
+    console.log("Retrieving attestation UID...");
+    const uid = await getEndorsementUid(txHash);
+    console.log("Attestation UID retrieved:", uid);
 
     console.log("Saving attestation UID to database...");
     // Save attestation to database
     await supabase.from("job_attestations").insert({
-      attestation_uid: newAttestationUID,
+      attestation_uid: uid,
       job_id: job.id,
       recipient: process.env.ATTESTATION_RECIPIENT_ADDRESS,
     });
 
     console.log("Attestation saved successfully.");
   } catch (err) {
-    console.error("Failed to create attestation:", err);
+    console.error("Failed to create attestation:");
   }
 }
