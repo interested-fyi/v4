@@ -95,8 +95,10 @@ export async function GET(req: NextRequest, res: NextResponse) {
         compensation: row.compensation,
       }));
       await saveDetailsOnchain(formattedData);
+      return NextResponse.json("Success", { status: 200 });
     } else {
       console.log("No IDs found to query job_postings_details.");
+      return NextResponse.json("No IDs found to query job_postings_details.");
     }
   } catch (e) {
     console.log(e);
@@ -259,6 +261,7 @@ async function saveDetailsOnchain(jobs: any[]) {
     await saveAttestations(uidToJobId, txHash);
 
     console.log("Attestation saved successfully.");
+    return NextResponse.json("Success", { status: 200 });
   } catch (err) {
     console.error("Failed to create attestation:", err);
     throw new Error("Failed to create attestation");
