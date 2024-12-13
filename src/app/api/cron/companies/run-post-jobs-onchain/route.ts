@@ -62,7 +62,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
                     )
                     `
         )
-        .in("job_postings_scraping_id", ids)
+        .in("job_posting_id", ids)
         .limit(5);
 
       if (detailsError) {
