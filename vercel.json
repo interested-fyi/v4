@@ -15,10 +15,6 @@
     {
       "path": "/api/cron/run-send-talent-profiles",
       "schedule": "*/15 * * * *"
-    },
-    {
-      "path": "/api/cron/companies/run-post-jobs-onchain",
-      "schedule": "*/15 * * * *"
     }
   ]
 }
