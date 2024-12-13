@@ -17,7 +17,7 @@
       "schedule": "*/15 * * * *"
     },
     {
-      "path": "/api/cron/run-post-jobs-onchain",
+      "path": "/api/cron/companies/run-post-jobs-onchain",
       "schedule": "*/15 * * * *"
     }
   ]
