@@ -18,23 +18,13 @@ export async function GET(req: NextRequest) {
       .from("job_details_last_scraping")
       .select("*")
       .eq("active", true)
-      .or(`last_scraped.is.null,last_scraped.lt.${sevenDaysAgo}`);
+      .or(`last_scraped.is.null,last_scraped.gt.${sevenDaysAgo}`);
 
     if (jobError) throw new Error(`Error fetching jobs: ${jobError.message}`);
 
     const postingsSaved: { [key: string]: any } = {};
 
     for (const job of jobs) {
-      const { data: companyDetails, error: companyError } = await supabase
-        .from("companies")
-        .select("company_name")
-        .eq("id", job.company_id)
-        .single();
-      console.log("🚀 ~ GET ~ companyError:", companyError);
-      console.log("🚀 ~ GET ~ companyDetails:", companyDetails);
-
-      const isNewJob = true;
-      console.log("🚀 ~ GET ~ isNewJob:", isNewJob);
       try {
         // Initiate scrape job details request without awaiting
 
@@ -47,11 +37,7 @@ export async function GET(req: NextRequest) {
               Authorization: `Bearer ${process.env.CRON_SECRET}`,
             },
             body: JSON.stringify({
-              posting: {
-                ...job,
-                company_name: companyDetails?.company_name,
-              },
-              isNewJob,
+              posting: job,
             }),
           }
         );
