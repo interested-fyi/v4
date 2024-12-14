@@ -43,7 +43,12 @@ export async function GET(req: NextRequest, res: NextResponse) {
         .from("job_postings_details")
         .select(
           `
-            *,
+          *,
+          job_attestations (
+          job_posting_id),
+          job_details_last_scraping (
+            last_scraped
+            ),
             job_postings (
                 id,
                 company_id,
@@ -63,6 +68,11 @@ export async function GET(req: NextRequest, res: NextResponse) {
                     `
         )
         .in("job_posting_id", ids)
+        .not(
+          "job_attestations.job_posting_id",
+          "in",
+          `(${attestedJobIds.join(",")})`
+        )
         .limit(5);
 
       if (detailsError) {
