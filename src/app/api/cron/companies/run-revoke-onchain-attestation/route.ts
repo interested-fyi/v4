@@ -60,6 +60,12 @@ export async function GET(req: NextRequest, res: NextResponse) {
     transport: http(),
   });
   // Attestation creation
+  const attestationsData = attestations.map((attestation) => ({
+    uid: attestation.attestation_uid,
+    value: 0,
+  }));
+  console.log("🚀 ~ attestationsData ~ attestationsData:", attestationsData);
+
   const contractParams = {
     address: process.env.NEXT_PUBLIC_EAS_CONTRACT_ADDRESS as `0x${string}`,
     abi: easAbi.abi,
@@ -69,10 +75,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         {
           schema:
             "0xc67b74fbed99776f3949844924f1a7f2641dfe34e39707b3bb97684c711b1d43",
-          data: attestations.map((attestation) => ({
-            uid: attestation.attestation_uid,
-            value: 0,
-          })),
+          data: attestationsData,
         },
       ],
     ],
@@ -82,14 +85,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
         : optimism,
     account: client.account,
   };
+  console.log("🚀 ~ GET ~ contractParams:", contractParams);
 
-  console.log(
-    "🚀 ~ GET ~ attestations.map:",
-    attestations.map((attestation) => ({
-      uid: attestation.attestation_uid,
-      value: 0,
-    }))
-  );
   console.log("Checking account balance...");
   const balance = await publicClient.getBalance({
     address: client.account.address,
