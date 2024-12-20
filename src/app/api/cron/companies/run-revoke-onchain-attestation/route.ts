@@ -108,10 +108,9 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
     try {
       console.log("Simulating attestation contract call...");
-      const nonce =
-        (await publicClient.getTransactionCount({
-          address: account.address,
-        })) + 3;
+      const nonce = await publicClient.getTransactionCount({
+        address: account.address,
+      });
 
       const { request } = await publicClient.simulateContract({
         ...contractParams,
@@ -121,7 +120,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
       const txHash = await client.writeContract({
         ...request,
-        account: client.account,
         nonce,
       });
 
