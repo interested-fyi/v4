@@ -19,6 +19,10 @@
     {
       "path": "/api/cron/companies/run-post-jobs-onchain",
       "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/cron/companies/run-revoke-onchain-attestation",
+      "schedule": "*/10 * * * *"
     }
   ]
 }
