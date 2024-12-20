@@ -85,7 +85,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         : optimism,
     account: client.account,
   };
-  console.log("🚀 ~ GET ~ contractParams:", contractParams);
+  console.log("🚀 ~ GET ~ contractParams:", contractParams.args[0][0].data);
 
   console.log("Checking account balance...");
   const balance = await publicClient.getBalance({
@@ -115,8 +115,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
       nonce,
       account: client.account,
     });
-
-    console.log("🚀 ~ GET ~ request:", request);
 
     const txHash = await client.writeContract({
       ...request,

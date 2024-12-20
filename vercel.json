@@ -22,7 +22,7 @@
     },
     {
       "path": "/api/cron/companies/run-revoke-onchain-attestation",
-      "schedule": "*/10 * * * *"
+      "schedule": "*/5 * * * *"
     }
   ]
 }
