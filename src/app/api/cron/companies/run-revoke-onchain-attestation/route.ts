@@ -75,7 +75,9 @@ export async function GET(req: NextRequest, res: NextResponse) {
         [
           {
             schema:
-              "0xc67b74fbed99776f3949844924f1a7f2641dfe34e39707b3bb97684c711b1d43",
+              process.env.NEXT_PUBLIC_VERCEL_ENV !== "production"
+                ? process.env.NEXT_PUBLIC_SEPOLIA_JOB_SCHEMA_UID
+                : process.env.NEXT_PUBLIC_JOB_SCHEMA_UID,
             data: attestationsData,
           },
         ],
@@ -86,7 +88,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
           : optimism,
       account: client.account,
     };
-    console.log("🚀 ~ GET ~ contractParams:", contractParams.args[0][0].data);
+    console.log("🚀 ~ GET ~ contractParams:", contractParams.args);
 
     console.log("Checking account balance...");
     const balance = await publicClient.getBalance({
