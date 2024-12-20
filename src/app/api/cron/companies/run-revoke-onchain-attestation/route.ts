@@ -10,7 +10,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
   console.log("Incoming request to scrape job details...");
 
   if (
-    req.headers.get("Authorization") === `Bearer ${process.env.CRON_SECRET}`
+    req.headers.get("Authorization") !== `Bearer ${process.env.CRON_SECRET}`
   ) {
     console.log("Unauthorized request. Authorization header does not match.");
     return NextResponse.json("Unauthorized", { status: 401 });
