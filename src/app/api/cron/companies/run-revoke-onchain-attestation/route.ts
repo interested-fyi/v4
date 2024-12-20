@@ -115,6 +115,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
       const { request } = await publicClient.simulateContract({
         ...contractParams,
         nonce,
+        gasPrice: (await publicClient.getGasPrice()) * BigInt(2),
         account: client.account,
       });
 
