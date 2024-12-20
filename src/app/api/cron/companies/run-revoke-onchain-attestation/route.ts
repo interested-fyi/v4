@@ -20,8 +20,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
   const { data: jobDetails, error: jobDetailsError } = await supabase
     .from("job_details_last_scraping")
     .select("id")
-    .eq("active", false)
-    .limit(5);
+    .eq("active", false);
 
   if (jobDetailsError) throw jobDetailsError;
 
@@ -45,7 +44,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
     .from("job_attestations")
     .select("attestation_uid")
     .eq("active", true)
-    .in("job_posting_id", jobPostingIDs);
+    .in("job_posting_id", jobPostingIDs)
+    .limit(5);
   console.log("🚀 ~ GET ~ attestations:", attestations);
 
   if (attestationsError) throw attestationsError;
