@@ -22,7 +22,7 @@ export function OnchainBadge({ attestationUrl }: OnchainBadgeProps) {
           <Badge
             variant='outline'
             className='cursor-pointer transition-all duration-300 flex items-center gap-1.5 
-              bg-gradient-to-r from-blue-500 via-purple-500 to-yellow-500 bg-[length:200%_100%]
+              bg-gradient-to-r from-blue-700 via-yellow-100 to-purple-500 bg-[length:200%_100%]
               hover:bg-[100%_0] bg-[0%_0]
               text-white border-none
               shadow-sm hover:shadow-md

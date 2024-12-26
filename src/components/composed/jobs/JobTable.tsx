@@ -88,7 +88,7 @@ const JobTable = () => {
         <SelectTrigger className='w-[180px] mb-2 text-black placeholder:text-gray-700'>
           <SelectValue
             className='text-black placeholder:text-black'
-            placeholder={"Active"}
+            placeholder={"Select job status"}
           />
         </SelectTrigger>
         <SelectContent className='text-body text-black'>

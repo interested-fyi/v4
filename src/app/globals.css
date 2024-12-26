@@ -103,5 +103,5 @@
 }
 
 .hover\:bg-\[100\%_0\]:hover {
-  animation: gradient-shift 3s ease infinite;
+  animation: gradient-shift 3s ease;
 }
