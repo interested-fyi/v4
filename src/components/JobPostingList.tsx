@@ -21,9 +21,9 @@ export function JobPostingList({ jobs }: JobPostingListProps) {
         return (
           <Card
             key={job.id}
-            className='relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2'
+            className='relative flex flex-col justify-between overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2'
           >
-            <CardContent className='p-6 space-y-4'>
+            <CardContent className='p-6 space-y-4 flex flex-col justify-between'>
               <div className='flex items-center justify-between'>
                 <div className='flex flex-row gap-3 justify-between items-center w-full'>
                   <div className='text-[#1a56db] text-md font-semibold font-body leading-[21px]'>
@@ -61,7 +61,7 @@ export function JobPostingList({ jobs }: JobPostingListProps) {
                 </div>
               </div>
             </CardContent>
-            {job.job_attestations && job.job_attestations?.length > 0 && (
+            {job.job_attestations && job.job_attestations?.length >= 0 && (
               <CardFooter className='flex flex-col gap-3 w-full'>
                 <div className='flex flex-row gap-3 px-0 w-full items-center justify-between'>
                   <OnchainBadge
