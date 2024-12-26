@@ -17,7 +17,7 @@ export function OnchainBadge({ attestationUrl }: OnchainBadgeProps) {
   return (
     <TooltipProvider>
       <Tooltip>
-        <TooltipTrigger asChild>
+        <TooltipTrigger asChild className='z-50'>
           <Badge
             variant='outline'
             className='cursor-pointer transition-all duration-300 flex items-center gap-1.5 
@@ -25,14 +25,14 @@ export function OnchainBadge({ attestationUrl }: OnchainBadgeProps) {
               hover:bg-[100%_0] bg-[0%_0]
               text-white border-none
               shadow-sm hover:shadow-md
-              px-3 py-1 relative overflow-hidden z-50'
+              px-3 py-1 relative overflow-hidden z-40'
             onClick={() => window.open(attestationUrl, "_blank")}
           >
             <Link2 className='h-3 w-3' />
-            <span className='font-medium'>Verified Onchain</span>
+            <span className='font-medium'>EAS Certified</span>
           </Badge>
         </TooltipTrigger>
-        <TooltipContent>
+        <TooltipContent className='z-50'>
           <p>Click to view blockchain attestation</p>
         </TooltipContent>
       </Tooltip>

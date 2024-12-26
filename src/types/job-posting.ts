@@ -12,6 +12,7 @@ export default interface JobPosting {
   job_attestations?: {
     attestation_uid?: string;
     attestation_tx_hash?: string;
+    created_at?: string;
   }[];
   active?: boolean;
   data?: any;

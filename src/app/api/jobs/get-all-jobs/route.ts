@@ -20,7 +20,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         `
           id,
           company_name,
-          job_postings ( id, company_id, role_title, location, posting_url, department, created_at, active, job_attestations ( attestation_uid, attestation_tx_hash ) )
+          job_postings ( id, company_id, role_title, location, posting_url, department, created_at, active, job_attestations ( attestation_uid, attestation_tx_hash, created_at) )
         `
       )
       .eq("approved", true);
