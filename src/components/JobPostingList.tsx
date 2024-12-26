@@ -25,10 +25,25 @@ export function JobPostingList({ jobs }: JobPostingListProps) {
           >
             <CardContent className='p-6 space-y-4'>
               <div className='flex items-center justify-between'>
-                <div className='flex flex-row gap-3'>
+                <div className='flex flex-row gap-3 justify-between items-center w-full'>
                   <div className='text-[#1a56db] text-md font-semibold font-body leading-[21px]'>
                     {job.company_name}
                   </div>
+                  <Link
+                    href={jobUrlBuilder(job.posting_url)}
+                    target='_blank'
+                    prefetch={false}
+                  >
+                    <span className='sr-only'>View job</span>
+
+                    <Button
+                      variant='outline'
+                      size='sm'
+                      className='text-gray-700 w-[120px] text-xs font-medium font-body leading-[18px] border border-gray-700 '
+                    >
+                      Apply
+                    </Button>
+                  </Link>
                 </div>
                 <div className='text-sm font-medium text-muted-foreground'>
                   {job.sub_department}
@@ -44,21 +59,6 @@ export function JobPostingList({ jobs }: JobPostingListProps) {
                 <div className='text-gray-500 text-xs font-medium font-body leading-[18px]'>
                   {job.department} - {job.location}
                 </div>
-                <Link
-                  href={jobUrlBuilder(job.posting_url)}
-                  target='_blank'
-                  prefetch={false}
-                >
-                  <span className='sr-only'>View job</span>
-
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    className='text-gray-700 w-[120px] text-xs font-medium font-body leading-[18px] border border-gray-700 '
-                  >
-                    Apply
-                  </Button>
-                </Link>
               </div>
             </CardContent>
             {job.job_attestations && job.job_attestations?.length > 0 && (
