@@ -20,13 +20,13 @@ export async function GET(req: NextRequest, res: NextResponse) {
         `
           id,
           company_name,
-          job_postings ( id, company_id, role_title, location, posting_url, department, created_at, active )
+          job_postings ( id, company_id, role_title, location, posting_url, department, created_at, active, job_attestations ( attestation_uid, attestation_tx_hash ) )
         `
       )
       .eq("approved", true);
 
     if (companyError) {
-      throw new Error(`Error fetching company data: ${companyError}`);
+      throw new Error(`Error fetching company data: ${companyError.message}`);
     }
 
     // Extract all job postings from approved companies
@@ -56,7 +56,9 @@ export async function GET(req: NextRequest, res: NextResponse) {
       },
       { status: 200 }
     );
-  } catch (e) {
-    return NextResponse.json(`Error Fetching Jobs: ${e}`, { status: 401 });
+  } catch (e: any) {
+    return NextResponse.json(`Error Fetching Jobs: ${e}`, {
+      status: 500,
+    });
   }
 }

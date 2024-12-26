@@ -1,13 +1,10 @@
 'use client'
-import CandidateSignUpForm from '@/components/forms/CandidateSignUpForm';
-import clsx from 'clsx';
-import { PrivyProvider, usePrivy } from '@privy-io/react-auth';
+
+import { PrivyProvider } from '@privy-io/react-auth';
 import { useState } from "react";
-import CompanySignUpForm from '@/components/forms/CompanySignUpForm';
 import NavBar from '@/components/navigation/NavBar';
 
 export default function Home() {
-  const [formType, setFormType] = useState<'candidate' | 'company' | null>(null);
 
   return (
     <PrivyProvider 

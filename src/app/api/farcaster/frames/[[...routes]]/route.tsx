@@ -29,6 +29,12 @@ app.frame("/jobs/:id", neynarMiddleware, async (c) => {
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/jobs/get-job-by-id/${id}`
   ).then((res) => res.json());
 
+  const jobDetails = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/jobs/get-job-details-by-id/${id}`
+  ).then((res) => res.json());
+
+  const summaryCharacterLimit = 535;
+
   return c.res({
     image: (
       <div
@@ -121,7 +127,7 @@ app.frame("/jobs/:id", neynarMiddleware, async (c) => {
             </p>
             <p>{jobData.job.location}</p>
           </div>
-          {jobData.job.job_postings_details && (
+          {jobDetails && jobDetails?.job?.compensation && (
             <div
               style={{
                 display: "flex",
@@ -132,11 +138,11 @@ app.frame("/jobs/:id", neynarMiddleware, async (c) => {
               <p style={{ margin: "0", color: "blue", fontSize: "20px" }}>
                 COMPENSATION
               </p>
-              <p>{jobData.job.job_postings_details?.compensation}</p>
+              <p>{jobDetails?.job?.compensation}</p>
             </div>
           )}
         </div>
-        {jobData.job.job_postings_details && (
+        {jobDetails && jobDetails?.job?.summary && (
           <div
             style={{
               display: "flex",
@@ -146,9 +152,14 @@ app.frame("/jobs/:id", neynarMiddleware, async (c) => {
               padding: "28px",
               paddingTop: "16px",
               fontSize: "20px",
+              overflow: "hidden",
             }}
           >
-            <p>{jobData.job.job_postings_details?.summary}</p>
+            <p>
+              {jobDetails?.job.summary.length > summaryCharacterLimit
+                ? jobDetails.job.summary.slice(0, summaryCharacterLimit) + "..."
+                : jobDetails.job.summary}
+            </p>
           </div>
         )}
       </div>

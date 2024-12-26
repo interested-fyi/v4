@@ -6,21 +6,18 @@ import Link from "next/link";
 
 const Navbar = () => {
   return (
-    <header className='flex relative justify-between w-full items-center px-2 sm:px-5 max-h-20'>
-      <Link className='w-32 md:w-[165px]' href='/'>
+    <header className='flex justify-between py-6 gap-6 px-2 sm:px-4'>
+      <Link className='m-auto md:m-0 w-32 md:w-[165px]' href='/'>
         <AspectRatio ratio={16 / 3}>
           <Image
-            width={165}
-            height={28}
-            src='/images/main-logo.png'
+            width={37.5}
+            height={32}
+            src='/svg/small-binocular.svg'
             alt='Interested Logo'
           />
         </AspectRatio>
       </Link>
-      <nav
-        className='flex justify-between gap-3 items-center h-16  text-black relative'
-        role='navigation'
-      >
+      <nav className='m-auto md:m-0 text-black relative' role='navigation'>
         <AuthControlledNav />
       </nav>
     </header>

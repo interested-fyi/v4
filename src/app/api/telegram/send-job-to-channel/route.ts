@@ -1,7 +1,9 @@
 import jobUrlBuilder from "@/functions/general/job-url-builder";
 import sendTelegramMessage from "@/functions/telegram/send-message";
+import { sendTweet } from "@/lib/twitter";
 import { InlineKeyboard } from "grammy";
 import { NextRequest, NextResponse } from "next/server";
+import OpenAI from "openai";
 
 export async function POST(req: NextRequest) {
   if (
@@ -31,12 +33,28 @@ export async function POST(req: NextRequest) {
         .url("Apply Now", jobUrlBuilder(job.posting_url))
     );
 
+    const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
+        
+    console.log('getting tweet text');
+    const tweetResponse = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        response_format: { type: 'text'},
+        messages: [
+            {role: 'system', content: "You are a job summary tweet bot. You are given job descriptions or summaries and need to shorten them down to a tweet of 280 characters or less."},
+            {role: "user", content: `Job Description: ${job.summary}`}
+        ]
+    });
+    const generatedText = tweetResponse.choices[0].message.content;
+    console.log('generated tweet text', generatedText);
+    const tweet = await sendTweet(`${generatedText}\n\n${jobUrlBuilder(job.posting_url)}`);
+
     // send cast containing frame to farcaster
     const signerUUID = process.env.SIGNER_UUID ?? "";
     const url = "https://api.neynar.com/v2/farcaster/cast";
 
-    const frameURL = `${process.env.NEXT_PUBLIC_HOST}/api/farcaster/frames/jobs/${job.job_posting_id}?chatName=${process.env.TELEGRAM_CHANNEL_NAME}&msgId=${message_id}`;
+    const frameURL = `${process.env.NEXT_PUBLIC_BASE_URL}/api/farcaster/frames/jobs/${job.job_posting_id}?chatName=${process.env.TELEGRAM_CHANNEL_NAME}&msgId=${message_id}`;
 
+    console.log("🚀 ~ POST ~ frameURL:", frameURL);
     const options = {
       method: "POST",
       headers: {
@@ -51,6 +69,7 @@ export async function POST(req: NextRequest) {
             url: frameURL,
           },
         ],
+        channel_id: "jobs",
       }),
     };
     const response = await fetch(url, options);

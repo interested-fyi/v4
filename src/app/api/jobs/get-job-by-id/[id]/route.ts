@@ -32,6 +32,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
       `
       )
       .eq("id", jobId)
+      .order("created_at", { ascending: false })
+      .limit(1)
       .single(); // Fetches a single record
 
     if (jobError) {
@@ -50,7 +52,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     );
   } catch (e: any) {
     return NextResponse.json(`Error Fetching Job: ${e.message}`, {
-      status: 401,
+      status: 500,
     });
   }
 }

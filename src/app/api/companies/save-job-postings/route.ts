@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import supabase from "@/lib/supabase";
-import User from "@/types/user";
-import Company from "@/types/company";
 import JobPosting from "@/types/job-posting";
-import extractJobBody from "@/functions/job-scraping/description_scraper/extract-job-body";
-import extractJobData from "@/functions/job-scraping/description_scraper/ai-description-scraper";
-
 export async function POST(req: NextRequest, res: NextResponse) {
     if (req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
         return NextResponse.json('Unauthorized', { status: 401 });
@@ -39,7 +34,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${process.env.CRON_SECRET}`
                     },
-                    body: JSON.stringify({ posting: posting })
+                    body: JSON.stringify({ posting })
                 });
             }
         }

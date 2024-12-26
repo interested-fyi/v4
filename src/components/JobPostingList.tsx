@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import JobPosting from "@/types/job-posting";
 import jobUrlBuilder from "@/functions/general/job-url-builder";
+import { OnchainBadge } from "./onchain-badge";
 
 interface JobPostingListProps {
   jobs: JobPosting[];
@@ -16,21 +17,20 @@ export function JobPostingList({ jobs }: JobPostingListProps) {
           key={job.id}
           className='relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2'
         >
-          <Link
-            href={jobUrlBuilder(job.posting_url)}
-            target="_blank"
-            className='absolute inset-0 z-10'
-            prefetch={false}
-          >
-            <span className='sr-only'>View job</span>
-          </Link>
           <CardContent className='p-6 space-y-4'>
+            {job.job_attestations && job.job_attestations?.length > 0 && (
+              <div className='flex flex-row gap-3 absolute top-3 right-3'>
+                <OnchainBadge
+                  attestationUrl={`https://optimism.easscan.org/attestation/view/${job.job_attestations[0]?.attestation_uid}`}
+                />
+              </div>
+            )}
             <div className='flex items-center justify-between'>
-              <div className='flex flex-col gap-0'>
-                <div className='text-sm font-medium text-muted-foreground'>
+              <div className='flex flex-row gap-3'>
+                <div className='text-[#1a56db] text-sm font-semibold font-body leading-[21px]'>
                   {job.company_name}
                 </div>
-                <div className='text-sm font-medium text-muted-foreground mt-0'>
+                <div className='text-gray-600 text-sm font-medium font-body leading-[21px]'>
                   {job.department}
                 </div>
               </div>
@@ -39,15 +39,31 @@ export function JobPostingList({ jobs }: JobPostingListProps) {
               </div>
             </div>
             <div>
-              <div className='text-lg font-semibold'>{job.role_title}</div>
+              <div className='text-black text-base font-semibold font-body leading-normal'>
+                {job.role_title}
+              </div>
               <div className='text-muted-foreground'>{job.type}</div>
             </div>
             <div className='flex items-center justify-between'>
-              <div className='text-muted-foreground'>{job.location}</div>
-              <Button variant='outline' size='sm'>
+              <div className='text-gray-500 text-xs font-medium font-body leading-[18px]'>
+                {job.location}
+              </div>
+            </div>
+            <Link
+              href={jobUrlBuilder(job.posting_url)}
+              target='_blank'
+              prefetch={false}
+            >
+              <span className='sr-only'>View job</span>
+
+              <Button
+                variant='outline'
+                size='sm'
+                className='place-self-end mt-4 text-gray-700 w-[120px] text-xs font-medium font-body leading-[18px] border border-gray-700 '
+              >
                 Apply
               </Button>
-            </div>
+            </Link>
           </CardContent>
         </Card>
       ))}

@@ -5,5 +5,8 @@ export default interface Company {
   careers_page_url: string;
   creator_email: string;
   creator_privy_did: string;
+  recruiting_help?: boolean;
+  host_bounty?: boolean;
+  telegram_handle?: string;
   approved?: boolean;
 }

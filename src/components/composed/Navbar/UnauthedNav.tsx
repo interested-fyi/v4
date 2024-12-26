@@ -1,27 +1,29 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import React from "react";
+import { NavButtons } from "./NavButtons";
+import { usePathname } from "next/navigation";
+
 interface UnauthedNavProps {
   login: () => void;
 }
 
 const UnauthedNav = ({ login }: UnauthedNavProps) => {
-  const pathname = usePathname();
-
+  const pathName = usePathname();
   return (
-    <>
-      <Link href={"/explore"}>
-        <Button variant={"secondary"}>Explore Jobs</Button>
-      </Link>
-      {pathname.includes("/admin") && (
-        <Button variant={"secondary"} onClick={login}>
+    <div className='flex gap-4'>
+      {
+        <Button
+          className='w-16 h-8 px-4 text-xs md:text-sm bg-[#919CF459]'
+          variant={"secondary"}
+          onClick={login}
+        >
           Login
         </Button>
-      )}
-    </>
+      }
+      <NavButtons />
+    </div>
   );
 };
 export default UnauthedNav;
