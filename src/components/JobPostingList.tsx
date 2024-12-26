@@ -18,13 +18,13 @@ export function JobPostingList({ jobs }: JobPostingListProps) {
           className='relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2'
         >
           <CardContent className='p-6 space-y-4'>
-            {job.job_attestations && job.job_attestations?.length > 0 && (
+            {/* {job.job_attestations && job.job_attestations?.length > 0 && (
               <div className='flex flex-row gap-3 absolute bottom-3 right-3'>
                 <OnchainBadge
                   attestationUrl={`https://optimism.easscan.org/attestation/view/${job.job_attestations[0]?.attestation_uid}`}
                 />
               </div>
-            )}
+            )} */}
             <div className='flex items-center justify-between'>
               <div className='flex flex-row gap-3'>
                 <div className='text-[#1a56db] text-sm font-semibold font-body leading-[21px]'>
