@@ -1,9 +1,9 @@
-import { Card, CardContent } from "@/components/ui/card";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import JobPosting from "@/types/job-posting";
 import jobUrlBuilder from "@/functions/general/job-url-builder";
-import { OnchainBadge } from "./onchain-badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { OnchainBadge } from "./OnchainBadge";
+import JobPosting from "@/types/job-posting";
+import Link from "next/link";
 
 interface JobPostingListProps {
   jobs: JobPosting[];
