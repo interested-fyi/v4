@@ -5,6 +5,7 @@ import { InterestedButton } from "../buttons/InterestedButton";
 import JobPosting from "@/types/job-posting";
 import Link from "next/link";
 import jobUrlBuilder from "@/functions/general/job-url-builder";
+import { OnchainBadge } from "@/components/OnchainBadge";
 
 interface JobRowProps {
   index: number;
@@ -31,7 +32,13 @@ export function JobRow({ index, job }: JobRowProps) {
             <div className='flex items-center gap-2 font-semibold'>
               <p>{job.department}</p>
             </div>
-            <p>{job.sub_department}</p>
+            {job.department !== job.sub_department ? (
+              <p>{job.sub_department}</p>
+            ) : null}
+
+            <OnchainBadge
+              attestationUrl={`https://optimism.easscan.org/attestation/view/${job.job_attestations?.[0].attestation_uid}`}
+            />
           </div>
         </Link>
       </TableCell>

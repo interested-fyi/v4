@@ -26,9 +26,11 @@ export function JobPostingList({ jobs }: JobPostingListProps) {
             <CardContent className='p-6 space-y-4 flex flex-col justify-between'>
               <div className='flex items-center justify-between'>
                 <div className='flex flex-row gap-3 justify-between items-center w-full'>
-                  <div className='text-[#1a56db] text-md font-semibold font-body leading-[21px]'>
-                    {job.company_name}
-                  </div>
+                  <Link href={`/company-details/${job.company_id}`}>
+                    <div className='text-[#1a56db] text-md font-semibold font-body leading-[21px]'>
+                      {job.company_name}
+                    </div>
+                  </Link>
                   <Link
                     href={jobUrlBuilder(job.posting_url)}
                     target='_blank'
