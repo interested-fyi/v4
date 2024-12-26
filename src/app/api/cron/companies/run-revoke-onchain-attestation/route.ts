@@ -128,7 +128,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         //update job_attestations set active = false where attestation_uid in attestations
         const { error: updateAttestationsError } = await supabase
           .from("job_attestations")
-          .update({ active: false })
+          .update({ active: false, revoked_at: `${new Date()}` })
           .in(
             "attestation_uid",
             attestations.map((attestation) => attestation.attestation_uid)
