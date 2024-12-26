@@ -5,21 +5,22 @@ import JobPosting from "@/types/job-posting";
 export async function GET(req: NextRequest, res: NextResponse) {
   const url = new URL(req.url);
   const companyId = url.searchParams.get("companyId");
-
+  const active = url.searchParams.get("active");
   if (!companyId) {
     return NextResponse.json(
       { success: false, error: "Company ID is required" },
       { status: 400 }
     );
   }
-
+  const isActive = active === "true" ? true : false;
+  console.log("🚀 ~ GET ~ isActive:", isActive);
   try {
     // Get job postings for the specified company ID
     const { data: jobData, error: jobError } = await supabase
       .from("job_postings")
       .select("*")
       .eq("company_id", companyId)
-      .eq("active", true)
+      .eq("active", isActive)
       .returns<JobPosting[]>();
 
     if (jobError) {
