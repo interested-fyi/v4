@@ -92,3 +92,16 @@
 [role="dialog"] {
   scrollbar-width: none !important;
 }
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
+}
+
+.hover\:bg-\[100\%_0\]:hover {
+  animation: gradient-shift 3s ease infinite;
+}
