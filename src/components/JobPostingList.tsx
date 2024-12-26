@@ -26,11 +26,8 @@ export function JobPostingList({ jobs }: JobPostingListProps) {
             <CardContent className='p-6 space-y-4'>
               <div className='flex items-center justify-between'>
                 <div className='flex flex-row gap-3'>
-                  <div className='text-[#1a56db] text-sm font-semibold font-body leading-[21px]'>
+                  <div className='text-[#1a56db] text-md font-semibold font-body leading-[21px]'>
                     {job.company_name}
-                  </div>
-                  <div className='text-gray-600 text-sm font-medium font-body leading-[21px]'>
-                    {job.department}
                   </div>
                 </div>
                 <div className='text-sm font-medium text-muted-foreground'>
@@ -45,7 +42,7 @@ export function JobPostingList({ jobs }: JobPostingListProps) {
               </div>
               <div className='flex items-center justify-between'>
                 <div className='text-gray-500 text-xs font-medium font-body leading-[18px]'>
-                  {job.location}
+                  {job.department} - {job.location}
                 </div>
                 <Link
                   href={jobUrlBuilder(job.posting_url)}
@@ -57,16 +54,16 @@ export function JobPostingList({ jobs }: JobPostingListProps) {
                   <Button
                     variant='outline'
                     size='sm'
-                    className='place-self-end mt-4 text-gray-700 w-[120px] text-xs font-medium font-body leading-[18px] border border-gray-700 '
+                    className='text-gray-700 w-[120px] text-xs font-medium font-body leading-[18px] border border-gray-700 '
                   >
                     Apply
                   </Button>
                 </Link>
               </div>
             </CardContent>
-            <CardFooter className='flex flex-col gap-3  w-full'>
-              {job.job_attestations && job.job_attestations?.length > 0 && (
-                <div className='flex flex-row gap-3 px-0 w-full justify-between'>
+            {job.job_attestations && job.job_attestations?.length > 0 && (
+              <CardFooter className='flex flex-col gap-3 w-full'>
+                <div className='flex flex-row gap-3 px-0 w-full items-center justify-between'>
                   <OnchainBadge
                     attestationUrl={`https://optimism.easscan.org/attestation/view/${job.job_attestations[0]?.attestation_uid}`}
                   />
@@ -74,8 +71,8 @@ export function JobPostingList({ jobs }: JobPostingListProps) {
                     {` Verified on ${verifiedDate || ""}`}
                   </div>
                 </div>
-              )}
-            </CardFooter>
+              </CardFooter>
+            )}
           </Card>
         );
       })}

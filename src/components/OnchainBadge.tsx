@@ -8,6 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import Image from "next/image";
 
 interface OnchainBadgeProps {
   attestationUrl: string;
@@ -28,8 +29,14 @@ export function OnchainBadge({ attestationUrl }: OnchainBadgeProps) {
               px-3 py-1 relative overflow-hidden z-40'
             onClick={() => window.open(attestationUrl, "_blank")}
           >
-            <Link2 className='h-3 w-3' />
             <span className='font-medium'>EAS Certified</span>
+            <Image
+              src={"/svg/small-binocular.svg"}
+              alt='binoculars'
+              className='stroke-white fill-white'
+              width={20}
+              height={20}
+            />
           </Badge>
         </TooltipTrigger>
         <TooltipContent className='z-50'>
