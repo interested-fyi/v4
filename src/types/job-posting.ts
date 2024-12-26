@@ -9,6 +9,10 @@ export default interface JobPosting {
   role_title?: string;
   location: string;
   posting_url: string;
+  job_attestations?: {
+    attestation_uid?: string;
+    attestation_tx_hash?: string;
+  }[];
   active?: boolean;
   data?: any;
 }
