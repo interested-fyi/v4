@@ -13,7 +13,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
     );
   }
   const isActive = active === "true" ? true : false;
-  console.log("🚀 ~ GET ~ isActive:", isActive);
   try {
     // Get job postings for the specified company ID
     const { data: jobData, error: jobError } = await supabase
