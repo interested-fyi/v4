@@ -19,7 +19,7 @@ export function JobPostingList({ jobs }: JobPostingListProps) {
         >
           <CardContent className='p-6 space-y-4'>
             {job.job_attestations && job.job_attestations?.length > 0 && (
-              <div className='flex flex-row gap-3 absolute top-3 right-3'>
+              <div className='flex flex-row gap-3 absolute bottom-3 right-3'>
                 <OnchainBadge
                   attestationUrl={`https://optimism.easscan.org/attestation/view/${job.job_attestations[0]?.attestation_uid}`}
                 />
