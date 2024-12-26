@@ -18,11 +18,11 @@
     },
     {
       "path": "/api/cron/companies/run-post-jobs-onchain",
-      "schedule": "*/10 * * * *"
+      "schedule": "*/45 * * * *"
     },
     {
       "path": "/api/cron/companies/run-revoke-onchain-attestation",
-      "schedule": "*/10 * * * *"
+      "schedule": "*/45 * * * *"
     }
   ]
 }
