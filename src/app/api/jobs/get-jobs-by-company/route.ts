@@ -19,6 +19,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
       .from("job_postings")
       .select("*")
       .eq("company_id", companyId)
+      .eq("active", true)
       .returns<JobPosting[]>();
 
     if (jobError) {

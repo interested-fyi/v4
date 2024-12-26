@@ -39,6 +39,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         `
       )
       .eq("approved", true)
+      .eq("job_postings.active", true)
       .range(offset, offset + limit - 1); // Apply pagination using range
 
     if (companyError) {
