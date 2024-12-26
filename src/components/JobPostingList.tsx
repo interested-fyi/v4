@@ -61,7 +61,7 @@ export function JobPostingList({ jobs }: JobPostingListProps) {
                 </div>
               </div>
             </CardContent>
-            {job.job_attestations && job.job_attestations?.length >= 0 && (
+            {job.job_attestations && job.job_attestations?.length > 0 && (
               <CardFooter className='flex flex-col gap-3 w-full'>
                 <div className='flex flex-row gap-3 px-0 w-full items-center justify-between'>
                   <OnchainBadge
