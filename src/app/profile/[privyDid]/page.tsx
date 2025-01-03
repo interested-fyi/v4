@@ -45,7 +45,6 @@ export default function ProfilePage() {
     SOCIALFEED.FARCASTER
   );
   const [addressData, setAddressData] = useState<EthAddress[] | null>(null);
-
   const { user } = usePrivy();
   const params = useParams();
   const { toast } = useToast();
@@ -66,16 +65,18 @@ export default function ProfilePage() {
     },
   });
 
-  const privyConnectedAddresses = user?.linkedAccounts?.filter(
-    (acc) => acc.type === "wallet" && acc.walletClientType !== "privy"
-  );
-
+  const privyConnectedAddresses = user?.linkedAccounts
+    ?.filter((acc) => acc.type === "wallet" && acc.walletClientType !== "privy")
+    .map((acc) => (acc.type === "wallet" ? acc.address : null));
   useEffect(() => {
     if (ethAddresses?.[0]?.ethAddresses.length > 0 || privyConnectedAddresses) {
       // Create an async function to fetch ENS names
-      const combinedAddresses = privyConnectedAddresses
-        ? [...privyConnectedAddresses, ...ethAddresses[0].ethAddresses]
-        : ethAddresses[0].ethAddresses;
+      const combinedAddresses =
+        privyConnectedAddresses && ethAddresses
+          ? [...privyConnectedAddresses, ...ethAddresses[0].ethAddresses]
+          : privyConnectedAddresses
+          ? privyConnectedAddresses
+          : ethAddresses[0].ethAddresses;
       const fetchEnsNames = async () => {
         try {
           const ensData = (await Promise.all(
@@ -98,7 +99,7 @@ export default function ProfilePage() {
 
       fetchEnsNames();
     }
-  }, [ethAddresses, wagmiConfig]);
+  }, [ethAddresses, privyConnectedAddresses, userProfileData]);
 
   const handleCopyToClipboard = async () => {
     if (navigator.clipboard) {

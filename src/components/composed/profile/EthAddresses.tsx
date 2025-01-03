@@ -102,11 +102,13 @@ export function EthAddresses({ addresses }: { addresses: EthAddress[] }) {
       <CollapsibleTrigger className='md:w-full'>
         <div className='flex items-center justify-between md:w-full'>
           <AddressRow {...addresses[0]} />
-          <ChevronDown
-            className={`h-6 w-6 ml-2 transition-transform stroke-black ${
-              isOpen ? "rotate-180" : ""
-            }`}
-          />
+          {addresses && addresses.length > 1 ? (
+            <ChevronDown
+              className={`h-6 w-6 ml-2 transition-transform stroke-black ${
+                isOpen ? "rotate-180" : ""
+              }`}
+            />
+          ) : null}
         </div>
       </CollapsibleTrigger>
       {addresses.length > 1 && (
