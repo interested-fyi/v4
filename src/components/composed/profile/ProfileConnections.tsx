@@ -20,6 +20,7 @@ enum PROFILE_TYPE {
   TELEGRAM = "telegram",
   TWITTER = "twitter",
   FARCASTER = "farcaster",
+  WALLET = "wallet",
 }
 
 const profiles = [
@@ -28,6 +29,7 @@ const profiles = [
   PROFILE_TYPE.FARCASTER,
   PROFILE_TYPE.TELEGRAM,
   PROFILE_TYPE.TWITTER,
+  PROFILE_TYPE.WALLET,
 ];
 
 export const ProfileConnections = ({
@@ -58,206 +60,239 @@ export const ProfileConnections = ({
     unlinkLinkedIn,
     unlinkTelegram,
     unlinkTwitter,
+    unlinkWallet,
   } = usePrivy();
 
-  const { linkGithub, linkFarcaster, linkLinkedIn, linkTelegram, linkTwitter } =
-    useLinkAccount({
-      onSuccess: (user, linkMethod, linkedAccount) => {
-        async function updateGithubUser(
-          privy_did: string,
-          email: string | null | undefined,
-          name: string | null | undefined,
-          username: string | null | undefined,
-          subject: string | null | undefined
-        ) {
-          const accessToken = await getAccessToken();
-          const res = await fetch(`/api/users/linking/github`, {
-            method: "POST",
-            cache: "no-store",
-            headers: {
-              "Content-type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify({
-              privy_did: privy_did,
-              email: email,
-              name: name,
-              username: username,
-              subject: subject,
-            }),
-          });
-        }
+  const {
+    linkGithub,
+    linkFarcaster,
+    linkLinkedIn,
+    linkTelegram,
+    linkTwitter,
+    linkWallet,
+  } = useLinkAccount({
+    onSuccess: (user, linkMethod, linkedAccount) => {
+      async function updateGithubUser(
+        privy_did: string,
+        email: string | null | undefined,
+        name: string | null | undefined,
+        username: string | null | undefined,
+        subject: string | null | undefined
+      ) {
+        const accessToken = await getAccessToken();
+        const res = await fetch(`/api/users/linking/github`, {
+          method: "POST",
+          cache: "no-store",
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            privy_did: privy_did,
+            email: email,
+            name: name,
+            username: username,
+            subject: subject,
+          }),
+        });
+      }
 
-        async function updateFarcasterUser(
-          privy_did: string,
-          fid: number | null | undefined,
-          username: string | null | undefined,
-          displayName: string | null | undefined,
-          pfp: string | null | undefined,
-          url: string | null | undefined,
-          ownerAddress: string | null | undefined,
-          bio: string | null | undefined
-        ) {
-          const accessToken = await getAccessToken();
-          const res = await fetch(`/api/users/linking/farcaster`, {
-            method: "POST",
-            cache: "no-store",
-            headers: {
-              "Content-type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify({
-              privy_did: privy_did,
-              fid: fid,
-              username: username,
-              display_name: displayName,
-              pfp: pfp,
-              url: url,
-              owner_address: ownerAddress,
-              bio: bio,
-            }),
-          });
-          if (!userProfileData?.profile?.photo_source && pfp) {
-            handleSelectPhoto(pfp);
-          }
+      async function updateFarcasterUser(
+        privy_did: string,
+        fid: number | null | undefined,
+        username: string | null | undefined,
+        displayName: string | null | undefined,
+        pfp: string | null | undefined,
+        url: string | null | undefined,
+        ownerAddress: string | null | undefined,
+        bio: string | null | undefined
+      ) {
+        const accessToken = await getAccessToken();
+        const res = await fetch(`/api/users/linking/farcaster`, {
+          method: "POST",
+          cache: "no-store",
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            privy_did: privy_did,
+            fid: fid,
+            username: username,
+            display_name: displayName,
+            pfp: pfp,
+            url: url,
+            owner_address: ownerAddress,
+            bio: bio,
+          }),
+        });
+        if (!userProfileData?.profile?.photo_source && pfp) {
+          handleSelectPhoto(pfp);
         }
+      }
 
-        async function updateLinkedInUser(
-          privy_did: string,
-          email: string | null | undefined,
-          name: string | null | undefined,
-          vanityName: string | null | undefined,
-          subject: string | null | undefined
-        ) {
-          const accessToken = await getAccessToken();
-          const res = await fetch(`/api/users/linking/linkedin`, {
-            method: "POST",
-            cache: "no-store",
-            headers: {
-              "Content-type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify({
-              privy_did: privy_did,
-              email: email,
-              name: name,
-              vanity_name: vanityName,
-              subject: subject,
-            }),
-          });
-        }
+      async function updateLinkedInUser(
+        privy_did: string,
+        email: string | null | undefined,
+        name: string | null | undefined,
+        vanityName: string | null | undefined,
+        subject: string | null | undefined
+      ) {
+        const accessToken = await getAccessToken();
+        const res = await fetch(`/api/users/linking/linkedin`, {
+          method: "POST",
+          cache: "no-store",
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            privy_did: privy_did,
+            email: email,
+            name: name,
+            vanity_name: vanityName,
+            subject: subject,
+          }),
+        });
+      }
 
-        async function updateTelegramUser(
-          privy_did: string,
-          telegram_user_id: string | null | undefined,
-          username: string | null | undefined,
-          photo_url: string | null | undefined,
-          first_name: string | null | undefined,
-          last_name: string | null | undefined
-        ) {
-          const accessToken = await getAccessToken();
-          const res = await fetch(`/api/users/linking/telegram`, {
-            method: "POST",
-            cache: "no-store",
-            headers: {
-              "Content-type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify({
-              privy_did: privy_did,
-              telegram_user_id: telegram_user_id,
-              username: username,
-              photo_url: photo_url,
-              first_name: first_name,
-              last_name: last_name,
-            }),
-          });
-          if (!userProfileData?.profile?.photo_source && photo_url) {
-            handleSelectPhoto(photo_url);
-          }
+      async function updateTelegramUser(
+        privy_did: string,
+        telegram_user_id: string | null | undefined,
+        username: string | null | undefined,
+        photo_url: string | null | undefined,
+        first_name: string | null | undefined,
+        last_name: string | null | undefined
+      ) {
+        const accessToken = await getAccessToken();
+        const res = await fetch(`/api/users/linking/telegram`, {
+          method: "POST",
+          cache: "no-store",
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            privy_did: privy_did,
+            telegram_user_id: telegram_user_id,
+            username: username,
+            photo_url: photo_url,
+            first_name: first_name,
+            last_name: last_name,
+          }),
+        });
+        if (!userProfileData?.profile?.photo_source && photo_url) {
+          handleSelectPhoto(photo_url);
         }
+      }
 
-        async function updateTwitterUser(
-          privy_did: string,
-          name: string | null | undefined,
-          username: string | null | undefined,
-          profile_picture_url: string | null | undefined,
-          subject: string | null | undefined
-        ) {
-          const accessToken = await getAccessToken();
-          const res = await fetch(`/api/users/linking/x`, {
-            method: "POST",
-            cache: "no-store",
-            headers: {
-              "Content-type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify({
-              privy_did: privy_did,
-              name: name,
-              username: username,
-              profile_picture_url: profile_picture_url,
-              subject: subject,
-            }),
-          });
-          if (!userProfileData?.profile?.photo_source && profile_picture_url) {
-            handleSelectPhoto(profile_picture_url);
-          }
+      async function updateTwitterUser(
+        privy_did: string,
+        name: string | null | undefined,
+        username: string | null | undefined,
+        profile_picture_url: string | null | undefined,
+        subject: string | null | undefined
+      ) {
+        const accessToken = await getAccessToken();
+        const res = await fetch(`/api/users/linking/x`, {
+          method: "POST",
+          cache: "no-store",
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            privy_did: privy_did,
+            name: name,
+            username: username,
+            profile_picture_url: profile_picture_url,
+            subject: subject,
+          }),
+        });
+        if (!userProfileData?.profile?.photo_source && profile_picture_url) {
+          handleSelectPhoto(profile_picture_url);
         }
+      }
 
-        switch (linkMethod) {
-          case "github":
-            updateGithubUser(
-              user?.id,
-              user?.github?.email,
-              user?.github?.name,
-              user?.github?.username,
-              user?.github?.subject
-            );
-            break;
-          case "farcaster":
-            updateFarcasterUser(
-              user?.id,
-              user?.farcaster?.fid,
-              user?.farcaster?.username,
-              user?.farcaster?.displayName,
-              user?.farcaster?.pfp,
-              user?.farcaster?.url,
-              user?.farcaster?.ownerAddress,
-              user?.farcaster?.bio
-            );
-            break;
-          case "linkedin":
-            updateLinkedInUser(
-              user?.id,
-              user?.linkedin?.email,
-              user?.linkedin?.name,
-              user?.linkedin?.vanityName,
-              user?.linkedin?.subject
-            );
-            break;
-          case "telegram":
-            updateTelegramUser(
-              user?.id,
-              user?.telegram?.telegramUserId,
-              user?.telegram?.username,
-              user?.telegram?.photoUrl,
-              user?.telegram?.firstName,
-              user?.telegram?.lastName
-            );
-            break;
-          case "twitter":
-            updateTwitterUser(
-              user?.id,
-              user?.twitter?.name,
-              user?.twitter?.username,
-              user?.twitter?.profilePictureUrl,
-              user?.twitter?.subject
-            );
-            break;
-        }
-      },
-    });
+      async function updateWalletUser(
+        privy_did: string,
+        wallet_address: string | null | undefined
+      ) {
+        console.log("🚀 ~ wallet_address:", wallet_address);
+        const accessToken = await getAccessToken();
+        const res = await fetch(`/api/users/linking/wallet`, {
+          method: "POST",
+          cache: "no-store",
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            privy_did: privy_did,
+            wallet_address: [wallet_address],
+          }),
+        });
+      }
+
+      switch (linkMethod) {
+        case "github":
+          updateGithubUser(
+            user?.id,
+            user?.github?.email,
+            user?.github?.name,
+            user?.github?.username,
+            user?.github?.subject
+          );
+          break;
+        case "farcaster":
+          updateFarcasterUser(
+            user?.id,
+            user?.farcaster?.fid,
+            user?.farcaster?.username,
+            user?.farcaster?.displayName,
+            user?.farcaster?.pfp,
+            user?.farcaster?.url,
+            user?.farcaster?.ownerAddress,
+            user?.farcaster?.bio
+          );
+          break;
+        case "linkedin":
+          updateLinkedInUser(
+            user?.id,
+            user?.linkedin?.email,
+            user?.linkedin?.name,
+            user?.linkedin?.vanityName,
+            user?.linkedin?.subject
+          );
+          break;
+        case "telegram":
+          updateTelegramUser(
+            user?.id,
+            user?.telegram?.telegramUserId,
+            user?.telegram?.username,
+            user?.telegram?.photoUrl,
+            user?.telegram?.firstName,
+            user?.telegram?.lastName
+          );
+          break;
+        case "twitter":
+          updateTwitterUser(
+            user?.id,
+            user?.twitter?.name,
+            user?.twitter?.username,
+            user?.twitter?.profilePictureUrl,
+            user?.twitter?.subject
+          );
+          break;
+        case "siwe":
+          updateWalletUser(
+            user?.id,
+            linkedAccount?.type === "wallet" ? linkedAccount.address : null
+          );
+          break;
+      }
+    },
+  });
 
   const updateUserProfileData = async (userProfileData: string | null) => {
     const accessToken = await getAccessToken();
@@ -329,6 +364,9 @@ export const ProfileConnections = ({
       case "twitter":
         linkTwitter();
         break;
+      case "wallet":
+        linkWallet();
+        break;
     }
     if (selectedProfile) {
       setAdditionalProfile(selectedProfile);
@@ -343,13 +381,14 @@ export const ProfileConnections = ({
     }
   };
 
-  const handleUnlink = (linkMethod: string) => {
+  const handleUnlink = (linkMethod: string, address?: string) => {
     if (
       userProfileData &&
       userProfileData?.profile?.preferred_profile === linkMethod
     ) {
       updateUserProfileData(null);
     }
+
     switch (linkMethod) {
       case "github":
         if (user?.github?.subject) {
@@ -376,12 +415,15 @@ export const ProfileConnections = ({
           unlinkTwitter(user.twitter.subject);
         }
         break;
+      case "siwe":
+        if (!!address) {
+          unlinkWallet(address);
+        }
     }
   };
 
   const linkedAccounts = user?.linkedAccounts.filter((linkedAccount: any) => {
     if (
-      linkedAccount.type !== "wallet" &&
       linkedAccount.type !== "smart_wallet" &&
       linkedAccount.type !== "google_oauth"
     ) {
@@ -401,20 +443,61 @@ export const ProfileConnections = ({
         <div className='flex flex-col gap-4'>
           {userProfileData &&
             linkedAccounts?.map((linkedAccount: any) => {
-              const accountName = linkedAccount.type.replace("_oauth", "");
-              if (accountName === "wallet") return;
-              const profileData = profiles.find(
-                (p) => p === linkedAccount.type.replace("_oauth", "")
+              console.log(
+                "🚀 ~ linkedAccounts?.map ~ linkedAccounts:",
+                linkedAccounts
               );
+              let accountName = "";
 
-              if (profileData) {
+              if (
+                linkedAccount.type === "wallet" &&
+                linkedAccount.walletClient === "privy"
+              ) {
+                console.log(
+                  "🚀 ~ linkedAccounts?.map ~ linkedAccount:",
+                  linkedAccount
+                );
+                return;
+              }
+              if (
+                linkedAccount.type === "smart_wallet" ||
+                linkedAccount.type === "google_oauth"
+              ) {
+                return;
+              }
+              if (linkedAccount.type === "google_oauth") {
+                accountName = "google";
+              }
+              if (linkedAccount.type === "twitter_oauth") {
+                accountName = "twitter";
+              }
+              if (linkedAccount.type === "farcaster") {
+                accountName = "farcaster";
+              }
+              if (linkedAccount.type === "linkedin") {
+                accountName = "linkedin";
+              }
+              if (linkedAccount.type === "telegram") {
+                accountName = "telegram";
+              }
+              if (linkedAccount.type === "github_oauth") {
+                accountName = "github";
+              }
+              if (linkedAccount.type === "wallet") {
+                accountName = `${linkedAccount.address.slice(
+                  0,
+                  6
+                )}...${linkedAccount.address.slice(-4)}`;
+              }
+
+              if (accountName) {
                 return (
                   <div
                     className='flex w-full gap-4 items-center'
                     key={accountName}
                   >
                     <UnlinkAccountButton
-                      profile={profileData}
+                      profile={accountName}
                       handleUnlink={handleUnlink}
                       setProfile={setSelectedProfile}
                     />

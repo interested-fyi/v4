@@ -66,13 +66,20 @@ export default function ProfilePage() {
     },
   });
 
+  const privyConnectedAddresses = user?.linkedAccounts?.filter(
+    (acc) => acc.type === "wallet" && acc.walletClientType !== "privy"
+  );
+
   useEffect(() => {
-    if (ethAddresses?.[0]?.ethAddresses.length > 0) {
+    if (ethAddresses?.[0]?.ethAddresses.length > 0 || privyConnectedAddresses) {
       // Create an async function to fetch ENS names
+      const combinedAddresses = privyConnectedAddresses
+        ? [...privyConnectedAddresses, ...ethAddresses[0].ethAddresses]
+        : ethAddresses[0].ethAddresses;
       const fetchEnsNames = async () => {
         try {
           const ensData = (await Promise.all(
-            ethAddresses[0].ethAddresses.map(async (address: `0x${string}`) => {
+            combinedAddresses.map(async (address: `0x${string}`) => {
               try {
                 const ensName = await getEnsName(wagmiConfig, { address });
                 return { address, ensName };

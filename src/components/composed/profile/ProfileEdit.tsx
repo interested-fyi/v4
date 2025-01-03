@@ -263,7 +263,7 @@ export const ProfileEditForm = ({ isEditMode, onSubmit, onClose }: Props) => {
       <>
         {" "}
         <div className='text-[#1e1e1e] text-sm font-bold font-heading leading-[14px] m-0 scroll-m-0 max-w-[360px]'>
-          <p className='mb-1'>READY TO APPEAR ON OUR TALENT PAGE?</p>
+          <p className='mb-1 leading-4'>READY TO APPEAR ON OUR TALENT PAGE?</p>
           <p className='text-xs text-gray-500 mb-3'>
             (your profile will be shared on our socials!)
           </p>
