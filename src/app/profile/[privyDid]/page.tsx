@@ -67,7 +67,7 @@ export default function ProfilePage() {
 
   const privyConnectedAddresses = user?.linkedAccounts
     ?.filter((acc) => acc.type === "wallet" && acc.walletClientType !== "privy")
-    .map((acc) => (acc.type === "wallet" ? acc.address : null));
+    .map((acc) => (acc.type === "wallet" ? acc?.address : null));
   useEffect(() => {
     if (ethAddresses?.[0]?.ethAddresses.length > 0 || privyConnectedAddresses) {
       // Create an async function to fetch ENS names
@@ -411,7 +411,7 @@ export default function ProfilePage() {
               className='pb-4 h-full min-h-96 place-self-start w-full'
               value='onchain'
             >
-              <POAPDisplay address={addressData?.[0].address ?? ""} />
+              <POAPDisplay address={addressData?.[0]?.address ?? ""} />
             </TabsContent>
             <TabsContent
               className='pb-4 h-full min-h-96 place-self-start w-full'

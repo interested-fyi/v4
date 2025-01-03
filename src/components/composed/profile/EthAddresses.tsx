@@ -89,7 +89,7 @@ export function EthAddresses({ addresses }: { addresses: EthAddress[] }) {
     </div>
   );
 
-  if (!addresses || addresses.length === 0) {
+  if (!addresses || addresses?.length === 0) {
     return null;
   }
 

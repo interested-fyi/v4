@@ -218,7 +218,6 @@ export const ProfileConnections = ({
         privy_did: string,
         wallet_address: string | null | undefined
       ) {
-        console.log("🚀 ~ wallet_address:", wallet_address);
         const accessToken = await getAccessToken();
         const res = await fetch(`/api/users/linking/wallet`, {
           method: "POST",
@@ -287,7 +286,7 @@ export const ProfileConnections = ({
         case "siwe":
           updateWalletUser(
             user?.id,
-            linkedAccount?.type === "wallet" ? linkedAccount.address : null
+            linkedAccount?.type === "wallet" ? linkedAccount?.address : null
           );
           break;
       }
@@ -443,20 +442,12 @@ export const ProfileConnections = ({
         <div className='flex flex-col gap-4'>
           {userProfileData &&
             linkedAccounts?.map((linkedAccount: any) => {
-              console.log(
-                "🚀 ~ linkedAccounts?.map ~ linkedAccounts:",
-                linkedAccounts
-              );
               let accountName = "";
 
               if (
                 linkedAccount.type === "wallet" &&
                 linkedAccount.walletClient === "privy"
               ) {
-                console.log(
-                  "🚀 ~ linkedAccounts?.map ~ linkedAccount:",
-                  linkedAccount
-                );
                 return;
               }
               if (
@@ -484,10 +475,7 @@ export const ProfileConnections = ({
                 accountName = "github";
               }
               if (linkedAccount.type === "wallet") {
-                accountName = `${linkedAccount.address.slice(
-                  0,
-                  6
-                )}...${linkedAccount.address.slice(-4)}`;
+                accountName = linkedAccount?.address;
               }
 
               if (accountName) {
@@ -610,7 +598,11 @@ export const UnlinkAccountButton: React.FC<UnlinkAccountButtonProps> = ({
   if (!profile) return null;
   return (
     <div className='flex items-center bg-white rounded-lg text-black px-5 pr-2 w-full'>
-      <span className='flex-grow'>{profile}</span>
+      <span className='flex-grow'>
+        {profile.length > 10
+          ? `${profile.slice(0, 6)}...${profile.slice(-4)}`
+          : profile}
+      </span>
       <Button
         variant='ghost'
         size='icon'
