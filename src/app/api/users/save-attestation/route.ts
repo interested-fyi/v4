@@ -8,7 +8,18 @@ const privyClient = new PrivyClient(
 );
 
 export async function POST(req: NextRequest) {
-  const { attestation_uid, attestation_tx_hash, recipient, recipient_address, endorser, endorser_address, relationship, endorsement, privy_did } = await req.json();
+  const {
+    attestation_uid,
+    attestation_tx_hash,
+    recipient,
+    recipient_address,
+    endorser,
+    endorser_address,
+    relationship,
+    endorsement,
+    privy_did,
+    additional_recipients,
+  } = await req.json();
   const accessToken = req.headers.get("Authorization")?.replace("Bearer ", "");
 
   // verify authenticate user sent request
@@ -17,7 +28,7 @@ export async function POST(req: NextRequest) {
     const verified = await privyClient.verifyAuthToken(accessToken!);
     privyDid = verified.userId;
     if (privy_did !== privyDid) {
-        throw new Error('Privy DIDs do not match');
+      throw new Error("Privy DIDs do not match");
     }
   } catch (e) {
     throw new Error("Invalid access token");
@@ -25,17 +36,24 @@ export async function POST(req: NextRequest) {
 
   const { data, error } = await supabase
     .from("attestations")
-    .upsert([{
-        attestation_uid: attestation_uid,
-        attestation_tx_hash: attestation_tx_hash,
-        recipient: recipient,
-        recipient_address: recipient_address,
-        endorser: endorser,
-        endorser_address: endorser_address,
-        relationship: relationship,
-        endorsement: endorsement
-    }], { onConflict: 'attestation_uid' })
-    .select().single();
+    .upsert(
+      [
+        {
+          attestation_uid: attestation_uid,
+          attestation_tx_hash: attestation_tx_hash,
+          recipient: recipient,
+          recipient_address: recipient_address,
+          endorser: endorser,
+          endorser_address: endorser_address,
+          relationship: relationship,
+          endorsement: endorsement,
+          additional_recipients: additional_recipients,
+        },
+      ],
+      { onConflict: "attestation_uid" }
+    )
+    .select()
+    .single();
 
   if (error) throw error;
 

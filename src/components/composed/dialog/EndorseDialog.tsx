@@ -54,6 +54,9 @@ export default function EndorseDialog({
     const accessToken = await getAccessToken();
     if (client && accessToken && form.relationship && form.endorsement) {
       try {
+        const allUserAddresses = user?.wallet_addresses
+          ? [...user?.wallet_addresses, user?.smart_wallet_address]
+          : [user?.smart_wallet_address];
         const schemaEncoder = new SchemaEncoder(
           "string relationship, string endorsement"
         );
@@ -65,22 +68,26 @@ export default function EndorseDialog({
           address: process.env
             .NEXT_PUBLIC_EAS_CONTRACT_ADDRESS as `0x${string}`,
           abi: easAbi.abi,
-          functionName: "attest",
+          functionName: "multiAttest",
           args: [
-            {
-              schema:
-                process.env.NEXT_PUBLIC_VERCEL_ENV !== "production"
-                  ? process.env.NEXT_PUBLIC_SEPOLIA_ENDORSEMENT_SCHEMA_UID
-                  : process.env.NEXT_PUBLIC_ENDORSEMENT_SCHEMA_UID, // schema uid
-              data: {
-                recipient: user?.smart_wallet_address as `0x${string}`,
-                expirationTime: 0,
-                revocable: true,
-                refUID: "0x" + "00".repeat(32),
-                data: encodedData,
-                value: 0,
-              }, // attestation data
-            },
+            [
+              {
+                schema:
+                  process.env.NEXT_PUBLIC_VERCEL_ENV !== "production"
+                    ? process.env.NEXT_PUBLIC_SEPOLIA_ENDORSEMENT_SCHEMA_UID
+                    : process.env.NEXT_PUBLIC_ENDORSEMENT_SCHEMA_UID, // schema uid
+                data: allUserAddresses?.map(
+                  (address) => ({
+                    recipient: address as `0x${string}`,
+                    expirationTime: 0,
+                    revocable: true,
+                    refUID: "0x" + "00".repeat(32),
+                    data: encodedData,
+                    value: 0,
+                  }) // attestation data
+                ),
+              },
+            ],
           ],
           chain:
             process.env.NEXT_PUBLIC_VERCEL_ENV !== "production"
@@ -88,7 +95,6 @@ export default function EndorseDialog({
               : (optimism as Chain),
           account: client?.account,
         };
-
         const { request } = await publicClient.simulateContract(contractParams);
         const txHash = await client?.writeContract(request);
         const uid = await getEndorsementUid(txHash);
@@ -105,6 +111,9 @@ export default function EndorseDialog({
             attestation_tx_hash: txHash,
             recipient: user?.privy_did,
             recipient_address: user?.smart_wallet_address as `0x${string}`,
+            additional_recipients: allUserAddresses.filter(
+              (address) => address !== user?.smart_wallet_address
+            ),
             endorser: privyUser?.id,
             endorser_address: privyUser?.smartWallet?.address,
             relationship: form.relationship,

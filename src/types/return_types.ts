@@ -25,6 +25,7 @@ export interface UserCombinedProfile {
   telegram_photo?: string | null;
   x_username?: string | null;
   x_photo?: string | null;
+  wallet_addresses?: string[] | null;
 }
 
 interface Embed {

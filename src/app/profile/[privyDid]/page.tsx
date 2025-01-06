@@ -64,14 +64,20 @@ export default function ProfilePage() {
     },
   });
 
-  const privyConnectedAddresses = useMemo(() => {
-    return user?.linkedAccounts
-      ?.filter(
-        (acc) => acc.type === "wallet" && acc.walletClientType !== "privy"
-      )
-      .map((acc) => (acc.type === "wallet" ? acc?.address : null));
-  }, [user?.linkedAccounts]);
   useEffect(() => {
+    const privyConnectedAddresses =
+      userProfileData?.profile?.wallet_addresses &&
+      userProfileData?.profile?.farcaster_address
+        ? [
+            userProfileData?.profile?.farcaster_address,
+            ...userProfileData?.profile?.wallet_addresses,
+          ]
+        : userProfileData?.profile?.farcaster_address
+        ? [userProfileData?.profile?.farcaster_address]
+        : userProfileData?.profile?.wallet_addresses
+        ? userProfileData?.profile?.wallet_addresses
+        : null;
+
     if (ethAddresses?.[0]?.ethAddresses.length > 0 || privyConnectedAddresses) {
       // Create an async function to fetch ENS names
       const combinedAddresses =
@@ -102,7 +108,7 @@ export default function ProfilePage() {
 
       fetchEnsNames();
     }
-  }, [userProfileData, ethAddresses, privyConnectedAddresses]);
+  }, [userProfileData, ethAddresses]);
 
   const handleCopyToClipboard = async () => {
     if (navigator.clipboard) {
