@@ -1,3 +1,5 @@
+"use client";
+
 import CompanyInfo from "@/components/composed/companies/CompanyInfo";
 import JobTable from "@/components/composed/jobs/JobTable";
 import React from "react";
