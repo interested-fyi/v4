@@ -7,11 +7,10 @@ import { usePrivy } from "@privy-io/react-auth";
 import { UserCombinedProfile } from "@/types/return_types";
 import { useParams } from "next/navigation";
 import EndorseDialog from "@/components/composed/dialog/EndorseDialog";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SearchIcon } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { fetchEthAddresses, fetchUserProfile } from "@/lib/api/helpers";
-import SwitchButtonGroup from "@/components/composed/buttons/SwitchButtonGroup";
 import ProfileSkeleton from "@/components/composed/profile/ProfileSkeleton";
 import SocialLinks from "@/components/composed/profile/SocialLinks";
 import ActivityTab from "@/components/composed/profile/ActivityTab";
@@ -65,9 +64,13 @@ export default function ProfilePage() {
     },
   });
 
-  const privyConnectedAddresses = user?.linkedAccounts
-    ?.filter((acc) => acc.type === "wallet" && acc.walletClientType !== "privy")
-    .map((acc) => (acc.type === "wallet" ? acc?.address : null));
+  const privyConnectedAddresses = useMemo(() => {
+    return user?.linkedAccounts
+      ?.filter(
+        (acc) => acc.type === "wallet" && acc.walletClientType !== "privy"
+      )
+      .map((acc) => (acc.type === "wallet" ? acc?.address : null));
+  }, [user?.linkedAccounts]);
   useEffect(() => {
     if (ethAddresses?.[0]?.ethAddresses.length > 0 || privyConnectedAddresses) {
       // Create an async function to fetch ENS names
@@ -99,7 +102,7 @@ export default function ProfilePage() {
 
       fetchEnsNames();
     }
-  }, [ethAddresses, privyConnectedAddresses, userProfileData]);
+  }, [userProfileData, ethAddresses, privyConnectedAddresses]);
 
   const handleCopyToClipboard = async () => {
     if (navigator.clipboard) {
