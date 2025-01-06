@@ -18,6 +18,7 @@ const CompanyInfo = () => {
 
   const { data: company, isLoading: isLoadingCompany } = useQuery({
     queryKey: ["company-by-id"],
+    enabled: typeof window !== "undefined",
     queryFn: async () => {
       const accessToken = await getAccessToken();
       const res = await fetch(
