@@ -1,6 +1,6 @@
 import { CompanyResponse } from "@/app/api/companies/get-approved-companies/route";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import React from "react";
 

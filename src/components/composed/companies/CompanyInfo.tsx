@@ -1,4 +1,3 @@
-// components/CompanyInfo.tsx
 "use client";
 import React from "react";
 import Image from "next/image";
@@ -25,7 +24,7 @@ const CompanyInfo = () => {
         `/api/companies/get-company-by-id?companyId=${slug["company-id"]}`,
         {
           method: "GET",
-          cache: 'no-store',
+          cache: "no-store",
           headers: {
             "Content-type": "application/json",
             authorization: `Bearer ${accessToken}`,
