@@ -29,7 +29,7 @@ export function OnchainBadge({ attestationUrl }: OnchainBadgeProps) {
               px-3 py-1 relative overflow-hidden z-40'
             onClick={() => window.open(attestationUrl, "_blank")}
           >
-            <span className='font-medium'>EAS Certified</span>
+            <span className='font-medium'>EAS Verified</span>
             <Image
               src={"/svg/small-binocular.svg"}
               alt='binoculars'
