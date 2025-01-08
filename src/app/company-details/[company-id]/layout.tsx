@@ -1,4 +1,4 @@
-import "./../../../../globals.css";
+import "./../../globals.css";
 import type { Metadata } from "next";
 import { Roboto_Mono } from "next/font/google";
 import { Inter } from "next/font/google";
