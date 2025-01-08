@@ -30,11 +30,6 @@ const fontBody = Inter({
   variable: "--font-body",
 });
 
-export const metadata: Metadata = {
-  title: "Interested.fyi",
-  description: "Find the best web3 jobs and employees",
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
