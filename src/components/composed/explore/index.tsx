@@ -292,7 +292,7 @@ export function Jobs({ page, limit, onPageChange, onLimitChange }: JobsProps) {
         <div>
           <div className='flex lg:flex-row flex-col gap-4 justify-between items-start lg:items-center px-8 max-w-3xl'>
             <div className='flex  items-center gap-2'>
-              <label className='min-w-24'>Department:</label>
+              <label className='min-w-24 lg:min-w-12'>Department:</label>
               <select
                 value={filters.department}
                 onChange={(e) =>
@@ -311,7 +311,7 @@ export function Jobs({ page, limit, onPageChange, onLimitChange }: JobsProps) {
             </div>
 
             <div className='flex items-center gap-2'>
-              <label className='min-w-24'>Location:</label>
+              <label className='min-w-24 lg:min-w-12'>Location:</label>
               <select
                 value={filters.location}
                 onChange={(e) =>
@@ -330,7 +330,7 @@ export function Jobs({ page, limit, onPageChange, onLimitChange }: JobsProps) {
             </div>
 
             <div className='flex items-center gap-2'>
-              <label className='min-w-24'>Title:</label>
+              <label className='min-w-24 lg:min-w-12'>Title:</label>
               <select
                 value={filters.title}
                 onChange={(e) =>
