@@ -1,5 +1,3 @@
-"use client";
-
 import "./globals.css";
 import type { Metadata } from "next";
 import { Roboto_Mono } from "next/font/google";
@@ -29,6 +27,11 @@ const fontBody = Inter({
   display: "swap",
   variable: "--font-body",
 });
+
+export const metadata: Metadata = {
+  title: "Interested.fyi",
+  description: "Find the best web3 jobs and employees",
+};
 
 export default function RootLayout({
   children,
