@@ -1,8 +1,8 @@
 import CompanyInfo from "@/components/composed/companies/CompanyInfo";
 import JobTable from "@/components/composed/jobs/JobTable";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
-const ServerExploreTalentPage = () => {
+const ExploreTalentPage = () => {
   return (
     <div className='flex flex-col gap-8'>
       <CompanyInfo />
@@ -11,4 +11,4 @@ const ServerExploreTalentPage = () => {
   );
 };
 
-export default ServerExploreTalentPage;
+export default ExploreTalentPage;
