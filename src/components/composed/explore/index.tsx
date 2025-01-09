@@ -210,22 +210,35 @@ interface JobsProps {
 }
 
 export function Jobs({ page, limit, onPageChange, onLimitChange }: JobsProps) {
+  const [filters, setFilters] = useState({
+    department: "",
+    location: "",
+    title: "",
+  });
+
   const { getAccessToken } = usePrivy();
 
   const { data: jobsData, isLoading: isLoadingJobs } = useQuery({
-    queryKey: ["jobs", page, limit],
+    queryKey: ["jobs", page, limit, filters],
     queryFn: async () => {
       const accessToken = await getAccessToken();
-      const res = await fetch(
-        `/api/jobs/get-all-jobs?page=${page}&limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-type": "application/json",
-            authorization: `Bearer ${accessToken}`,
-          },
+      // build query string
+      const query = new URLSearchParams();
+      query.append("page", String(page));
+      query.append("limit", String(limit));
+      for (const key in filters) {
+        if (filters[key as keyof typeof filters]) {
+          query.append(key, filters[key as keyof typeof filters]);
         }
-      );
+      }
+
+      const res = await fetch(`/api/jobs/get-all-jobs?${query.toString()}`, {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json",
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
       return (await res.json()) as {
         success: boolean;
         jobs: JobPosting[];
@@ -235,6 +248,25 @@ export function Jobs({ page, limit, onPageChange, onLimitChange }: JobsProps) {
     },
   });
 
+  const { data: jobFilters, isLoading: isLoadingJobFilters } = useQuery({
+    queryKey: ["job-filters"],
+    queryFn: async () => {
+      const accessToken = await getAccessToken();
+      const res = await fetch(`/api/jobs/get-job-filters`, {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json",
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return (await res.json()) as {
+        success: boolean;
+        departments: string[];
+        locations: string[];
+        roleTitles: string[];
+      };
+    },
+  });
   return (
     <>
       <div className='flex justify-end items-center gap-4 px-8'>
@@ -257,7 +289,66 @@ export function Jobs({ page, limit, onPageChange, onLimitChange }: JobsProps) {
           <LoaderCircle className='w-12 h-12 text-blue-500 animate-spin mx-auto' />
         </div>
       ) : (
-        <JobPostingList jobs={jobsData?.jobs ?? []} />
+        <div>
+          <div className='flex lg:flex-row flex-col gap-4 justify-between items-start lg:items-center px-8 max-w-3xl'>
+            <div className='flex  items-center gap-2'>
+              <label className='min-w-24'>Department:</label>
+              <select
+                value={filters.department}
+                onChange={(e) =>
+                  setFilters({ ...filters, department: e.target.value })
+                }
+                className='border p-1 rounded w-40'
+              >
+                <option value=''>All Departments</option>
+                {jobFilters?.departments?.map((department) => (
+                  <option key={department} value={department}>
+                    {department}
+                  </option>
+                ))}
+                {/* Add more options */}
+              </select>
+            </div>
+
+            <div className='flex items-center gap-2'>
+              <label className='min-w-24'>Location:</label>
+              <select
+                value={filters.location}
+                onChange={(e) =>
+                  setFilters({ ...filters, location: e.target.value })
+                }
+                className='border p-1 rounded w-40'
+              >
+                <option value=''>All Locations</option>
+                {jobFilters?.locations?.map((location) => (
+                  <option key={location} value={location}>
+                    {location}
+                  </option>
+                ))}
+                {/* Add more options */}
+              </select>
+            </div>
+
+            <div className='flex items-center gap-2'>
+              <label className='min-w-24'>Title:</label>
+              <select
+                value={filters.title}
+                onChange={(e) =>
+                  setFilters({ ...filters, title: e.target.value })
+                }
+                className='border p-1 rounded w-40'
+              >
+                <option value=''>All Titles</option>
+                {jobFilters?.roleTitles?.map((title) => (
+                  <option key={title} value={title}>
+                    {title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <JobPostingList jobs={jobsData?.jobs ?? []} />
+        </div>
       )}
 
       <Pagination
