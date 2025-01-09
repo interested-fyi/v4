@@ -1,7 +1,7 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import JobPosting from "@/types/job-posting";
 import { usePrivy } from "@privy-io/react-auth";
-import { User } from "@privy-io/server-auth";
 import React from "react";
 
 interface ApprovalButtonGroupProps {

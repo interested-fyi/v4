@@ -1,4 +1,3 @@
-// components/JobList.tsx
 "use client";
 import React, { useState } from "react";
 import {
@@ -28,7 +27,6 @@ const JobTable = () => {
   const [activeJobFilter, setActiveJobFilter] = useState("true");
   const { data: company } = useQuery({
     queryKey: ["company-by-id"],
-    enabled: typeof window !== "undefined",
     queryFn: async () => {
       const accessToken = await getAccessToken();
       const res = await fetch(
@@ -54,7 +52,6 @@ const JobTable = () => {
     isRefetching,
   } = useQuery({
     queryKey: ["jobs", activeJobFilter],
-    enabled: typeof window !== "undefined",
     queryFn: async () => {
       const accessToken = await getAccessToken();
       const res = await fetch(

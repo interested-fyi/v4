@@ -1,5 +1,5 @@
 "use client";
-import { User, usePrivy, useLogin } from "@privy-io/react-auth";
+import { User, usePrivy } from "@privy-io/react-auth";
 import React, { useEffect } from "react";
 
 /**
@@ -73,10 +73,11 @@ const AuthedUIController = ({
   authedUI,
   unauthedUI,
 }: AuthedUIControllerProps) => {
-  const { ready, authenticated, user, logout, login, getAccessToken } = usePrivy();
+  const { ready, authenticated, user, logout, login, getAccessToken } =
+    usePrivy();
   useEffect(() => {
     async function saveUser() {
-      if(authenticated) {
+      if (authenticated) {
         const accessToken = await getAccessToken();
         const res = await fetch(`/api/users/save-user`, {
           method: "POST",
