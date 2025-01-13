@@ -65,18 +65,9 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    const privyConnectedAddresses =
-      userProfileData?.profile?.wallet_addresses &&
-      userProfileData?.profile?.farcaster_address
-        ? [
-            userProfileData?.profile?.farcaster_address,
-            ...userProfileData?.profile?.wallet_addresses,
-          ]
-        : userProfileData?.profile?.farcaster_address
-        ? [userProfileData?.profile?.farcaster_address]
-        : userProfileData?.profile?.wallet_addresses
-        ? userProfileData?.profile?.wallet_addresses
-        : null;
+    const privyConnectedAddresses = userProfileData?.profile?.wallet_addresses
+      ? userProfileData?.profile?.wallet_addresses
+      : null;
 
     if (ethAddresses?.[0]?.ethAddresses.length > 0 || privyConnectedAddresses) {
       // Create an async function to fetch ENS names
