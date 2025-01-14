@@ -15,8 +15,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
-import React, { ChangeEvent, FormEvent, useState } from "react";
+import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { SelectComposed } from "../inputs/SelectComposed";
+import { fetchUserProfile } from "@/lib/api/helpers";
+import { usePrivy } from "@privy-io/react-auth";
 
 export type SalaryFormData = {
   category: string;
@@ -33,6 +35,17 @@ export function SalaryRangeFinder({ onSubmit }: SalaryRangeFinderProps) {
     role: "",
     seniority: "",
     geography: "",
+  });
+
+  const { user, getAccessToken } = usePrivy();
+
+  const { data: userProfileData } = useQuery({
+    enabled: !!user,
+    queryKey: ["user", user?.id.replace("did:privy:", "")],
+    queryFn: async () => {
+      const accessToken = await getAccessToken();
+      return await fetchUserProfile({ userId: user?.id, accessToken });
+    },
   });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -77,6 +90,17 @@ export function SalaryRangeFinder({ onSubmit }: SalaryRangeFinderProps) {
         };
       },
     });
+
+  useEffect(() => {
+    if (userProfileData) {
+      console.log("🚀 ~ useEffect ~ userProfileData:", userProfileData);
+      setFormData((prevState) => ({
+        ...prevState,
+        role: userProfileData.profile.position?.[0] ?? "",
+        geography: userProfileData.profile.geography ?? "",
+      }));
+    }
+  }, [userProfileData]);
 
   return (
     <div className='w-[517px] h-[600px] max-w-full md:h-[710px] relative bg-coins bg-no-repeat bg-center bg-cover transform rotate-[15deg]'>
