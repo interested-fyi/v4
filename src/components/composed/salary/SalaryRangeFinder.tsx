@@ -93,7 +93,6 @@ export function SalaryRangeFinder({ onSubmit }: SalaryRangeFinderProps) {
 
   useEffect(() => {
     if (userProfileData) {
-      console.log("🚀 ~ useEffect ~ userProfileData:", userProfileData);
       setFormData((prevState) => ({
         ...prevState,
         role: userProfileData.profile.position?.[0] ?? "",
