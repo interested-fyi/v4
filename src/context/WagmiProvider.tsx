@@ -3,7 +3,7 @@ import React from "react";
 import { type State, WagmiProvider, createConfig, http } from "wagmi";
 import { mainnet, optimism } from "wagmi/chains";
 import { type PropsWithChildren } from "react";
-import { coinbaseWallet, injected, metaMask, safe } from "wagmi/connectors";
+import { coinbaseWallet, injected, safe } from "wagmi/connectors";
 
 interface Props extends PropsWithChildren {
   initialState?: State;

@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
     preferred_profile,
     bio,
     position,
+    geography,
     employment_type,
     calendly_link,
     unlock_calendar_fee,
@@ -52,6 +53,7 @@ export async function POST(req: NextRequest) {
     preferred_profile: preferredProfile,
     bio: bio,
     position: position,
+    geography: geography,
     employment_type: employment_type,
     calendly_link: calendly_link,
     unlock_calendar_fee: unlock_calendar_fee,
@@ -63,10 +65,7 @@ export async function POST(req: NextRequest) {
   );
   const { data, error } = await supabase
     .from("user_profiles")
-    .upsert(
-      [filteredProfileData],
-      { onConflict: "privy_did" }
-    )
+    .upsert([filteredProfileData], { onConflict: "privy_did" })
     .select()
     .single();
 

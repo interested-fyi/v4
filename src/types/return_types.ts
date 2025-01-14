@@ -7,6 +7,7 @@ export interface UserCombinedProfile {
   position?: string[] | null;
   employment_type?: string[] | null;
   bio?: string | null;
+  geography?: string | null;
   booking_description?: string | null;
   smart_wallet_address?: string | null;
   unlock_calendar_fee?: string | null;

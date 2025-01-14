@@ -109,6 +109,7 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
     calendar: string;
     fee: string;
     bookingDescription: string;
+    geography: string;
     isAvailable: boolean;
     position: string[];
     employmentType: string[];
@@ -149,6 +150,7 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
         calendly_link: formToSubmit.calendar,
         unlock_calendar_fee: formToSubmit.fee,
         booking_description: formToSubmit.bookingDescription,
+        geography: formToSubmit.geography,
         available: formToSubmit.isAvailable,
         position: formToSubmit.position,
         employment_type:
@@ -241,6 +243,7 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
               fee: string;
               bookingDescription: string;
               isAvailable: boolean;
+              geography: string;
               position: string[];
               employmentType: string[];
               tempPhotoUrl: string | null;

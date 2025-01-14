@@ -51,7 +51,7 @@ const JobTable = () => {
     isLoading: isLoadingJobs,
     isRefetching,
   } = useQuery({
-    queryKey: ["jobs", activeJobFilter],
+    queryKey: ["jobs", slug["company-id"], activeJobFilter],
     queryFn: async () => {
       const accessToken = await getAccessToken();
       const res = await fetch(

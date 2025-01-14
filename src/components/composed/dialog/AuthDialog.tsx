@@ -45,6 +45,7 @@ export default function AuthDialog({
     bestProfile: string;
     calendar: string;
     fee: string;
+    geography: string;
     position: string[];
     employmentType: string[];
     bookingDescription: string;
@@ -73,6 +74,7 @@ export default function AuthDialog({
         calendly_link: formToSubmit.calendar,
         unlock_calendar_fee: formToSubmit.fee,
         position: formToSubmit.position,
+        geography: formToSubmit.geography,
         employment_type:
           typeof formToSubmit.employmentType === "string"
             ? [formToSubmit.employmentType]
@@ -120,6 +122,7 @@ export default function AuthDialog({
               isAvailable: boolean;
               calendar: string;
               fee: string;
+              geography: string;
               bookingDescription: string;
               position: string[];
               employmentType: string[];

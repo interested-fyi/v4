@@ -14,6 +14,7 @@ import { fetchUserProfile } from "@/lib/api/helpers";
 import { usePathname, useRouter } from "next/navigation";
 import { JobTypeSelect } from "../inputs/JobTypeSelect";
 import { JobSelect } from "../inputs/JobSelect";
+import { SelectComposed } from "../inputs/SelectComposed";
 
 interface Props {
   isEditMode?: boolean;
@@ -26,6 +27,7 @@ interface Props {
     fee: string;
     bookingDescription: string;
     isAvailable: boolean;
+    geography: string;
     position: string[];
     employmentType: string[];
     tempPhotoUrl: string | null;
@@ -44,6 +46,7 @@ export const ProfileEditForm = ({ isEditMode, onSubmit, onClose }: Props) => {
     calendar: "",
     fee: "",
     bookingDescription: "",
+    geography: "",
     isAvailable: true,
     position: [""],
     employmentType: [""],
@@ -65,6 +68,29 @@ export const ProfileEditForm = ({ isEditMode, onSubmit, onClose }: Props) => {
       return await fetchUserProfile({ userId: user?.id, accessToken });
     },
   });
+
+  console.log("🚀 ~ ProfileEditForm ~ userProfileData:", userProfileData);
+  const { data: jobSalaryOptions, isLoading: jobSalaryOptionsLoading } =
+    useQuery({
+      queryKey: ["job-salary-options"],
+      queryFn: async () => {
+        const res = await fetch(`/api/salary-range/details`, {
+          method: "GET",
+          cache: "no-store",
+          headers: {
+            "Content-type": "application/json",
+          },
+        });
+        return (await res.json()) as {
+          success: boolean;
+          salaryDetails: {
+            roleTitles: string[];
+
+            locations: string[];
+          };
+        };
+      },
+    });
 
   useEffect(() => {
     // check if the url contains any query params and set the form state accordingly
@@ -90,6 +116,7 @@ export const ProfileEditForm = ({ isEditMode, onSubmit, onClose }: Props) => {
         employmentType: urlParams.employmentType
           ? urlParams.employmentType.split(",")
           : [""],
+        geography: urlParams.geography ?? "",
       });
     } else if (userProfileData?.success) {
       setForm({
@@ -103,6 +130,7 @@ export const ProfileEditForm = ({ isEditMode, onSubmit, onClose }: Props) => {
         isAvailable: userProfileData.profile?.available ?? true,
         position: userProfileData.profile?.position ?? [""],
         employmentType: userProfileData.profile?.employment_type ?? [""],
+        geography: userProfileData.profile?.geography ?? "",
       });
     }
   }, [userProfileData]);
@@ -458,52 +486,92 @@ export const ProfileEditForm = ({ isEditMode, onSubmit, onClose }: Props) => {
               + Add another
             </Button>
           }
-          <div>
-            <Label className='text-sm font-medium' htmlFor='calendar'>
-              Scheduling link (Calendly, etc)
-            </Label>
-            <Input
-              className='rounded-lg'
-              id='calendar'
-              value={form.calendar}
-              onChange={(e) =>
-                setForm({ ...form, calendar: e.target.value.trim() })
-              }
-            />
-          </div>
-          <div>
-            <Label className='text-sm font-medium' htmlFor='fee'>
-              Fee to unlock your calendar:
-            </Label>
-            <Input
-              className='rounded-lg'
-              id='fee'
-              value={form.fee}
-              onChange={(e) => setForm({ ...form, fee: e.target.value.trim() })}
-            />
-          </div>
           <div className='flex flex-col gap-2'>
-            <Label className='text-sm font-medium' htmlFor='bookingDescription'>
-              {`Description of your booking: (<180 characters)`}
+            <Label className='text-sm font-medium' htmlFor='bestProfile'>
+              Geography
             </Label>
-            <Textarea
-              className='rounded-lg'
-              id='bookingDescription'
-              value={form.bookingDescription}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  bookingDescription: e.target.value.trim(),
-                })
-              }
+            <SelectComposed
+              placeholder='Select geography'
+              value={form.geography}
+              onValueChange={(val) => {
+                setForm({ ...form, geography: val });
+              }}
+              options={jobSalaryOptions?.salaryDetails.locations}
             />
           </div>
-          <Button
-            variant={"link"}
-            className='text-center text-[#2640eb] text-sm font-medium font-body leading-[21px]'
-          >
-            Don&apos;t have a calendar? Create one
-          </Button>
+          {/* {jobSalary?.success ? (
+            // display the salary range and ask if it looks right, too high, or too low
+            <>
+              <div className='space-y-4 border p-4 rounded-md shadow-sm bg-white'>
+                <div className='space-y-2'>
+                  <Label
+                    className='text-sm font-medium text-gray-700'
+                    htmlFor='bestProfile'
+                  >
+                    Salary Range
+                  </Label>
+                  <div className='grid grid-cols-2 gap-y-1'>
+                    <p className='text-sm font-medium text-gray-600'>Min:</p>
+                    <p className='text-sm font-medium'>
+                      {`${new Intl.NumberFormat(
+                        jobSalary.salaryRange?.currency,
+                        {
+                          style: "currency",
+                          currency: jobSalary.salaryRange?.currency,
+                        }
+                      )}`}
+                    </p>
+                    <p className='text-sm font-medium text-gray-600'>Max:</p>
+                    <p className='text-sm font-medium'>
+                      {jobSalary.salaryRange?.new_max}
+                    </p>
+                    <p className='text-sm font-medium text-gray-600'>Median:</p>
+                    <p className='text-sm font-medium'>
+                      {jobSalary.salaryRange?.new_mid}
+                    </p>
+                  </div>
+                </div>
+                <hr className='border-gray-200' />
+                <div className='space-y-2'>
+                  <Label
+                    className='text-sm font-medium text-gray-700'
+                    htmlFor='bestProfile'
+                  >
+                    Does this look right?
+                  </Label>
+                  <div className='flex gap-4'>
+                    <Button
+                      variant='link'
+                      className='text-sm text-red-700 hover:underline'
+                      onClick={() => {
+                        // set the salary range to the form
+                      }}
+                    >
+                      Too low
+                    </Button>
+                    <Button
+                      variant='link'
+                      className='text-sm text-green-700 hover:underline'
+                      onClick={() => {
+                        // set the salary range to the form
+                      }}
+                    >
+                      Just right
+                    </Button>
+                    <Button
+                      variant='link'
+                      className='text-sm text-red-700 hover:underline'
+                      onClick={() => {
+                        // set the salary range to the form
+                      }}
+                    >
+                      Too high
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : null} */}
         </div>
         <Button
           className='w-full text-sm font-body font-medium leading-[21px] mt-4 bg-[#2640eb]'
