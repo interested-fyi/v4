@@ -69,7 +69,6 @@ export const ProfileEditForm = ({ isEditMode, onSubmit, onClose }: Props) => {
     },
   });
 
-  console.log("🚀 ~ ProfileEditForm ~ userProfileData:", userProfileData);
   const { data: jobSalaryOptions, isLoading: jobSalaryOptionsLoading } =
     useQuery({
       queryKey: ["job-salary-options"],

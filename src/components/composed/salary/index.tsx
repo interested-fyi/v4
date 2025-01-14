@@ -10,12 +10,13 @@ export function SalaryRangeComposed() {
     category: "",
     role: "",
     seniority: "",
-    location: "",
+    geography: "",
   });
   const [salaryData, setSalaryData] = React.useState<{
-    minSalary: number;
-    medianSalary: number;
-    maxSalary: number;
+    minSalary: string;
+    medianSalary: string;
+    maxSalary: string;
+    currency: string;
   } | null>(null);
 
   const scrollToTop = () => {
@@ -24,20 +25,28 @@ export function SalaryRangeComposed() {
 
   const handleSubmit = async (formData: SalaryFormData) => {
     try {
-      const response = await fetch("/api/salary-range", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        `/api/salary-range?country_code=${formData.geography}&job_profile=${formData.role}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
 
       const data = await response.json();
-      setSalaryData(data);
+      console.log("🚀 ~ handleSubmit ~ data:", data);
+      setSalaryData({
+        minSalary: data.salaryRange.new_min,
+        medianSalary: data.salaryRange.new_mid,
+        maxSalary: data.salaryRange.new_max,
+        currency: data.salaryRange.currency,
+      });
       setFormData(formData);
 
       scrollToTop();
@@ -49,14 +58,14 @@ export function SalaryRangeComposed() {
   };
   return (
     <>
-      {formData.category && salaryData?.maxSalary ? (
+      {formData.role && salaryData?.maxSalary ? (
         <SalaryRange
           role={formData.role}
-          roleLevel={formData.seniority}
           minSalary={salaryData.minSalary}
           medianSalary={salaryData.medianSalary}
           maxSalary={salaryData.maxSalary}
-          location={formData.location}
+          currencyCode={salaryData.currency}
+          location={formData.geography}
         />
       ) : (
         <SalaryQuizCopy />

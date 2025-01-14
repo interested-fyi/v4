@@ -3,32 +3,35 @@ import React from "react";
 import { RateCalculator } from "./composed/salary/RateCalculator";
 
 interface SalaryRangeProps {
-  roleLevel: string;
   location: string;
-  minSalary: number;
-  medianSalary: number;
-  maxSalary: number;
+  minSalary: string;
+  medianSalary: string;
+  maxSalary: string;
   role: string;
+  currencyCode: string;
 }
 
 export function SalaryRange({
-  roleLevel,
   location,
   role,
   minSalary,
   medianSalary,
   maxSalary,
+  currencyCode,
 }: SalaryRangeProps) {
   const [isHourly, setIsHourly] = React.useState(false);
   const handleCalculateHourlyRate = () => {
     const hoursInYearOfWork = 2080;
-    const minHourlyRate = minSalary / hoursInYearOfWork;
-    const medianHourlyRate = medianSalary / hoursInYearOfWork;
-    const maxHourlyRate = maxSalary / hoursInYearOfWork;
+    const minHourlyRate =
+      Number(minSalary.replace(",", "")) / hoursInYearOfWork;
+    const medianHourlyRate =
+      Number(medianSalary.replace(",", "")) / hoursInYearOfWork;
+    const maxHourlyRate =
+      Number(maxSalary.replace(",", "")) / hoursInYearOfWork;
     return {
-      minSalary: minHourlyRate,
-      medianSalary: medianHourlyRate,
-      maxSalary: maxHourlyRate,
+      minSalary: minHourlyRate.toLocaleString(),
+      medianSalary: medianHourlyRate.toLocaleString(),
+      maxSalary: maxHourlyRate.toLocaleString(),
     };
   };
 
@@ -48,11 +51,8 @@ export function SalaryRange({
         />
       </div>
       <p className='text-left text-[#333333]'>
-        For a{" "}
-        <span className='font-semibold'>
-          {roleLevel} {role}
-        </span>{" "}
-        living in <span className='font-semibold'>{location}</span>:
+        For a <span className='font-semibold'>{role}</span> living in{" "}
+        <span className='font-semibold'>{location}</span>:
       </p>
       <div className='mt-6 w-full'>
         <p className='text-[#333333] text-left font-semibold'>
@@ -89,6 +89,7 @@ export function SalaryRange({
           minSalary={rates.minSalary}
           maxSalary={rates.maxSalary}
           medianSalary={rates.medianSalary}
+          currencyCode={currencyCode}
         />
       </div>
     </div>

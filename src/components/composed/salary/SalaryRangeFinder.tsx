@@ -7,7 +7,6 @@ import {
   CardFooter,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -15,13 +14,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useQuery } from "@tanstack/react-query";
 import React, { ChangeEvent, FormEvent, useState } from "react";
+import { SelectComposed } from "../inputs/SelectComposed";
 
 export type SalaryFormData = {
   category: string;
   role: string;
   seniority: string;
-  location: string;
+  geography: string;
 };
 interface SalaryRangeFinderProps {
   onSubmit: (formData: SalaryFormData) => void;
@@ -31,7 +32,7 @@ export function SalaryRangeFinder({ onSubmit }: SalaryRangeFinderProps) {
     category: "",
     role: "",
     seniority: "",
-    location: "",
+    geography: "",
   });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -54,11 +55,28 @@ export function SalaryRangeFinder({ onSubmit }: SalaryRangeFinderProps) {
     onSubmit(formData);
   };
 
-  const isReadyToSubmit =
-    formData.category &&
-    formData.role &&
-    formData.seniority &&
-    formData.location;
+  const isReadyToSubmit = formData.role && formData.geography;
+
+  const { data: jobSalaryOptions, isLoading: jobSalaryOptionsLoading } =
+    useQuery({
+      queryKey: ["job-salary-options"],
+      queryFn: async () => {
+        const res = await fetch(`/api/salary-range/details`, {
+          method: "GET",
+          cache: "no-store",
+          headers: {
+            "Content-type": "application/json",
+          },
+        });
+        return (await res.json()) as {
+          success: boolean;
+          salaryDetails: {
+            roleTitles: string[];
+            locations: string[];
+          };
+        };
+      },
+    });
 
   return (
     <div className='w-[517px] h-[600px] max-w-full md:h-[710px] relative bg-coins bg-no-repeat bg-center bg-cover transform rotate-[15deg]'>
@@ -69,19 +87,6 @@ export function SalaryRangeFinder({ onSubmit }: SalaryRangeFinderProps) {
           </CardHeader>
           <CardContent className='space-y-4'>
             <Select
-              value={formData.category}
-              onValueChange={(value) => handleSelectChange("category", value)}
-            >
-              <SelectTrigger id='category'>
-                <SelectValue placeholder='Choose a category' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='category1'>Category 1</SelectItem>
-                <SelectItem value='category2'>Category 2</SelectItem>
-                <SelectItem value='category3'>Category 3</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select
               value={formData.role}
               onValueChange={(value) => handleSelectChange("role", value)}
             >
@@ -89,33 +94,22 @@ export function SalaryRangeFinder({ onSubmit }: SalaryRangeFinderProps) {
                 <SelectValue placeholder='Role' />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='role1'>Role 1</SelectItem>
-                <SelectItem value='role2'>Role 2</SelectItem>
-                <SelectItem value='role3'>Role 3</SelectItem>
+                {jobSalaryOptions?.salaryDetails.roleTitles.map((role) => (
+                  <SelectItem key={role} value={role}>
+                    {role}
+                  </SelectItem>
+                )) ?? <SelectItem value='Loading...'>Loading...</SelectItem>}
               </SelectContent>
             </Select>
-            <Select
-              value={formData.seniority}
-              onValueChange={(value) => handleSelectChange("seniority", value)}
-            >
-              <SelectTrigger id='seniority' aria-label='Seniority level'>
-                <SelectValue placeholder='Seniority level' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='junior'>Junior</SelectItem>
-                <SelectItem value='mid'>Mid</SelectItem>
-                <SelectItem value='senior'>Senior</SelectItem>
-              </SelectContent>
-            </Select>
+
             <div className='relative'>
-              <MapPinIcon className='absolute left-3 top-3 h-5 w-5 text-muted-foreground' />
-              <Input
-                id='location'
-                name='location'
+              <SelectComposed
+                value={formData.geography}
+                onValueChange={(value) =>
+                  handleSelectChange("geography", value)
+                }
                 placeholder='Location'
-                value={formData.location}
-                onChange={handleChange}
-                className='pl-10'
+                options={jobSalaryOptions?.salaryDetails.locations ?? []}
               />
             </div>
           </CardContent>
