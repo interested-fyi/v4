@@ -81,7 +81,7 @@ export function SalaryRangeFinder({ onSubmit }: SalaryRangeFinderProps) {
   return (
     <div className='w-[517px] h-[600px] max-w-full md:h-[710px] relative bg-coins bg-no-repeat bg-center bg-cover transform rotate-[15deg]'>
       <form onSubmit={handleSubmit}>
-        <Card className='absolute left-0 sm:left-12 md:left-8 top-20 md:top-40 w-full max-w-md mt-8 md:mt-0 transform rotate-[-15deg]'>
+        <Card className='absolute -left-4 sm:left-12 md:left-8 top-20 md:top-40 w-full max-w-md mt-8 md:mt-0 transform rotate-[-15deg]'>
           <CardHeader>
             <CardTitle>Salary range finder</CardTitle>
           </CardHeader>
