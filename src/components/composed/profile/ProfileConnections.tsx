@@ -4,13 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { usePrivy, useLinkAccount } from "@privy-io/react-auth";
 import { useEffect, useState } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -513,16 +506,22 @@ export const ProfileConnections = ({
             })}
         </div>
 
-        {(addProfile || (!!linkedAccounts && linkedAccounts?.length === 0)) && (
-          <div>
-            <LinkAccountSelect
-              profiles={profiles}
-              selectedProfile={selectedProfile}
-              setSelectedProfile={setSelectedProfile}
-              handleLink={handleLink}
-            />
-          </div>
-        )}
+        <div>
+          <LinkAccountSelect
+            profiles={profiles.filter((account) => {
+              if (
+                !linkedAccounts?.find((linkedAccount) => {
+                  return linkedAccount.type
+                    .toLocaleLowerCase()
+                    .includes(account.toLocaleLowerCase());
+                })
+              ) {
+                return account;
+              }
+            })}
+            handleLink={handleLink}
+          />
+        </div>
       </div>
       {!additionalProfile &&
         !addProfile &&
@@ -545,41 +544,24 @@ export const ProfileConnections = ({
 
 interface LinkAccountSelectProps {
   profiles: string[];
-  selectedProfile: string | null;
-  setSelectedProfile: (profile: string | null) => void;
   handleLink: (linkMethod: string) => void;
 }
 
 export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
   profiles,
-  selectedProfile,
-  setSelectedProfile,
   handleLink,
 }) => {
   return (
-    <div className='flex items-center rounded-lg text-black'>
-      <Select
-        onValueChange={(value) =>
-          setSelectedProfile(profiles.find((p) => p === value) || null)
-        }
-      >
-        <SelectTrigger className='w-full bg-white'>
-          <SelectValue placeholder='Select profile' />
-        </SelectTrigger>
-        <SelectContent>
-          {profiles.map((profile) => (
-            <SelectItem key={profile} value={profile}>
-              <span>{profile}</span>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Button
-        className='ml-4 bg-[#2640eb]'
-        onClick={() => handleLink(selectedProfile?.toLocaleLowerCase() ?? "")}
-      >
-        Link
-      </Button>
+    <div className='flex flex-wrap gap-3 items-start rounded-lg text-black'>
+      {profiles.map((profile) => (
+        <Button
+          key={profile}
+          className='bg-[#2640eb] text-yellow-200 w-40'
+          onClick={() => handleLink(profile?.toLocaleLowerCase() ?? "")}
+        >
+          Link {profile}
+        </Button>
+      ))}
     </div>
   );
 };
