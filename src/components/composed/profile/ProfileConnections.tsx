@@ -528,7 +528,7 @@ export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
   handleLink,
 }) => {
   return (
-    <div className='flex flex-col gap-4  max-w-xl mx-auto  rounded-xl'>
+    <div className='flex flex-col gap-4  max-w-xl mx-auto  rounded-xl font-heading'>
       {profiles.map((platform) => (
         <motion.div
           key={platform}
@@ -536,11 +536,8 @@ export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
           whileHover={{ y: -2 }}
           whileTap={{ y: 0 }}
         >
-          <div className='flex items-center justify-between p-4'>
+          <div className='flex items-center justify-between p-2 px-3'>
             <div className='flex items-center gap-3'>
-              <div className={`p-2 rounded-full`}>
-                {/* <platform.icon className="h-5 w-5 text-white" /> */}
-              </div>
               <span className='text-lg font-medium text-gray-800'>
                 {platform}
               </span>
@@ -589,15 +586,12 @@ export const UnlinkAccountButton: React.FC<UnlinkAccountButtonProps> = ({
   if (!profile) return null;
   return (
     <motion.div
-      className='group relative overflow-hidden rounded-lg bg-white w-full shadow-md'
+      className='group relative overflow-hidden rounded-lg bg-white w-full shadow-md font-heading'
       whileHover={{ y: -2 }}
       whileTap={{ y: 0 }}
     >
-      <div className='flex items-center justify-between p-4'>
+      <div className='flex items-center justify-between p-2 px-3'>
         <div className='flex items-center gap-3'>
-          <div className={`p-2 rounded-full`}>
-            {/* <platform.icon className="h-5 w-5 text-white" /> */}
-          </div>
           <span className='text-lg font-medium text-gray-800'>
             {profile.length > 10
               ? `${profile.slice(0, 6)}...${profile.slice(-4)}`
