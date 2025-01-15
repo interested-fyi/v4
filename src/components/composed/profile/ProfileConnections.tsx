@@ -6,6 +6,7 @@ import { usePrivy, useLinkAccount } from "@privy-io/react-auth";
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { motion } from "framer-motion";
 
 enum PROFILE_TYPE {
   GITHUB = "github",
@@ -39,11 +40,6 @@ export const ProfileConnections = ({
   onHandleLink?: (profile: string) => void;
 }) => {
   const [bestProfile, setBestProfile] = useState<string | null>(null);
-  const [additionalProfile, setAdditionalProfile] = useState<string | null>(
-    null
-  );
-  const [selectedProfile, setSelectedProfile] = useState<string | null>(null);
-  const [addProfile, setAddProfile] = useState(false);
 
   const {
     user,
@@ -339,7 +335,6 @@ export const ProfileConnections = ({
   const handleLink = async (linkMethod: string) => {
     onHandleLink && (await onHandleLink(linkMethod));
     await new Promise((resolve) => setTimeout(resolve, 750));
-    setAddProfile(false);
     switch (linkMethod) {
       case "github":
         linkGithub();
@@ -359,17 +354,6 @@ export const ProfileConnections = ({
       case "wallet":
         linkWallet();
         break;
-    }
-    if (selectedProfile) {
-      setAdditionalProfile(selectedProfile);
-      onSetProfile && onSetProfile(selectedProfile);
-      setSelectedProfile(null);
-      setAddProfile(true);
-    } else {
-      setAdditionalProfile(null);
-      setSelectedProfile(null);
-      onSetProfile && onSetProfile("");
-      setAddProfile(true);
     }
   };
 
@@ -429,12 +413,16 @@ export const ProfileConnections = ({
         <div className='flex justify-between'>
           <Label>Profiles</Label>
           {linkedAccounts && linkedAccounts.length > 0 && (
-            <Label>Select Primary</Label>
+            <Label>Select Primary Image</Label>
           )}
         </div>
         <div className='flex flex-col gap-4'>
           {userProfileData &&
             linkedAccounts?.map((linkedAccount: any) => {
+              console.log(
+                "🚀 ~ linkedAccounts?.map ~ linkedAccount:",
+                linkedAccount
+              );
               let accountName = "";
 
               if (
@@ -480,25 +468,29 @@ export const ProfileConnections = ({
                     <UnlinkAccountButton
                       profile={accountName}
                       handleUnlink={handleUnlink}
-                      setProfile={setSelectedProfile}
                     />
                     <div className='w-[40%] flex justify-center'>
-                      <Checkbox
-                        className='w-6 h-6'
-                        checked={
-                          bestProfile === accountName ||
-                          (bestProfile === "x" && accountName === "twitter")
-                        }
-                        onCheckedChange={(e) => {
-                          if (e.valueOf() === true) {
-                            setBestProfile(accountName);
-                            onSetBestProfile && onSetBestProfile(accountName);
-                          } else {
-                            setBestProfile(null);
-                            onSetBestProfile && onSetBestProfile("");
-                          }
-                        }}
-                      />
+                      {linkedAccount &&
+                        (linkedAccount.profilePictureUrl ||
+                          linkedAccount.pfp) && (
+                          <Checkbox
+                            className='w-6 h-6'
+                            checked={
+                              bestProfile === accountName ||
+                              (bestProfile === "x" && accountName === "twitter")
+                            }
+                            onCheckedChange={(e) => {
+                              if (e.valueOf() === true) {
+                                setBestProfile(accountName);
+                                onSetBestProfile &&
+                                  onSetBestProfile(accountName);
+                              } else {
+                                setBestProfile(null);
+                                onSetBestProfile && onSetBestProfile("");
+                              }
+                            }}
+                          />
+                        )}
                     </div>
                   </div>
                 );
@@ -523,21 +515,6 @@ export const ProfileConnections = ({
           />
         </div>
       </div>
-      {!additionalProfile &&
-        !addProfile &&
-        !!linkedAccounts &&
-        linkedAccounts?.length > 0 && (
-          <Button
-            variant='link'
-            className='w-full mt-0 pt-0 text-blue-700'
-            onClick={() => {
-              setAddProfile(true);
-              setSelectedProfile(null);
-            }}
-          >
-            + Add another
-          </Button>
-        )}{" "}
     </>
   );
 };
@@ -552,54 +529,91 @@ export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
   handleLink,
 }) => {
   return (
-    <div className='flex flex-wrap gap-3 mt-1 items-start rounded-lg text-black'>
-      {profiles.map((profile) => (
-        <div className='w-full flex rounded-lg shadow-sm border items-center bg-white p-4'>
-          <p className='flex-grow'>
-            {profile[0].toLocaleUpperCase() + profile.slice(1)}
-          </p>
-          <Button
-            key={profile}
-            className='bg-[#2640eb] text-yellow-200 w-40'
-            onClick={() => handleLink(profile?.toLocaleLowerCase() ?? "")}
-          >
-            Connect
-          </Button>
-        </div>
+    <div className='flex flex-col gap-4  max-w-xl mx-auto  rounded-xl shadow-lg'>
+      {profiles.map((platform) => (
+        <motion.div
+          key={platform}
+          className='group relative overflow-hidden rounded-lg bg-white shadow-md'
+          whileHover={{ y: -2 }}
+          whileTap={{ y: 0 }}
+        >
+          <div className='flex items-center justify-between p-4'>
+            <div className='flex items-center gap-3'>
+              <div className={`p-2 rounded-full`}>
+                {/* <platform.icon className="h-5 w-5 text-white" /> */}
+              </div>
+              <span className='text-lg font-medium text-gray-800'>
+                {platform}
+              </span>
+            </div>
+            <button
+              onClick={() => handleLink(platform.toLowerCase())}
+              className='rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+            >
+              Connect
+            </button>
+          </div>
+          <div className='absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-blue-600 via-yellow-400 to-blue-600 transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100' />
+        </motion.div>
       ))}
     </div>
+    // <div className='flex flex-wrap gap-3 mt-1 items-start rounded-lg text-black'>
+    //   {profiles.map((profile) => (
+    //     <div className='w-full flex rounded-lg shadow-sm border items-center bg-gradient-to-r to-slate-200 via-yellow-100 from-blue-700 text-white p-3'>
+    //       <p className='flex-grow font-bold font-heading'>
+    //         {profile[0].toLocaleUpperCase() + profile.slice(1)}
+    //       </p>
+    //       <Button
+    //         key={profile}
+    //         className='bg-[#2640eb] text-yellow-200 w-40'
+    //         onClick={() => handleLink(profile?.toLocaleLowerCase() ?? "")}
+    //       >
+    //         Connect
+    //       </Button>
+    //     </div>
+    //   ))}
+    // </div>
   );
 };
 
 interface UnlinkAccountButtonProps {
   profile: string | null;
   handleUnlink: (linkMethod: string) => void;
-  setProfile: (profile: string | null) => void;
 }
 
 export const UnlinkAccountButton: React.FC<UnlinkAccountButtonProps> = ({
   profile,
   handleUnlink,
-  setProfile,
 }) => {
   if (!profile) return null;
   return (
-    <div className='flex items-center bg-white rounded-lg text-black px-5 pr-2 w-full'>
-      <span className='flex-grow'>
-        {profile.length > 10
-          ? `${profile.slice(0, 6)}...${profile.slice(-4)}`
-          : profile}
-      </span>
-      <Button
-        variant='ghost'
-        size='icon'
-        onClick={() => {
-          setProfile(null);
-          handleUnlink(profile.toLowerCase());
-        }}
-      >
-        <X className='h-4 w-4' />
-      </Button>
-    </div>
+    <motion.div
+      className='group relative overflow-hidden rounded-lg bg-white w-full shadow-md'
+      whileHover={{ y: -2 }}
+      whileTap={{ y: 0 }}
+    >
+      <div className='flex items-center justify-between p-4'>
+        <div className='flex items-center gap-3'>
+          <div className={`p-2 rounded-full`}>
+            {/* <platform.icon className="h-5 w-5 text-white" /> */}
+          </div>
+          <span className='text-lg font-medium text-gray-800'>
+            {profile.length > 10
+              ? `${profile.slice(0, 6)}...${profile.slice(-4)}`
+              : profile}
+          </span>
+        </div>
+        <Button
+          variant={"ghost"}
+          className='rounded-md  px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+          onClick={() => {
+            handleUnlink(profile.toLowerCase());
+          }}
+        >
+          <X className='h-4 w-4' />
+        </Button>
+      </div>
+      <div className='absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-blue-600 via-yellow-400 to-blue-600 transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100' />
+    </motion.div>
   );
 };
