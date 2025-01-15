@@ -496,7 +496,7 @@ export const ProfileConnections = ({
             })}
         </div>
 
-        <div>
+        <div className='mt-2'>
           <LinkAccountSelect
             profiles={profiles.filter((account) => {
               if (
@@ -528,7 +528,7 @@ export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
   handleLink,
 }) => {
   return (
-    <div className='flex flex-col gap-4  max-w-xl mx-auto  rounded-xl shadow-lg'>
+    <div className='flex flex-col gap-4  max-w-xl mx-auto  rounded-xl'>
       {profiles.map((platform) => (
         <motion.div
           key={platform}
