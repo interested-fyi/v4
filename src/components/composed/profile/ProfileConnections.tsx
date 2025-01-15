@@ -472,7 +472,8 @@ export const ProfileConnections = ({
                     <div className='w-[40%] flex justify-center'>
                       {linkedAccount &&
                         (linkedAccount.profilePictureUrl ||
-                          linkedAccount.pfp) && (
+                          linkedAccount.pfp ||
+                          linkedAccount.photoUrl) && (
                           <Checkbox
                             className='w-6 h-6'
                             checked={
