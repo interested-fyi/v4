@@ -419,10 +419,6 @@ export const ProfileConnections = ({
         <div className='flex flex-col gap-4'>
           {userProfileData &&
             linkedAccounts?.map((linkedAccount: any) => {
-              console.log(
-                "🚀 ~ linkedAccounts?.map ~ linkedAccount:",
-                linkedAccount
-              );
               let accountName = "";
 
               if (
@@ -467,6 +463,7 @@ export const ProfileConnections = ({
                   >
                     <UnlinkAccountButton
                       profile={accountName}
+                      linkType={linkedAccount.type}
                       handleUnlink={handleUnlink}
                     />
                     <div className='w-[40%] flex justify-center'>
@@ -503,6 +500,7 @@ export const ProfileConnections = ({
           <LinkAccountSelect
             profiles={profiles.filter((account) => {
               if (
+                account === "wallet" ||
                 !linkedAccounts?.find((linkedAccount) => {
                   return linkedAccount.type
                     .toLocaleLowerCase()
@@ -579,11 +577,13 @@ export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
 
 interface UnlinkAccountButtonProps {
   profile: string | null;
-  handleUnlink: (linkMethod: string) => void;
+  linkType: string;
+  handleUnlink: (linkMethod: string, address?: string) => void;
 }
 
 export const UnlinkAccountButton: React.FC<UnlinkAccountButtonProps> = ({
   profile,
+  linkType,
   handleUnlink,
 }) => {
   if (!profile) return null;
@@ -608,7 +608,10 @@ export const UnlinkAccountButton: React.FC<UnlinkAccountButtonProps> = ({
           variant={"ghost"}
           className='rounded-md  px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
           onClick={() => {
-            handleUnlink(profile.toLowerCase());
+            handleUnlink(
+              linkType === "wallet" ? "siwe" : profile.toLowerCase(),
+              linkType === "wallet" ? profile : undefined
+            );
           }}
         >
           <X className='h-4 w-4' />
