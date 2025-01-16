@@ -23,11 +23,11 @@ export function SalaryRange({
   const handleCalculateHourlyRate = () => {
     const hoursInYearOfWork = 2080;
     const minHourlyRate =
-      Number(minSalary.replace(",", "")) / hoursInYearOfWork;
+      Number(minSalary.replace(/,/g, "")) / hoursInYearOfWork;
     const medianHourlyRate =
-      Number(medianSalary.replace(",", "")) / hoursInYearOfWork;
+      Number(medianSalary.replace(/,/g, "")) / hoursInYearOfWork;
     const maxHourlyRate =
-      Number(maxSalary.replace(",", "")) / hoursInYearOfWork;
+      Number(maxSalary.replace(/,/g, "")) / hoursInYearOfWork;
     return {
       minSalary: minHourlyRate.toLocaleString(),
       medianSalary: medianHourlyRate.toLocaleString(),
@@ -41,16 +41,7 @@ export function SalaryRange({
 
   return (
     <div className='flex text-heading w-[355px] max-w-full flex-col items-center text-center md:items-start md:text-left'>
-      <div className='flex justify-center mb-4'>
-        <Image
-          src='/svg/happy-binocular.svg'
-          alt='binoculars'
-          height={20}
-          width={20}
-          className='w-20 h-20 text-[#6b6bff]'
-        />
-      </div>
-      <p className='text-left text-[#333333]'>
+      <p className='text-left text-[#333333] self-start'>
         For a <span className='font-semibold'>{role}</span> living in{" "}
         <span className='font-semibold'>{location}</span>:
       </p>

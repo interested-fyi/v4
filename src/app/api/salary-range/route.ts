@@ -6,10 +6,10 @@ export async function GET(req: NextRequest, res: NextResponse) {
     // Get the `lookup_value` and `level` from query parameters
     const url = new URL(req.url);
     const countryCode = url.searchParams.get("country_code");
-    const jobProfile = url.searchParams.get("job_profile");
+    const jobCode = url.searchParams.get("job_code");
 
     // Validate input
-    if (!countryCode || !jobProfile) {
+    if (!countryCode || !jobCode) {
       return NextResponse.json(
         {
           success: false,
@@ -22,9 +22,9 @@ export async function GET(req: NextRequest, res: NextResponse) {
     // Query Supabase for the salary range based on lookup_value and level
     const { data, error } = await supabase
       .from("salary_ranges")
-      .select("new_min, new_mid, new_max, currency")
+      .select("new_min, new_mid, new_max, currency, level, job_profile")
       .eq("geography", countryCode)
-      .eq("job_profile", jobProfile);
+      .eq("job_code", jobCode);
     console.log("🚀 ~ GET ~ data:", data);
 
     // Handle any query errors
@@ -45,7 +45,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
     // Return the salary range data
     return NextResponse.json(
-      { success: true, salaryRange: data[0] },
+      { success: true, salaryRange: data },
       { status: 200 }
     );
   } catch (e: any) {

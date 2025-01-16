@@ -4,6 +4,7 @@ import React, { FormEvent } from "react";
 import { SalaryRangeFinder, SalaryFormData } from "./SalaryRangeFinder";
 import { SalaryRange } from "../../SalaryRange";
 import SalaryQuizCopy from "./SalaryQuizCopy";
+import Image from "next/image";
 
 export function SalaryRangeComposed() {
   const [formData, setFormData] = React.useState<SalaryFormData>({
@@ -11,13 +12,20 @@ export function SalaryRangeComposed() {
     role: "",
     seniority: "",
     geography: "",
+    code: "",
   });
-  const [salaryData, setSalaryData] = React.useState<{
-    minSalary: string;
-    medianSalary: string;
-    maxSalary: string;
-    currency: string;
-  } | null>(null);
+  const [salaryData, setSalaryData] = React.useState<
+    | {
+        minSalary: string;
+        medianSalary: string;
+        maxSalary: string;
+        currency: string;
+        level: number;
+        jobProfile: string;
+      }[]
+    | null
+  >(null);
+  console.log("🚀 ~ SalaryRangeComposed ~ salaryData:", salaryData);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -26,7 +34,9 @@ export function SalaryRangeComposed() {
   const handleSubmit = async (formData: SalaryFormData) => {
     try {
       const response = await fetch(
-        `/api/salary-range?country_code=${formData.geography}&job_profile=${formData.role}`,
+        `/api/salary-range?country_code=${formData.geography}&job_code=${
+          formData.code.split("-")[0]
+        }`,
         {
           method: "GET",
           headers: {
@@ -41,12 +51,25 @@ export function SalaryRangeComposed() {
 
       const data = await response.json();
       console.log("🚀 ~ handleSubmit ~ data:", data);
-      setSalaryData({
-        minSalary: data.salaryRange.new_min,
-        medianSalary: data.salaryRange.new_mid,
-        maxSalary: data.salaryRange.new_max,
-        currency: data.salaryRange.currency,
-      });
+      setSalaryData(
+        data.salaryRange.map(
+          (d: {
+            new_min: string;
+            new_mid: string;
+            new_max: string;
+            currency: string;
+            level: string;
+            job_profile: string;
+          }) => ({
+            minSalary: d.new_min,
+            medianSalary: d.new_mid,
+            maxSalary: d.new_max,
+            currency: d.currency,
+            level: d.level,
+            jobProfile: d.job_profile,
+          })
+        )
+      );
       setFormData(formData);
 
       scrollToTop();
@@ -58,15 +81,29 @@ export function SalaryRangeComposed() {
   };
   return (
     <>
-      {formData.role && salaryData?.maxSalary ? (
-        <SalaryRange
-          role={formData.role}
-          minSalary={salaryData.minSalary}
-          medianSalary={salaryData.medianSalary}
-          maxSalary={salaryData.maxSalary}
-          currencyCode={salaryData.currency}
-          location={formData.geography}
-        />
+      {formData.code && salaryData ? (
+        <div className='flex flex-col items-center gap-4'>
+          <div className='flex justify-center mb-4'>
+            <Image
+              src='/svg/happy-binocular.svg'
+              alt='binoculars'
+              height={20}
+              width={20}
+              className='w-20 h-20 text-[#6b6bff]'
+            />
+          </div>
+          {salaryData.map((salary, index) => (
+            <SalaryRange
+              key={index}
+              minSalary={salary.minSalary}
+              medianSalary={salary.medianSalary}
+              maxSalary={salary.maxSalary}
+              location={formData.geography}
+              role={salary.jobProfile}
+              currencyCode={salary.currency}
+            />
+          ))}
+        </div>
       ) : (
         <SalaryQuizCopy />
       )}

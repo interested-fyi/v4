@@ -28,7 +28,7 @@ export function RateCalculator({
         <span className='text-[#333333]'>Minimum</span>
         <span className='font-semibold text-[#0052cc]'>
           {formatCurrencyByCode(
-            Number(minSalary.replace(",", "")),
+            Number(minSalary.replace(/,/g, "")),
             currencyCode
           )}
         </span>
@@ -37,7 +37,7 @@ export function RateCalculator({
         <span className='text-[#333333]'>Median</span>
         <span className='font-semibold text-[#0052cc]'>
           {formatCurrencyByCode(
-            Number(medianSalary.replace(",", "")),
+            Number(medianSalary.replace(/,/g, "")),
             currencyCode
           )}
         </span>
@@ -46,7 +46,7 @@ export function RateCalculator({
         <span className='text-[#333333]'>Maximum</span>
         <span className='font-semibold text-[#0052cc]'>
           {formatCurrencyByCode(
-            Number(maxSalary.replace(",", "")),
+            Number(maxSalary.replace(/,/g, "")),
             currencyCode
           )}
         </span>

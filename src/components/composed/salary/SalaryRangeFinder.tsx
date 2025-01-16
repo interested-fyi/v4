@@ -25,6 +25,7 @@ export type SalaryFormData = {
   role: string;
   seniority: string;
   geography: string;
+  code: string;
 };
 interface SalaryRangeFinderProps {
   onSubmit: (formData: SalaryFormData) => void;
@@ -35,6 +36,7 @@ export function SalaryRangeFinder({ onSubmit }: SalaryRangeFinderProps) {
     role: "",
     seniority: "",
     geography: "",
+    code: "",
   });
 
   const { user, getAccessToken } = usePrivy();
@@ -84,7 +86,10 @@ export function SalaryRangeFinder({ onSubmit }: SalaryRangeFinderProps) {
         return (await res.json()) as {
           success: boolean;
           salaryDetails: {
-            roleTitles: string[];
+            roleTitles: {
+              job_profile: string;
+              job_code: string;
+            }[];
             locations: string[];
           };
         };
@@ -110,18 +115,23 @@ export function SalaryRangeFinder({ onSubmit }: SalaryRangeFinderProps) {
           </CardHeader>
           <CardContent className='space-y-4'>
             <Select
-              value={formData.role}
-              onValueChange={(value) => handleSelectChange("role", value)}
+              value={formData.code}
+              onValueChange={(value) => handleSelectChange("code", value)}
             >
-              <SelectTrigger id='role' aria-label='Role'>
+              <SelectTrigger id='code' aria-label='Role'>
                 <SelectValue placeholder='Role' />
               </SelectTrigger>
               <SelectContent>
-                {jobSalaryOptions?.salaryDetails?.roleTitles.map((role) => (
-                  <SelectItem key={role} value={role}>
-                    {role}
-                  </SelectItem>
-                )) ?? <SelectItem value='Loading...'>Loading...</SelectItem>}
+                {jobSalaryOptions?.salaryDetails?.roleTitles.map((role) => {
+                  return (
+                    <SelectItem
+                      key={`${role.job_code}-${role.job_profile}`}
+                      value={role.job_code + "-" + role.job_profile}
+                    >
+                      {role.job_profile}
+                    </SelectItem>
+                  );
+                }) ?? <SelectItem value='Loading...'>Loading...</SelectItem>}
               </SelectContent>
             </Select>
 
