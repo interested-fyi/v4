@@ -103,7 +103,7 @@ export function SalaryRangeFinder({
   }, [userProfileData]);
 
   return (
-    <div className='w-full max-w-2xl h-full relative '>
+    <div className='w-full max-w-[686px] mx-auto h-full relative '>
       <form className='w-full' onSubmit={handleSubmit}>
         <Card className=' m-auto '>
           <CardHeader>
