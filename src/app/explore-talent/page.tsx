@@ -41,7 +41,7 @@ export default function ExploreTalentPage() {
       },
       {
         root: null,
-        rootMargin: "600px", // Trigger 200px before element comes into view
+        rootMargin: "20px", // Trigger 200px before element comes into view
         threshold: 0.1,
       }
     );
