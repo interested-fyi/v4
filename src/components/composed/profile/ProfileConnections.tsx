@@ -357,12 +357,57 @@ export const ProfileConnections = ({
     }
   };
 
-  const handleUnlink = (linkMethod: string, address?: string) => {
+  const deleteLinkMethodFromDB = async (
+    linkMethod: string,
+    privyDid: string,
+    walletAddress?: string
+  ) => {
+    const accessToken = await getAccessToken();
+    let body = {
+      privy_did: privyDid,
+    } as {
+      privy_did: string;
+      address_to_remove?: string;
+    };
+    if (walletAddress) {
+      body = {
+        ...body,
+        address_to_remove: walletAddress,
+      };
+    }
+    const res = await fetch(`/api/users/unlinking/${linkMethod}`, {
+      method: "DELETE",
+      cache: "no-store",
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (res.ok) {
+      return true;
+    }
+    return false;
+  };
+
+  const handleUnlink = async (linkMethod: string, address?: string) => {
     if (
       userProfileData &&
       userProfileData?.profile?.preferred_profile === linkMethod
     ) {
       updateUserProfileData(null);
+    }
+
+    const isDeleted = await deleteLinkMethodFromDB(
+      linkMethod,
+      user?.id as string,
+      address
+    );
+
+    if (!isDeleted) {
+      console.error("Failed to delete link method from DB");
+      return;
     }
 
     switch (linkMethod) {
@@ -442,7 +487,7 @@ export const ProfileConnections = ({
               if (linkedAccount.type === "farcaster") {
                 accountName = "farcaster";
               }
-              if (linkedAccount.type === "linkedin") {
+              if (linkedAccount.type === "linkedin_oauth") {
                 accountName = "linkedin";
               }
               if (linkedAccount.type === "telegram") {
@@ -527,6 +572,7 @@ export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
   profiles,
   handleLink,
 }) => {
+  const [loading, setLoading] = useState(false);
   return (
     <div className='flex flex-col gap-4  max-w-xl mx-auto  rounded-xl font-heading'>
       {profiles.map((platform) => (
@@ -543,7 +589,12 @@ export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
               </span>
             </div>
             <button
-              onClick={() => handleLink(platform.toLowerCase())}
+              onClick={async () => {
+                setLoading(true);
+                await handleLink(platform.toLowerCase());
+                setLoading(false);
+              }}
+              disabled={loading}
               className='rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
             >
               Connect
@@ -583,6 +634,7 @@ export const UnlinkAccountButton: React.FC<UnlinkAccountButtonProps> = ({
   linkType,
   handleUnlink,
 }) => {
+  const [loading, setLoading] = useState(false);
   if (!profile) return null;
   return (
     <motion.div
@@ -600,12 +652,15 @@ export const UnlinkAccountButton: React.FC<UnlinkAccountButtonProps> = ({
         </div>
         <Button
           variant={"ghost"}
+          disabled={loading}
           className='rounded-md  px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
-          onClick={() => {
-            handleUnlink(
+          onClick={async () => {
+            setLoading(true);
+            await handleUnlink(
               linkType === "wallet" ? "siwe" : profile.toLowerCase(),
               linkType === "wallet" ? profile : undefined
             );
+            setLoading(false);
           }}
         >
           <X className='h-4 w-4' />
