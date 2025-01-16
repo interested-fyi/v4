@@ -84,7 +84,8 @@ export function SalaryRangeComposed() {
     }
   };
   return (
-    <>
+    <div className='flex flex-col items-center gap-4'>
+      {!salaryData ? <SalaryQuizCopy /> : null}
       <SalaryRangeFinder
         onSubmit={(formData: SalaryFormData) => {
           handleSubmit(formData);
@@ -92,26 +93,24 @@ export function SalaryRangeComposed() {
       >
         {formData.code && salaryData ? (
           <div className='flex text-heading max-w-[415px] mx-auto flex-col items-center text-center md:items-start md:text-left'>
-            <div className='flex justify-center mb-4'>
-              <Image
-                src='/svg/happy-binocular.svg'
-                alt='binoculars'
-                height={20}
-                width={20}
-                className='w-20 h-20 text-[#6b6bff]'
-              />
+            <p className='text-gray-800'>
+              Is this what you&apos;re looking for? If not, scroll through our
+              other salaries and let us know how far off we were.
+            </p>
+
+            <div className='flex flex-row w-96 overflow-hidden'>
+              {salaryData.map((salary, index) => (
+                <SalaryRange
+                  key={index}
+                  minSalary={salary.minSalary}
+                  medianSalary={salary.medianSalary}
+                  maxSalary={salary.maxSalary}
+                  location={formData.geography}
+                  role={salary.jobProfile}
+                  currencyCode={salary.currency}
+                />
+              ))}
             </div>
-            {salaryData.map((salary, index) => (
-              <SalaryRange
-                key={index}
-                minSalary={salary.minSalary}
-                medianSalary={salary.medianSalary}
-                maxSalary={salary.maxSalary}
-                location={formData.geography}
-                role={salary.jobProfile}
-                currencyCode={salary.currency}
-              />
-            ))}
             <form className='w-full'>
               <Card className='w-full max-w-md'>
                 <CardHeader>
@@ -176,10 +175,8 @@ export function SalaryRangeComposed() {
             />
             <h2 className='text-center text-red-500'>{error}</h2>
           </div>
-        ) : (
-          <SalaryQuizCopy />
-        )}
+        ) : null}
       </SalaryRangeFinder>
-    </>
+    </div>
   );
 }

@@ -8,7 +8,7 @@ export default function SalaryQuizCopy() {
         alt='binoculars'
         height={20}
         width={20}
-        className='w-20 h-20 text-[#6b6bff]'
+        className='w-20 h-20 text-[#6b6bff] mx-auto'
       />
 
       <h2 className='mt-4 text-2xl font-semibold text-gray-800'>

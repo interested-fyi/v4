@@ -40,17 +40,14 @@ export function SalaryRange({
     : { minSalary, medianSalary, maxSalary };
 
   return (
-    <div className='flex text-heading w-[355px] max-w-full flex-col items-center text-center md:items-start md:text-left'>
-      <p className='text-left text-[#333333] self-start'>
-        For a <span className='font-semibold'>{role}</span> living in{" "}
-        <span className='font-semibold'>
-          {USAGroupMap[location as keyof typeof USAGroupMap] ?? location}
-        </span>
-        :
-      </p>
-      <div className='mt-6 w-full'>
-        <p className='text-[#333333] text-left font-semibold'>
-          Market pay range
+    <div className='flex mx-7 mb-4 text-heading min-w-[355px] max-w-full flex-col items-center text-center md:items-start md:text-left'>
+      <div className='mt-2 w-full'>
+        <p className='text-[#333333] text-left font-normal'>
+          Pay range for a <span className='font-semibold'>{role}</span> living
+          in{" "}
+          <span className='font-semibold'>
+            {USAGroupMap[location as keyof typeof USAGroupMap] ?? location}
+          </span>
         </p>
         <div className='flex items-center mt-2 space-x-4'>
           <div className='flex items-center'>
