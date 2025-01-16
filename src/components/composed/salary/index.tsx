@@ -50,7 +50,6 @@ export function SalaryRangeComposed() {
       }
 
       const data = await response.json();
-      console.log("🚀 ~ handleSubmit ~ data:", data);
       setSalaryData(
         data.salaryRange.map(
           (d: {
