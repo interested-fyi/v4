@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function SalaryQuizCopy() {
   return (
-    <div className='flex text-heading max-w-[415px] flex-col items-center text-center md:items-start md:text-left'>
+    <div className='flex text-heading max-w-[415px] mx-auto flex-col items-center text-center md:items-start md:text-left'>
       <Image
         src='/svg/binocular-question.svg'
         alt='binoculars'

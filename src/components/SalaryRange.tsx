@@ -1,6 +1,6 @@
-import Image from "next/image";
 import React from "react";
 import { RateCalculator } from "./composed/salary/RateCalculator";
+import { USAGroupMap } from "./composed/inputs/SelectComposed";
 
 interface SalaryRangeProps {
   location: string;
@@ -43,7 +43,10 @@ export function SalaryRange({
     <div className='flex text-heading w-[355px] max-w-full flex-col items-center text-center md:items-start md:text-left'>
       <p className='text-left text-[#333333] self-start'>
         For a <span className='font-semibold'>{role}</span> living in{" "}
-        <span className='font-semibold'>{location}</span>:
+        <span className='font-semibold'>
+          {USAGroupMap[location as keyof typeof USAGroupMap] ?? location}
+        </span>
+        :
       </p>
       <div className='mt-6 w-full'>
         <p className='text-[#333333] text-left font-semibold'>

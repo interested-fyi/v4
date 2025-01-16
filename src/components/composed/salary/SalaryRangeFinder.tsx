@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { SelectComposed } from "../inputs/SelectComposed";
 import { fetchUserProfile } from "@/lib/api/helpers";
 import { usePrivy } from "@privy-io/react-auth";
@@ -29,8 +29,12 @@ export type SalaryFormData = {
 };
 interface SalaryRangeFinderProps {
   onSubmit: (formData: SalaryFormData) => void;
+  children?: React.ReactNode;
 }
-export function SalaryRangeFinder({ onSubmit }: SalaryRangeFinderProps) {
+export function SalaryRangeFinder({
+  onSubmit,
+  children,
+}: SalaryRangeFinderProps) {
   const [formData, setFormData] = useState<SalaryFormData>({
     category: "",
     role: "",
@@ -49,14 +53,6 @@ export function SalaryRangeFinder({ onSubmit }: SalaryRangeFinderProps) {
       return await fetchUserProfile({ userId: user?.id, accessToken });
     },
   });
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
 
   const handleSelectChange = (name: keyof SalaryFormData, value: string) => {
     setFormData((prevState) => ({
@@ -107,55 +103,65 @@ export function SalaryRangeFinder({ onSubmit }: SalaryRangeFinderProps) {
   }, [userProfileData]);
 
   return (
-    <div className='w-[517px] h-[600px] max-w-full md:h-[710px] relative bg-coins bg-no-repeat bg-center bg-cover transform rotate-[15deg]'>
-      <form onSubmit={handleSubmit}>
-        <Card className='absolute -left-4 sm:left-12 md:left-8 top-20 md:top-40 w-full max-w-md mt-8 md:mt-0 transform rotate-[-15deg]'>
+    <div className='w-full max-w-2xl h-full relative '>
+      <form className='w-full' onSubmit={handleSubmit}>
+        <Card className=' m-auto '>
           <CardHeader>
-            <CardTitle>Salary range finder</CardTitle>
+            <CardTitle className='flex items-center gap-2 flex-wrap'>
+              I&apos;m a{" "}
+              {
+                <Select
+                  value={formData.code}
+                  onValueChange={(value) => handleSelectChange("code", value)}
+                >
+                  <SelectTrigger
+                    id='code'
+                    aria-label='Role'
+                    className='w-64 mx-2'
+                  >
+                    <SelectValue placeholder='Role' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {jobSalaryOptions?.salaryDetails?.roleTitles.map((role) => {
+                      return (
+                        <SelectItem
+                          key={`${role.job_code}-${role.job_profile}`}
+                          value={role.job_code + "-" + role.job_profile}
+                        >
+                          {role.job_profile}
+                        </SelectItem>
+                      );
+                    }) ?? (
+                      <SelectItem value='Loading...'>Loading...</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+              }{" "}
+              in{" "}
+              {
+                <div className='relative'>
+                  <SelectComposed
+                    className='w-64 mx-2'
+                    value={formData.geography}
+                    onValueChange={(value) =>
+                      handleSelectChange("geography", value)
+                    }
+                    placeholder='Location'
+                    options={jobSalaryOptions?.salaryDetails?.locations ?? []}
+                  />
+                </div>
+              }
+              <Button
+                type='submit'
+                className='w-full bg-blue-700'
+                disabled={!isReadyToSubmit}
+              >
+                <SearchIcon className='mr-2 h-5 w-5' />
+                Find your salary range
+              </Button>
+            </CardTitle>
           </CardHeader>
-          <CardContent className='space-y-4'>
-            <Select
-              value={formData.code}
-              onValueChange={(value) => handleSelectChange("code", value)}
-            >
-              <SelectTrigger id='code' aria-label='Role'>
-                <SelectValue placeholder='Role' />
-              </SelectTrigger>
-              <SelectContent>
-                {jobSalaryOptions?.salaryDetails?.roleTitles.map((role) => {
-                  return (
-                    <SelectItem
-                      key={`${role.job_code}-${role.job_profile}`}
-                      value={role.job_code + "-" + role.job_profile}
-                    >
-                      {role.job_profile}
-                    </SelectItem>
-                  );
-                }) ?? <SelectItem value='Loading...'>Loading...</SelectItem>}
-              </SelectContent>
-            </Select>
-
-            <div className='relative'>
-              <SelectComposed
-                value={formData.geography}
-                onValueChange={(value) =>
-                  handleSelectChange("geography", value)
-                }
-                placeholder='Location'
-                options={jobSalaryOptions?.salaryDetails?.locations ?? []}
-              />
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button
-              type='submit'
-              className='w-full bg-blue-700'
-              disabled={!isReadyToSubmit}
-            >
-              <SearchIcon className='mr-2 h-5 w-5' />
-              Find your salary range
-            </Button>
-          </CardFooter>
+          <CardContent>{children}</CardContent>
         </Card>
       </form>
     </div>

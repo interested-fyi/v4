@@ -13,9 +13,10 @@ interface JobTypeSelectProps {
   value: string;
   placeholder: string;
   options?: string[];
+  className?: string;
 }
 
-const USAGroupMap = {
+export const USAGroupMap = {
   "USA - GROUP A": "USA - California",
   "USA - GROUP B": "USA - NY & Northeast, Washington",
   "USA - GROUP C": "USA - DC, Colorado, NC",
@@ -27,6 +28,7 @@ export function SelectComposed({
   value,
   placeholder,
   options,
+  className,
 }: JobTypeSelectProps) {
   return (
     <Select
@@ -35,7 +37,7 @@ export function SelectComposed({
       }}
       value={value}
     >
-      <SelectTrigger className='w-full'>
+      <SelectTrigger className={`w-full ${className}`}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent className='relative z-50'>
