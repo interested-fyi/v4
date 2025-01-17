@@ -89,8 +89,8 @@ export function SalaryRangeFinder({
     if (userProfileData) {
       setFormData((prevState) => ({
         ...prevState,
-        role: userProfileData.profile.position?.[0] ?? "",
-        geography: userProfileData.profile.geography ?? "",
+        role: userProfileData?.profile?.position?.[0] ?? "",
+        geography: userProfileData?.profile?.geography ?? "",
       }));
     }
   }, [userProfileData]);

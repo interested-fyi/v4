@@ -166,7 +166,7 @@ export const ProfileSettings = ({
           <Label className='text-sm font-medium' htmlFor='position'>
             Job title(s)
           </Label>
-          {form.position?.map((job) => (
+          {form?.position?.map((job) => (
             <div className='flex gap-2' key={job}>
               <JobSelect
                 value={job}
@@ -184,7 +184,7 @@ export const ProfileSettings = ({
                 onClick={() => {
                   setForm({
                     ...form,
-                    position: form.position.filter(
+                    position: form.position?.filter(
                       (position) => position !== job
                     ),
                   });
@@ -321,7 +321,8 @@ export const ProfileSettings = ({
         className='w-full text-sm font-body font-medium leading-[21px] mt-4 bg-[#2640eb]'
         disabled={
           isLoading ||
-          (form.isAvailable && (!form.position[0] || !form.employmentType[0]))
+          (form.isAvailable &&
+            (!form?.position?.[0] || !form.employmentType?.[0]))
         }
         onClick={async () => {
           setIsLoading(true);
