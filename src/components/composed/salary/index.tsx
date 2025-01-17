@@ -409,7 +409,10 @@ const SalaryCarousel = ({
         <div className='flex flex-col gap-1'>
           <div className='flex justify-center gap-2 mt-4'>
             {salaryData.map((_, index) => (
-              <div className='flex items-center justify-center gap-2 flex-col'>
+              <div
+                key={_.jobProfile + index}
+                className='flex items-center justify-center gap-2 flex-col'
+              >
                 <button
                   key={index}
                   onClick={() => setCurrentIndex(index)}
