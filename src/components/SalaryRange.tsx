@@ -3,23 +3,21 @@ import { RateCalculator } from "./composed/salary/RateCalculator";
 import { USAGroupMap } from "./composed/inputs/SelectComposed";
 
 interface SalaryRangeProps {
-  location: string;
   minSalary: string;
   medianSalary: string;
   maxSalary: string;
-  role: string;
   currencyCode: string;
+  isHourly?: boolean;
+  setIsHourly: (isHourly: boolean) => void;
 }
 
 export function SalaryRange({
-  location,
-  role,
   minSalary,
   medianSalary,
   maxSalary,
   currencyCode,
+  isHourly,
 }: SalaryRangeProps) {
-  const [isHourly, setIsHourly] = React.useState(false);
   const handleCalculateHourlyRate = () => {
     const hoursInYearOfWork = 2080;
     const minHourlyRate =
@@ -40,49 +38,11 @@ export function SalaryRange({
     : { minSalary, medianSalary, maxSalary };
 
   return (
-    <div className='flex mx-7 mb-4 text-heading min-w-[355px] max-w-full flex-col items-center text-center md:items-start md:text-left'>
-      <div className='mt-2 w-full'>
-        <p className='text-[#333333] text-left font-normal'>
-          Pay range for a <span className='font-semibold'>{role}</span> living
-          in{" "}
-          <span className='font-semibold'>
-            {USAGroupMap[location as keyof typeof USAGroupMap] ?? location}
-          </span>
-        </p>
-        <div className='flex items-center mt-2 space-x-4'>
-          <div className='flex items-center'>
-            <input
-              type='radio'
-              id='annual'
-              name='pay'
-              className=''
-              onChange={() => setIsHourly(false)}
-              defaultChecked
-            />
-            <label htmlFor='annual' className='ml-2 '>
-              Annual salary
-            </label>
-          </div>
-          <div className='flex items-center'>
-            <input
-              type='radio'
-              id='hourly'
-              name='pay'
-              onChange={() => setIsHourly(true)}
-              className='text-[#cccccc]'
-            />
-            <label htmlFor='hourly' className='ml-2 '>
-              Hourly rate
-            </label>
-          </div>
-        </div>
-        <RateCalculator
-          minSalary={rates.minSalary}
-          maxSalary={rates.maxSalary}
-          medianSalary={rates.medianSalary}
-          currencyCode={currencyCode}
-        />
-      </div>
-    </div>
+    <RateCalculator
+      minSalary={rates.minSalary}
+      maxSalary={rates.maxSalary}
+      medianSalary={rates.medianSalary}
+      currencyCode={currencyCode}
+    />
   );
 }

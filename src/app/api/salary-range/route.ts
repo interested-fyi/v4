@@ -7,6 +7,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     const url = new URL(req.url);
     const countryCode = url.searchParams.get("country_code");
     const jobCode = url.searchParams.get("job_code");
+    const privyDid = url.searchParams.get("privy_did");
 
     // Validate input
     if (!countryCode || !jobCode) {
@@ -26,6 +27,19 @@ export async function GET(req: NextRequest, res: NextResponse) {
       .eq("geography", countryCode)
       .eq("job_code", jobCode);
     console.log("🚀 ~ GET ~ data:", data);
+
+    // log the event to the analytics table
+    const { data: logData, error: logError } = await supabase
+      .from("salary_lookup_analytics")
+      .insert([
+        {
+          geography: countryCode,
+          code: jobCode,
+          privy_did: privyDid,
+        },
+      ]);
+    console.log("🚀 ~ GET ~ logError:", logError);
+    console.log("🚀 ~ GET ~ logData:", logData);
 
     // Handle any query errors
     if (error) {

@@ -1,12 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardFooter,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -15,15 +9,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SelectComposed } from "../inputs/SelectComposed";
 import { fetchUserProfile } from "@/lib/api/helpers";
 import { usePrivy } from "@privy-io/react-auth";
+import { LoaderCircle } from "lucide-react";
 
 export type SalaryFormData = {
-  category: string;
   role: string;
-  seniority: string;
   geography: string;
   code: string;
 };
@@ -36,13 +29,11 @@ export function SalaryRangeFinder({
   children,
 }: SalaryRangeFinderProps) {
   const [formData, setFormData] = useState<SalaryFormData>({
-    category: "",
     role: "",
-    seniority: "",
     geography: "",
     code: "",
   });
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { user, getAccessToken } = usePrivy();
 
   const { data: userProfileData } = useQuery({
@@ -59,14 +50,16 @@ export function SalaryRangeFinder({
       ...prevState,
       [name]: value,
     }));
+    setIsSubmitting(false);
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    await onSubmit(formData);
+    setIsSubmitting(false);
   };
 
-  const isReadyToSubmit = formData.role && formData.geography;
+  const isReadyToSubmit = !!formData.role && !!formData.geography;
 
   const { data: jobSalaryOptions, isLoading: jobSalaryOptionsLoading } =
     useQuery({
@@ -74,7 +67,7 @@ export function SalaryRangeFinder({
       queryFn: async () => {
         const res = await fetch(`/api/salary-range/details`, {
           method: "GET",
-          cache: "no-store",
+
           headers: {
             "Content-type": "application/json",
           },
@@ -104,66 +97,71 @@ export function SalaryRangeFinder({
 
   return (
     <div className='w-full max-w-[686px] mx-auto h-full relative '>
-      <form className='w-full' onSubmit={handleSubmit}>
-        <Card className=' m-auto '>
-          <CardHeader>
-            <CardTitle className='flex items-center gap-2 flex-wrap'>
-              I&apos;m a{" "}
-              {
-                <Select
-                  value={formData.code}
-                  onValueChange={(value) => handleSelectChange("code", value)}
-                >
-                  <SelectTrigger
-                    id='code'
-                    aria-label='Role'
-                    className='w-64 mx-2'
-                  >
-                    <SelectValue placeholder='Role' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {jobSalaryOptions?.salaryDetails?.roleTitles.map((role) => {
-                      return (
-                        <SelectItem
-                          key={`${role.job_code}-${role.job_profile}`}
-                          value={role.job_code + "-" + role.job_profile}
-                        >
-                          {role.job_profile}
-                        </SelectItem>
-                      );
-                    }) ?? (
-                      <SelectItem value='Loading...'>Loading...</SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-              }{" "}
-              in{" "}
-              {
-                <div className='relative'>
-                  <SelectComposed
-                    className='w-64 mx-2'
-                    value={formData.geography}
-                    onValueChange={(value) =>
-                      handleSelectChange("geography", value)
-                    }
-                    placeholder='Location'
-                    options={jobSalaryOptions?.salaryDetails?.locations ?? []}
-                  />
-                </div>
-              }
-              <Button
-                type='submit'
-                className='w-full bg-blue-700'
-                disabled={!isReadyToSubmit}
+      <Card className=' m-auto '>
+        <CardHeader>
+          <CardTitle className='flex items-center gap-2 flex-wrap'>
+            I&apos;m a{" "}
+            {
+              <Select
+                value={formData.code}
+                onValueChange={(value) => {
+                  handleSelectChange("code", value);
+                  handleSelectChange("role", value.split("-")[1]);
+                }}
               >
-                <SearchIcon className='mr-2 h-5 w-5' />
-                Find your salary range
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>{children}</CardContent>
-        </Card>
-      </form>
+                <SelectTrigger
+                  id='code'
+                  aria-label='Role'
+                  className='w-64 mx-2'
+                >
+                  <SelectValue placeholder='Role' />
+                </SelectTrigger>
+                <SelectContent>
+                  {jobSalaryOptions?.salaryDetails?.roleTitles.map((role) => {
+                    return (
+                      <SelectItem
+                        key={`${role.job_code}-${role.job_profile}`}
+                        value={role.job_code + "-" + role.job_profile}
+                      >
+                        {role.job_profile}
+                      </SelectItem>
+                    );
+                  }) ?? <SelectItem value='Loading...'>Loading...</SelectItem>}
+                </SelectContent>
+              </Select>
+            }{" "}
+            in{" "}
+            {
+              <div className='relative'>
+                <SelectComposed
+                  className='w-64 mx-2'
+                  value={formData.geography}
+                  onValueChange={(value) =>
+                    handleSelectChange("geography", value)
+                  }
+                  placeholder='Location'
+                  options={jobSalaryOptions?.salaryDetails?.locations ?? []}
+                />
+              </div>
+            }
+            <Button
+              className='w-full bg-blue-700'
+              disabled={!isReadyToSubmit || isSubmitting}
+              onClick={handleSubmit}
+            >
+              {isSubmitting ? (
+                <LoaderCircle className='w-6 h-6 m-auto animate-spin' />
+              ) : (
+                <>
+                  <SearchIcon className='mr-2 h-5 w-5' />
+                  Find your salary range
+                </>
+              )}
+            </Button>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>{children}</CardContent>
+      </Card>
     </div>
   );
 }
