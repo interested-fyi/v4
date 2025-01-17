@@ -1,14 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import supabase from "@/lib/supabase";
+import { PrivyClient } from "@privy-io/server-auth";
 
+const privyClient = new PrivyClient(
+  process.env.NEXT_PUBLIC_PRIVY_APP_ID!,
+  process.env.PRIVY_SECRET!
+);
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
     // Get the `lookup_value` and `level` from query parameters
     const url = new URL(req.url);
     const countryCode = url.searchParams.get("country_code");
     const jobCode = url.searchParams.get("job_code");
-    const privyDid = url.searchParams.get("privy_did");
+    const privy_did = url.searchParams.get("privy_did");
 
+    const accessToken = req.headers
+      .get("Authorization")
+      ?.replace("Bearer ", "");
+    // Verify and authenticate the user
+    const verified = await privyClient.verifyAuthToken(accessToken!);
+    const privyDid = verified.userId;
+    if (privy_did !== privyDid) {
+      throw new Error("Privy DIDs do not match");
+    }
     // Validate input
     if (!countryCode || !jobCode) {
       return NextResponse.json(
@@ -26,20 +40,15 @@ export async function GET(req: NextRequest, res: NextResponse) {
       .select("new_min, new_mid, new_max, currency, level, job_profile")
       .eq("geography", countryCode)
       .eq("job_code", jobCode);
-    console.log("🚀 ~ GET ~ data:", data);
 
     // log the event to the analytics table
-    const { data: logData, error: logError } = await supabase
-      .from("salary_lookup_analytics")
-      .insert([
-        {
-          geography: countryCode,
-          code: jobCode,
-          privy_did: privyDid,
-        },
-      ]);
-    console.log("🚀 ~ GET ~ logError:", logError);
-    console.log("🚀 ~ GET ~ logData:", logData);
+    await supabase.from("salary_lookup_analytics").insert([
+      {
+        geography: countryCode,
+        code: jobCode,
+        privy_did: privyDid,
+      },
+    ]);
 
     // Handle any query errors
     if (error) {

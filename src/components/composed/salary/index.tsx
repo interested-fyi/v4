@@ -36,7 +36,7 @@ export function SalaryRangeComposed() {
   );
   const [isComplete, setIsComplete] = useState(false);
 
-  const { user } = usePrivy();
+  const { user, authenticated, login } = usePrivy();
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -119,6 +119,24 @@ export function SalaryRangeComposed() {
 
   return (
     <div className='flex flex-col items-center gap-4'>
+      <Dialog open={!authenticated}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className='text-2xl font-bold font-heading text-center mt-4'>
+              Login to continue
+            </DialogTitle>
+          </DialogHeader>
+
+          <Button
+            onClick={() => {
+              login();
+            }}
+          >
+            Login
+          </Button>
+        </DialogContent>
+      </Dialog>
+
       {!salaryData ? <SalaryQuizCopy /> : null}
       <SalaryRangeFinder
         onSubmit={async (formData: SalaryFormData) => {
@@ -250,13 +268,15 @@ export function SalaryRangeComposed() {
 import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { USAGroupMap } from "../inputs/SelectComposed";
 import { current } from "@reduxjs/toolkit";
-import { usePrivy } from "@privy-io/react-auth";
+import { LoginModal, usePrivy } from "@privy-io/react-auth";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import AuthDialog from "../dialog/AuthDialog";
 interface SalaryCarouselProps {
   salaryData: {
     minSalary: string;
