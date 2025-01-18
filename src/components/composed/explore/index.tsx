@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CompanyCard } from "@/components/composed/companies/CompanyCard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -9,17 +9,47 @@ import JobPosting from "@/types/job-posting";
 import { JobPostingList } from "@/components/JobPostingList";
 import { CompanyResponse } from "@/app/api/companies/get-approved-companies/route";
 import { LoaderCircle } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Explore() {
-  const [activeButton, setActiveButton] = useState("companies");
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(20);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Initialize state from URL params or defaults
+  const [activeButton, setActiveButton] = useState(
+    searchParams.get("view") || "companies"
+  );
+  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
+  const [limit, setLimit] = useState(Number(searchParams.get("limit")) || 20);
+
+  // Update URL when parameters change
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", page.toString());
+    params.set("limit", limit.toString());
+    params.set("view", activeButton);
+
+    // Replace current URL with new params
+    router.replace(`/?${params.toString()}`);
+  }, [page, limit, activeButton, router]);
 
   const handleButtonClick = (button: string) => {
     setActiveButton(button);
-    setPage(1); // Reset page when switching
+    setPage(1); // Reset page when switching views
   };
 
+  // Listen for popstate (back/forward navigation)
+  useEffect(() => {
+    const handleRouteChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      setPage(Number(params.get("page")) || 1);
+      setLimit(Number(params.get("limit")) || 20);
+      setActiveButton(params.get("view") || "companies");
+    };
+
+    window.addEventListener("popstate", handleRouteChange);
+    return () => window.removeEventListener("popstate", handleRouteChange);
+  }, []);
   return (
     <>
       <div className='flex flex-col px-4 md:px-28 h-fit py-6 max-h-full items-start md:items-center justify-center md:justify-between w-full bg-[#e1effe]'>

@@ -37,7 +37,7 @@ export function SalaryRangeComposed() {
   );
   const [isComplete, setIsComplete] = useState(false);
 
-  const { user, authenticated, login } = usePrivy();
+  const { user, authenticated, ready } = usePrivy();
   const router = useRouter();
 
   const scrollToTop = () => {
@@ -119,6 +119,7 @@ export function SalaryRangeComposed() {
     }
   };
   useEffect(() => {
+    if (!ready) return;
     if (!authenticated) {
       router.push("/?message=login");
     }
