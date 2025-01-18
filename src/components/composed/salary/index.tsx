@@ -17,6 +17,7 @@ export function SalaryRangeComposed() {
     geography: "",
     code: "",
   });
+
   const [salaryData, setSalaryData] = React.useState<
     | {
         minSalary: string;
@@ -86,7 +87,11 @@ export function SalaryRangeComposed() {
       setFormData(formData);
 
       scrollToTop();
-
+      posthog.capture("salary_range_selected", {
+        geography: formData.geography,
+        job_code: formData.code.split("-")[0],
+        privy_did: user?.id,
+      });
       console.log("Form submitted successfully:", data);
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -112,6 +117,12 @@ export function SalaryRangeComposed() {
       if (data.success) {
         setIsComplete(true);
         console.log("Feedback submitted successfully:", data);
+        posthog.capture("salary_feedback_submitted", {
+          deviation: selectedDeviation,
+          privy_did: user?.id,
+          job_code: formData.code.split("-")[0],
+          level: salaryData[currentIndex].level,
+        });
       }
     } catch (error) {
       console.error("Error submitting feedback:", error);
@@ -122,6 +133,8 @@ export function SalaryRangeComposed() {
     if (!ready) return;
     if (!authenticated) {
       router.push("/?message=login");
+    } else {
+      posthog.identify(user?.id);
     }
   }, [authenticated]);
 
@@ -265,6 +278,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import posthog from "posthog-js";
 
 interface SalaryCarouselProps {
   salaryData: {
@@ -315,7 +329,6 @@ const SalaryCarousel = ({
   }) => {
     setIsLoading(true);
     try {
-      console.log("🚀 ~ handleSendSalarySelection ~ salary", salary);
       const res = await fetch("/api/salary-range/analytics/select-level", {
         method: "POST",
         headers: {
@@ -332,6 +345,12 @@ const SalaryCarousel = ({
 
       if (data.success) {
         console.log("Feedback submitted successfully:", data);
+        posthog.capture("salary_level_selected", {
+          level: salary.level,
+          geography: formData.geography,
+          job_code: formData.code.split("-")[0],
+          privy_did: user?.id,
+        });
         setIsSalaryRangeSelected(true);
       }
     } catch (error) {
