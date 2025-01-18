@@ -4,7 +4,7 @@ import supabase from "@/lib/supabase";
 export async function GET(req: NextRequest) {
   try {
     // Query the `fetch_salary_details` function in Supabase
-    const { data, error } = await supabase.rpc("fetch_salary_filter");
+    const { data, error } = await supabase.rpc("fetch_salary_filter_v2");
 
     // Handle any errors from the RPC call
     if (error) {
