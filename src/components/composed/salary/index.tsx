@@ -103,10 +103,12 @@ export function SalaryRangeComposed() {
     if (!salaryData) return;
 
     try {
+      const accessToken = await getAccessToken();
       const res = await fetch("/api/salary-range/analytics/submit-feedback", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           deviation: selectedDeviation,
@@ -305,7 +307,7 @@ const SalaryCarousel = ({
 
   setIsSalaryRangeSelected,
 }: SalaryCarouselProps) => {
-  const { user } = usePrivy();
+  const { user, getAccessToken } = usePrivy();
   const goToPrevious = () => {
     setCurrentIndex((prevIndex) =>
       prevIndex === 0 ? salaryData.length - 1 : prevIndex - 1
@@ -331,10 +333,12 @@ const SalaryCarousel = ({
   }) => {
     setIsLoading(true);
     try {
+      const accessToken = await getAccessToken();
       const res = await fetch("/api/salary-range/analytics/select-level", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           geography: formData.geography,
