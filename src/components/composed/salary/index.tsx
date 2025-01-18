@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { SalaryRangeFinder, SalaryFormData } from "./SalaryRangeFinder";
 import { SalaryRange } from "../../SalaryRange";
 import SalaryQuizCopy from "./SalaryQuizCopy";
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export function SalaryRangeComposed() {
   const [formData, setFormData] = React.useState<SalaryFormData>({
@@ -37,6 +38,7 @@ export function SalaryRangeComposed() {
   const [isComplete, setIsComplete] = useState(false);
 
   const { user, authenticated, login } = usePrivy();
+  const router = useRouter();
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -116,27 +118,14 @@ export function SalaryRangeComposed() {
       setIsComplete(false);
     }
   };
+  useEffect(() => {
+    if (!authenticated) {
+      router.push("/?message=login");
+    }
+  }, [authenticated]);
 
   return (
     <div className='flex flex-col items-center gap-4'>
-      <Dialog open={!authenticated}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className='text-2xl font-bold font-heading text-center mt-4'>
-              Login to continue
-            </DialogTitle>
-          </DialogHeader>
-
-          <Button
-            onClick={() => {
-              login();
-            }}
-          >
-            Login
-          </Button>
-        </DialogContent>
-      </Dialog>
-
       {!salaryData ? <SalaryQuizCopy /> : null}
       <SalaryRangeFinder
         onSubmit={async (formData: SalaryFormData) => {
@@ -267,16 +256,15 @@ export function SalaryRangeComposed() {
 }
 import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { USAGroupMap } from "../inputs/SelectComposed";
-import { current } from "@reduxjs/toolkit";
-import { LoginModal, usePrivy } from "@privy-io/react-auth";
+
+import { usePrivy } from "@privy-io/react-auth";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import AuthDialog from "../dialog/AuthDialog";
+
 interface SalaryCarouselProps {
   salaryData: {
     minSalary: string;

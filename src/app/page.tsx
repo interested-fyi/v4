@@ -8,15 +8,27 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { fetchUserProfile } from "@/lib/api/helpers";
 import Banner from "@/components/composed/popups/Banner";
+import { useSearchParams } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const { user } = usePrivy();
   const [dialogClosed, setDialogClosed] = useState(false);
+  const params = useSearchParams();
+  const router = useRouter();
   const { data: userProfileData, isLoading: userProfileLoading } = useQuery({
     enabled: !!user,
     queryKey: ["user", user?.id.replace("did:privy:", "")],
     queryFn: async () => await fetchUserProfile({ userId: user?.id }),
   });
+
+  const isUserLoginMessageOpen = params.get("message") === "login";
 
   return (
     <main className='flex  min-h-screen flex-col gap-0 items-center justify-start '>
@@ -69,6 +81,26 @@ export default function Home() {
             }}
           />
         }
+        <Dialog
+          open={isUserLoginMessageOpen}
+          onOpenChange={(open) => {
+            if (!open) {
+              router.push("/");
+            }
+          }}
+        >
+          <DialogContent className='sm:max-w-[425px] bg-[#e1effe] font-body m-auto py-8'>
+            <DialogHeader className='flex flex-col gap-3'>
+              <DialogTitle className='text-2xl font-bold font-heading text-center mt-4'>
+                LOGIN TO CONTINUE
+              </DialogTitle>
+              <div className='text-gray-700 text-sm font-semibold font-body leading-[21px] text-center'>
+                We ask that you please login and complete your profile to
+                continue. Thank you!
+              </div>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
       </section>
     </main>
   );
