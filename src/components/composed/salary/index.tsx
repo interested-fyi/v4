@@ -103,31 +103,13 @@ export function SalaryRangeComposed() {
     if (!salaryData) return;
 
     try {
-      const accessToken = await getAccessToken();
-      const res = await fetch("/api/salary-range/analytics/submit-feedback", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          deviation: selectedDeviation,
-          privy_did: user?.id,
-          code: formData.code.split("-")[0],
-          level: salaryData[currentIndex].level,
-        }),
+      setIsComplete(true);
+      posthog.capture("salary_feedback_submitted", {
+        deviation: selectedDeviation,
+        privy_did: user?.id,
+        job_code: formData.code.split("-")[0],
+        level: salaryData[currentIndex].level,
       });
-      const data = await res.json();
-      if (data.success) {
-        setIsComplete(true);
-        console.log("Feedback submitted successfully:", data);
-        posthog.capture("salary_feedback_submitted", {
-          deviation: selectedDeviation,
-          privy_did: user?.id,
-          job_code: formData.code.split("-")[0],
-          level: salaryData[currentIndex].level,
-        });
-      }
     } catch (error) {
       console.error("Error submitting feedback:", error);
       setIsComplete(false);
@@ -307,7 +289,7 @@ const SalaryCarousel = ({
 
   setIsSalaryRangeSelected,
 }: SalaryCarouselProps) => {
-  const { user, getAccessToken } = usePrivy();
+  const { user } = usePrivy();
   const goToPrevious = () => {
     setCurrentIndex((prevIndex) =>
       prevIndex === 0 ? salaryData.length - 1 : prevIndex - 1
@@ -333,37 +315,18 @@ const SalaryCarousel = ({
   }) => {
     setIsLoading(true);
     try {
-      const accessToken = await getAccessToken();
-      const res = await fetch("/api/salary-range/analytics/select-level", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          geography: formData.geography,
-          level: salary.level,
-          code: formData.code.split("-")[0],
-          privy_did: user?.id,
-        }),
+      await posthog.capture("salary_level_selected", {
+        level: salary.level,
+        geography: formData.geography,
+        job_code: formData.code.split("-")[0],
+        privy_did: user?.id,
       });
-      const data = await res.json();
-
-      if (data.success) {
-        console.log("Feedback submitted successfully:", data);
-        posthog.capture("salary_level_selected", {
-          level: salary.level,
-          geography: formData.geography,
-          job_code: formData.code.split("-")[0],
-          privy_did: user?.id,
-        });
-        setIsSalaryRangeSelected(true);
-      }
+      setIsSalaryRangeSelected(true);
     } catch (error) {
-      console.error("Error submitting feedback:", error);
-    } finally {
       setIsLoading(false);
+      console.error("Error sending salary selection:", error);
     }
+    setIsLoading(false);
   };
 
   return (

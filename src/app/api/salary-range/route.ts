@@ -38,15 +38,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       .eq("geography", countryCode)
       .eq("job_code", jobCode);
 
-    // log the event to the analytics table
-    await supabase.from("salary_lookup_analytics").insert([
-      {
-        geography: countryCode,
-        code: jobCode,
-        privy_did: privyDid,
-      },
-    ]);
-
     // Handle any query errors
     if (error) {
       throw new Error(`Error fetching salary range: ${error.message}`);
