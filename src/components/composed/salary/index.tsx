@@ -38,7 +38,7 @@ export function SalaryRangeComposed() {
   );
   const [isComplete, setIsComplete] = useState(false);
 
-  const { user, authenticated, ready } = usePrivy();
+  const { user, getAccessToken, authenticated, ready } = usePrivy();
   const router = useRouter();
 
   const scrollToTop = () => {
@@ -47,17 +47,19 @@ export function SalaryRangeComposed() {
 
   const handleSubmit = async (formData: SalaryFormData) => {
     try {
-      const response = await fetch(
-        `/api/salary-range?country_code=${formData.geography}&job_code=${
-          formData.code.split("-")[0]
-        }&privy_did=${user?.id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const accessToken = await getAccessToken();
+      const response = await fetch(`/api/salary-range`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          countryCode: formData.geography,
+          jobCode: formData.code.split("-")[0],
+          privy_did: user?.id,
+        }),
+      });
 
       if (!response.ok) {
         setError("No data found for the selected role and location");

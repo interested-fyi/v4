@@ -6,14 +6,11 @@ const privyClient = new PrivyClient(
   process.env.NEXT_PUBLIC_PRIVY_APP_ID!,
   process.env.PRIVY_SECRET!
 );
-export async function GET(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest, res: NextResponse) {
   try {
     // Get the `lookup_value` and `level` from query parameters
-    const url = new URL(req.url);
-    const countryCode = url.searchParams.get("country_code");
-    const jobCode = url.searchParams.get("job_code");
-    const privy_did = url.searchParams.get("privy_did");
 
+    const { countryCode, jobCode, privy_did } = await req.json();
     const accessToken = req.headers
       .get("Authorization")
       ?.replace("Bearer ", "");
