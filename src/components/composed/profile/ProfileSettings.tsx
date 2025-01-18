@@ -151,16 +151,6 @@ export const ProfileSettings = ({
           </Button>
         </div>
       </div>
-      {!isSettingsMode ? (
-        <div className='w-[343px] text-center text-gray-700 text-sm font-semibold font-body leading-[21px] pt-5 '>
-          If you&apos;re on our talent page and looking for work, having
-          prospective companies and recruiters book a call with you is a great
-          first step.
-          <br />
-          <br />
-          (You can also do this later in settings).
-        </div>
-      ) : null}
       <div className='grid gap-4'>
         <div className='flex flex-col gap-2'>
           <Label className='text-sm font-medium' htmlFor='position'>
