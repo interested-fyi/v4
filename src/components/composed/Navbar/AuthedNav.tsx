@@ -193,7 +193,13 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
         <DropdownMenuTrigger asChild>{avatar}</DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem className='text-gray-500 text-sm font-medium font-body leading-[21px]'>
-            <Link href={`/profile/${user?.id.replace("did:privy:", "")}`}>
+            <Link
+              href={`/profile/${user?.id.replace("did:privy:", "")}`}
+              onClick={() => {
+                setOpen(false);
+                router.push(`/profile/${user?.id.replace("did:privy:", "")}`);
+              }}
+            >
               View profile
             </Link>
           </DropdownMenuItem>
