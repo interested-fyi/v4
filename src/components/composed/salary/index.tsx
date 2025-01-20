@@ -122,7 +122,7 @@ export function SalaryRangeComposed() {
     } else {
       posthog.identify(user?.id);
     }
-  }, [authenticated]);
+  }, [authenticated, ready]);
 
   return (
     <div className='flex flex-col items-center gap-4'>
