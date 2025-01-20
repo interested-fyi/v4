@@ -145,7 +145,7 @@ export function SalaryRangeFinder({
               </div>
             }
             <Button
-              className='w-full bg-blue-700'
+              className='w-fit mx-auto bg-blue-700'
               disabled={!isReadyToSubmit || isSubmitting}
               onClick={handleSubmit}
             >

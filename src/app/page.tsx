@@ -95,8 +95,7 @@ export default function Home() {
                 LOGIN TO CONTINUE
               </DialogTitle>
               <div className='text-gray-700 text-sm font-semibold font-body leading-[21px] text-center'>
-                We ask that you please login and complete your profile to
-                continue. Thank you!
+                Please login/signup to start the quiz
               </div>
             </DialogHeader>
           </DialogContent>
