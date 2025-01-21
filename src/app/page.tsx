@@ -16,9 +16,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
-  const { user } = usePrivy();
+  const { user, login } = usePrivy();
   const [dialogClosed, setDialogClosed] = useState(false);
   const params = useSearchParams();
   const router = useRouter();
@@ -97,6 +98,13 @@ export default function Home() {
               <div className='text-gray-700 text-sm font-semibold font-body leading-[21px] text-center'>
                 Please login/signup to start the quiz
               </div>
+              <Button
+                className='w-16 h-8 px-4 mx-auto text-xs md:text-sm bg-[#919df483] hover:bg-[#919CF459]'
+                variant={"secondary"}
+                onClick={login}
+              >
+                Login
+              </Button>
             </DialogHeader>
           </DialogContent>
         </Dialog>
