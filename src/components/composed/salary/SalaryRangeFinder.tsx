@@ -153,7 +153,7 @@ export function SalaryRangeFinder({
                 <LoaderCircle className='w-6 h-6 m-auto animate-spin' />
               ) : (
                 <>
-                  <SearchIcon className='mr-2 mt-2 h-5 w-5' />
+                  <SearchIcon className='mr-2 h-5 w-5' />
                   Find your salary range
                 </>
               )}

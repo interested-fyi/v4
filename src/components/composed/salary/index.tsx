@@ -254,7 +254,12 @@ export function SalaryRangeComposed() {
     </div>
   );
 }
-import { Check, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  MousePointerClickIcon,
+} from "lucide-react";
 import { USAGroupMap } from "../inputs/SelectComposed";
 
 import { usePrivy } from "@privy-io/react-auth";
@@ -473,40 +478,46 @@ const AnimatedSuccessButton = ({
   };
 
   return (
-    <Button
-      className={`
-        mx-auto mt-4 
+    <div className='flex mt-4 flex-col gap-2'>
+      <span className='text-gray-500 text-xs'>
+        Select your level to continue
+      </span>
+      <Button
+        className={`
+        mx-auto  
         relative 
         transition-all 
         duration-300 
         ${className}
-        ${isSuccess ? "bg-green-600 scale-105" : "bg-green-500"}
+        ${isSuccess ? "bg-green-600 scale-105" : "bg-blue-700"}
         ${isAnimating ? "pointer-events-none" : ""}
         overflow-hidden
       `}
-      onClick={handleClick}
-      disabled={isAnimating || disabled}
-    >
-      <span
-        className={`
-        flex items-center gap-2
-        transition-transform duration-300
-        ${isSuccess ? "transform -translate-y-10" : ""}
-      `}
+        onClick={handleClick}
+        disabled={isAnimating || disabled}
       >
-        This is my level
-      </span>
+        <span
+          className={`
+          flex items-center gap-2
+          transition-transform duration-300
+          ${isSuccess ? "transform -translate-y-10" : ""}
+          `}
+        >
+          This is my level
+          <MousePointerClickIcon />
+        </span>
 
-      <span
-        className={`
+        <span
+          className={`
         absolute inset-0
         flex items-center justify-center
         transition-transform duration-300
         ${isSuccess ? "transform translate-y-1" : "transform translate-y-10"}
       `}
-      >
-        <Check className='w-5 h-5 animate-bounce' />
-      </span>
-    </Button>
+        >
+          <Check className='w-5 h-5 animate-bounce' />
+        </span>
+      </Button>
+    </div>
   );
 };
