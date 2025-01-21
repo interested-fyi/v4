@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SalaryRangeFinder, SalaryFormData } from "./SalaryRangeFinder";
 import { SalaryRange } from "../../SalaryRange";
 import SalaryQuizCopy from "./SalaryQuizCopy";
