@@ -101,7 +101,10 @@ export default function Home() {
               <Button
                 className='w-16 h-8 px-4 mx-auto text-xs md:text-sm bg-[#919df483] hover:bg-[#919CF459]'
                 variant={"secondary"}
-                onClick={login}
+                onClick={async () => {
+                  await login();
+                  router.push("/");
+                }}
               >
                 Login
               </Button>
