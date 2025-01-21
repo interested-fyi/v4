@@ -104,12 +104,30 @@ export function SalaryRangeComposed() {
 
     try {
       setIsComplete(true);
+      const accessToken = await getAccessToken();
+      const res = await fetch("/api/salary-range/analytics/submit-feedback", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          deviation: selectedDeviation,
+          code: formData.code.split("-")[0],
+          level: salaryData[currentIndex].level,
+          privy_did: user?.id,
+        }),
+      });
       posthog.capture("salary_feedback_submitted", {
         deviation: selectedDeviation,
         privy_did: user?.id,
         job_code: formData.code.split("-")[0],
         level: salaryData[currentIndex].level,
       });
+      if (!res.ok) {
+        setIsComplete(false);
+        throw new Error("Network response was not ok");
+      }
     } catch (error) {
       console.error("Error submitting feedback:", error);
       setIsComplete(false);
@@ -270,6 +288,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import posthog from "posthog-js";
+import { json } from "stream/consumers";
 
 interface SalaryCarouselProps {
   salaryData: {
