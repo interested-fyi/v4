@@ -99,7 +99,12 @@ export const ProfileEditForm = ({ isEditMode, onSubmit, onClose }: Props) => {
 
     if (
       Object.keys(urlParams).filter(
-        (val) => val !== "settingsMode" && val !== "editMode"
+        (val) =>
+          val !== "settingsMode" &&
+          val !== "editMode" &&
+          val !== "page" &&
+          val !== "view" &&
+          val !== "limit"
       ).length
     ) {
       setForm({
