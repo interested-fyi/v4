@@ -405,10 +405,10 @@ export const ProfileConnections = ({
       address
     );
 
-    if (!isDeleted) {
-      console.error("Failed to delete link method from DB");
-      return;
-    }
+    // if (!isDeleted) {
+    //   console.error("Failed to delete link method from DB");
+    //   return;
+    // }
 
     switch (linkMethod) {
       case "github":
