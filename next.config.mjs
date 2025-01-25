@@ -7,7 +7,7 @@ const nextConfig = {
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https: https://i.imgur.com",
       "media-src 'self'",
-      "connect-src 'self' https://auth.privy.io wss://relay.walletconnect.com wss://relay.walletconnect.org wss://www.walletlink.org https://*.rpc.privy.systems https://api.mainnet-beta.solana.com https://api.devnet.solana.com https://api.testnet.solana.com https://api.relay.link https://api.testnets.relay.link https://sepolia.optimism.io https://explorer-api.walletconnect.com https://pulse.walletconnect.org",
+      "connect-src 'self' https://auth.privy.io wss://relay.walletconnect.com wss://relay.walletconnect.org wss://www.walletlink.org https://*.rpc.privy.systems https://api.mainnet-beta.solana.com https://api.devnet.solana.com https://api.testnet.solana.com https://api.relay.link https://api.testnets.relay.link https://sepolia.optimism.io https://explorer-api.walletconnect.com https://pulse.walletconnect.org https://us.i.posthog.com",
       "frame-src 'self' https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org https://challenges.cloudflare.com https://oauth.telegram.org",
       "child-src 'self' https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org",
       "worker-src 'self' blob:",
@@ -49,10 +49,6 @@ const nextConfig = {
           {
             key: "Strict-Transport-Security",
             value: "max-age=31536000; includeSubDomains",
-          },
-          {
-            key: "Access-Control-Allow-Origin",
-            value: "*",
           },
         ],
       },
