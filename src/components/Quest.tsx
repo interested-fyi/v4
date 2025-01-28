@@ -125,7 +125,7 @@ export default function Quest() {
       linkMethod: "siwe",
     },
     {
-      id: "salary-quiz",
+      id: "salary_quiz",
       title: "Complete Salary Quiz",
       icon: <Check className='h-5 w-5' />,
       points: questPoints,
@@ -262,7 +262,11 @@ export default function Quest() {
     const linkFunction =
       linkMethodMap[linkMethod as keyof typeof linkMethodMap];
     if (linkFunction) {
-      linkFunction();
+      try {
+        linkFunction();
+      } catch (error) {
+        alert("Failed to start quest");
+      }
     }
   };
 
@@ -395,7 +399,12 @@ export default function Quest() {
                     if (step.linkMethod === "quiz") {
                       router.push("/salary-quiz");
                     } else {
-                      handleStartQuest(step.linkMethod);
+                      try {
+                        handleStartQuest(step.linkMethod);
+                      } catch (error) {
+                        alert("Error starting quest");
+                        console.error("Error starting quest:", error);
+                      }
                     }
                   }}
                   className={`${
