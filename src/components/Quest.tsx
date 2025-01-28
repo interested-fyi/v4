@@ -59,7 +59,7 @@ export default function Quest() {
 
   const router = useRouter();
   const { getAccessToken } = usePrivy();
-  const { data } = useQuery<{
+  const { data, refetch } = useQuery<{
     completedTaskIds: string[];
     totalPoints: number;
   }>({
@@ -157,6 +157,18 @@ export default function Quest() {
     linkFarcaster,
     linkWallet,
   } = useLinkAccount({
+    onError: async (error, details) => {
+      console.error("Error linking account:", error);
+      if (
+        user?.linkedAccounts.find(
+          (account) => account.type === details.linkMethod
+        )
+      ) {
+        alert("Account already linked");
+        await completeTask(user.id, details.linkMethod);
+        refetch();
+      }
+    },
     onSuccess: async (user, linkMethod, linkedAccount) => {
       // Update completed status for the specific linked account
       setSteps((prevSteps) =>
