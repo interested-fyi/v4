@@ -28,6 +28,7 @@ import {
   updateWalletUser,
 } from "@/lib/updateSocialConnections";
 import { completeTask } from "@/lib/completeTask";
+import Image from "next/image";
 
 interface QuestStep {
   id: string;
@@ -369,13 +370,19 @@ export default function Quest() {
                       ) : (
                         <motion.span
                           key='points'
-                          className='text-sm text-blue-700 font-semibold'
+                          className='text-sm text-blue-700 font-semibold flex gap-1'
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -10 }}
                           transition={{ duration: 0.2 }}
                         >
-                          +{step.points} points
+                          +{step.points}{" "}
+                          <Image
+                            src='/svg/small-binocular.svg'
+                            width={16}
+                            height={16}
+                            alt='binoculars'
+                          />
                         </motion.span>
                       )}
                     </AnimatePresence>
