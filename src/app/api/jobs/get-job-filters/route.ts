@@ -13,13 +13,13 @@ export async function GET(req: NextRequest) {
     // Format the data and ensure alphabetical order
     const filters = {
       roleTitles: Array.from(
-        new Set(data.map((item: any) => item.role_title).filter(Boolean))
+        new Set(data.map((item: any) => item.role_title.trim()).filter(Boolean))
       ).sort(),
       locations: Array.from(
-        new Set(data.map((item: any) => item.location).filter(Boolean))
+        new Set(data.map((item: any) => item.location.trim()).filter(Boolean))
       ).sort(),
       departments: Array.from(
-        new Set(data.map((item: any) => item.department).filter(Boolean))
+        new Set(data.map((item: any) => item.department.trim()).filter(Boolean))
       ).sort(),
     };
 
