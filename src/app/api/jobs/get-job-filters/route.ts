@@ -10,17 +10,17 @@ export async function GET(req: NextRequest) {
       throw new Error(`Error fetching filters: ${error.message}`);
     }
 
-    // Format the data
+    // Format the data and ensure alphabetical order
     const filters = {
       roleTitles: Array.from(
-        new Set(data.map((item: any) => item.role_title))
-      ).filter(Boolean),
+        new Set(data.map((item: any) => item.role_title).filter(Boolean))
+      ).sort(),
       locations: Array.from(
-        new Set(data.map((item: any) => item.location))
-      ).filter(Boolean),
+        new Set(data.map((item: any) => item.location).filter(Boolean))
+      ).sort(),
       departments: Array.from(
-        new Set(data.map((item: any) => item.department))
-      ).filter(Boolean),
+        new Set(data.map((item: any) => item.department).filter(Boolean))
+      ).sort(),
     };
 
     return NextResponse.json(
