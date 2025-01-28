@@ -100,7 +100,7 @@ export function SalaryRangeComposed() {
     }
   };
   const handleSendSalaryFeedback = async () => {
-    if (!salaryData) return;
+    if (!salaryData || !user?.id) return;
 
     try {
       setIsComplete(true);
@@ -115,12 +115,12 @@ export function SalaryRangeComposed() {
           deviation: selectedDeviation,
           code: formData.code.split("-")[0],
           level: salaryData[currentIndex].level,
-          privy_did: user?.id,
+          privy_did: user.id,
         }),
       });
       posthog.capture("salary_feedback_submitted", {
         deviation: selectedDeviation,
-        privy_did: user?.id,
+        privy_did: user.id,
         job_code: formData.code.split("-")[0],
         level: salaryData[currentIndex].level,
       });
@@ -128,6 +128,7 @@ export function SalaryRangeComposed() {
         setIsComplete(false);
         throw new Error("Network response was not ok");
       }
+      await completeTask(user.id, "salary_quiz");
     } catch (error) {
       console.error("Error submitting feedback:", error);
       setIsComplete(false);
@@ -289,6 +290,7 @@ import {
 } from "@/components/ui/dialog";
 import posthog from "posthog-js";
 import { json } from "stream/consumers";
+import { completeTask } from "@/lib/completeTask";
 
 interface SalaryCarouselProps {
   salaryData: {

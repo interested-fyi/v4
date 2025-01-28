@@ -7,6 +7,15 @@ import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion } from "framer-motion";
+import {
+  updateFarcasterUser,
+  updateGithubUser,
+  updateLinkedInUser,
+  updateTelegramUser,
+  updateTwitterUser,
+  updateWalletUser,
+} from "@/lib/updateSocialConnections";
+import { completeTask } from "@/lib/completeTask";
 
 enum PROFILE_TYPE {
   GITHUB = "github",
@@ -25,6 +34,15 @@ const profiles = [
   PROFILE_TYPE.TWITTER,
   PROFILE_TYPE.WALLET,
 ];
+
+const TaskMap = {
+  [PROFILE_TYPE.GITHUB]: "github",
+  [PROFILE_TYPE.LINKEDIN]: "linkedin",
+  [PROFILE_TYPE.FARCASTER]: "farcaster",
+  [PROFILE_TYPE.TELEGRAM]: "telegram",
+  [PROFILE_TYPE.TWITTER]: "x",
+  [PROFILE_TYPE.WALLET]: "wallet",
+};
 
 export const ProfileConnections = ({
   setTempPhotoUrl,
@@ -60,168 +78,12 @@ export const ProfileConnections = ({
     linkTwitter,
     linkWallet,
   } = useLinkAccount({
-    onSuccess: (user, linkMethod, linkedAccount) => {
-      async function updateGithubUser(
-        privy_did: string,
-        email: string | null | undefined,
-        name: string | null | undefined,
-        username: string | null | undefined,
-        subject: string | null | undefined
-      ) {
-        const accessToken = await getAccessToken();
-        const res = await fetch(`/api/users/linking/github`, {
-          method: "POST",
-          cache: "no-store",
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            privy_did: privy_did,
-            email: email,
-            name: name,
-            username: username,
-            subject: subject,
-          }),
-        });
-      }
+    onSuccess: async (user, linkMethod, linkedAccount) => {
+      const stepId = TaskMap[linkMethod as keyof typeof TaskMap];
 
-      async function updateFarcasterUser(
-        privy_did: string,
-        fid: number | null | undefined,
-        username: string | null | undefined,
-        displayName: string | null | undefined,
-        pfp: string | null | undefined,
-        url: string | null | undefined,
-        ownerAddress: string | null | undefined,
-        bio: string | null | undefined
-      ) {
-        const accessToken = await getAccessToken();
-        const res = await fetch(`/api/users/linking/farcaster`, {
-          method: "POST",
-          cache: "no-store",
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            privy_did: privy_did,
-            fid: fid,
-            username: username,
-            display_name: displayName,
-            pfp: pfp,
-            url: url,
-            owner_address: ownerAddress,
-            bio: bio,
-          }),
-        });
-        if (!userProfileData?.profile?.photo_source && pfp) {
-          handleSelectPhoto(pfp);
-        }
-      }
-
-      async function updateLinkedInUser(
-        privy_did: string,
-        email: string | null | undefined,
-        name: string | null | undefined,
-        vanityName: string | null | undefined,
-        subject: string | null | undefined
-      ) {
-        const accessToken = await getAccessToken();
-        const res = await fetch(`/api/users/linking/linkedin`, {
-          method: "POST",
-          cache: "no-store",
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            privy_did: privy_did,
-            email: email,
-            name: name,
-            vanity_name: vanityName,
-            subject: subject,
-          }),
-        });
-      }
-
-      async function updateTelegramUser(
-        privy_did: string,
-        telegram_user_id: string | null | undefined,
-        username: string | null | undefined,
-        photo_url: string | null | undefined,
-        first_name: string | null | undefined,
-        last_name: string | null | undefined
-      ) {
-        const accessToken = await getAccessToken();
-        const res = await fetch(`/api/users/linking/telegram`, {
-          method: "POST",
-          cache: "no-store",
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            privy_did: privy_did,
-            telegram_user_id: telegram_user_id,
-            username: username,
-            photo_url: photo_url,
-            first_name: first_name,
-            last_name: last_name,
-          }),
-        });
-        if (!userProfileData?.profile?.photo_source && photo_url) {
-          handleSelectPhoto(photo_url);
-        }
-      }
-
-      async function updateTwitterUser(
-        privy_did: string,
-        name: string | null | undefined,
-        username: string | null | undefined,
-        profile_picture_url: string | null | undefined,
-        subject: string | null | undefined
-      ) {
-        const accessToken = await getAccessToken();
-        const res = await fetch(`/api/users/linking/x`, {
-          method: "POST",
-          cache: "no-store",
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            privy_did: privy_did,
-            name: name,
-            username: username,
-            profile_picture_url: profile_picture_url,
-            subject: subject,
-          }),
-        });
-        if (!userProfileData?.profile?.photo_source && profile_picture_url) {
-          handleSelectPhoto(profile_picture_url);
-        }
-      }
-
-      async function updateWalletUser(
-        privy_did: string,
-        wallet_address: string | null | undefined
-      ) {
-        const accessToken = await getAccessToken();
-        const res = await fetch(`/api/users/linking/wallet`, {
-          method: "POST",
-          cache: "no-store",
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            privy_did: privy_did,
-            wallet_address: [wallet_address],
-          }),
-        });
-      }
-
+      await completeTask(user.id, stepId);
+      const accessToken = await getAccessToken();
+      if (!accessToken) return;
       switch (linkMethod) {
         case "github":
           updateGithubUser(
@@ -229,7 +91,8 @@ export const ProfileConnections = ({
             user?.github?.email,
             user?.github?.name,
             user?.github?.username,
-            user?.github?.subject
+            user?.github?.subject,
+            accessToken
           );
           break;
         case "farcaster":
@@ -241,8 +104,12 @@ export const ProfileConnections = ({
             user?.farcaster?.pfp,
             user?.farcaster?.url,
             user?.farcaster?.ownerAddress,
-            user?.farcaster?.bio
+            user?.farcaster?.bio,
+            accessToken
           );
+          if (!userProfileData?.profile?.photo_source && user?.farcaster?.pfp) {
+            handleSelectPhoto(user?.farcaster?.pfp);
+          }
           break;
         case "linkedin":
           updateLinkedInUser(
@@ -250,7 +117,8 @@ export const ProfileConnections = ({
             user?.linkedin?.email,
             user?.linkedin?.name,
             user?.linkedin?.vanityName,
-            user?.linkedin?.subject
+            user?.linkedin?.subject,
+            accessToken
           );
           break;
         case "telegram":
@@ -260,8 +128,15 @@ export const ProfileConnections = ({
             user?.telegram?.username,
             user?.telegram?.photoUrl,
             user?.telegram?.firstName,
-            user?.telegram?.lastName
+            user?.telegram?.lastName,
+            accessToken
           );
+          if (
+            !userProfileData?.profile?.photo_source &&
+            user?.telegram?.photoUrl
+          ) {
+            handleSelectPhoto(user?.telegram?.photoUrl);
+          }
           break;
         case "twitter":
           updateTwitterUser(
@@ -269,13 +144,21 @@ export const ProfileConnections = ({
             user?.twitter?.name,
             user?.twitter?.username,
             user?.twitter?.profilePictureUrl,
-            user?.twitter?.subject
+            user?.twitter?.subject,
+            accessToken
           );
+          if (
+            !userProfileData?.profile?.photo_source &&
+            user?.twitter?.profilePictureUrl
+          ) {
+            handleSelectPhoto(user?.twitter?.profilePictureUrl);
+          }
           break;
         case "siwe":
           updateWalletUser(
             user?.id,
-            linkedAccount?.type === "wallet" ? linkedAccount?.address : null
+            linkedAccount?.type === "wallet" ? linkedAccount?.address : null,
+            accessToken
           );
           break;
       }
