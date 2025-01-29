@@ -2,6 +2,7 @@
 import { NavButtons } from "./NavButtons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 import {
   Dialog,
   DialogContent,
@@ -21,10 +22,12 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { ProfileEditForm } from "../profile/ProfileEdit";
-import { LoaderIcon } from "lucide-react";
+import { Loader, LoaderIcon } from "lucide-react";
 import { UserCombinedProfile } from "@/types/return_types";
 import { fetchUserProfile } from "@/lib/api/helpers";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { fetchCompletedTasks } from "@/components/Quest";
+import { QuestPoints } from "../quest/QuestPoints";
 
 interface AuthedNavProps {
   user: User | null;
@@ -50,10 +53,16 @@ const AuthedNav = ({ user, logout, getAccessToken }: AuthedNavProps) => {
       <NavButtons />
       <AvatarMenu
         avatar={
-          <Avatar className='h-8 w-8'>
-            <AvatarImage src={data?.profile?.photo_source ?? undefined} />
-            <AvatarFallback>{user?.google?.name?.slice(0, 2)}</AvatarFallback>
-          </Avatar>
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.75 }}
+          >
+            <Avatar className='h-8 w-8'>
+              <AvatarImage src={data?.profile?.photo_source ?? undefined} />
+              <AvatarFallback>{user?.google?.name?.slice(0, 2)}</AvatarFallback>
+            </Avatar>
+          </motion.div>
         }
         logout={logout}
       />
@@ -72,6 +81,23 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
+
+  const { data: questStatus, isLoading: isQuestSTatusLoading } = useQuery<{
+    completedTaskIds: string[];
+    totalPoints: number;
+  }>({
+    enabled: !!user,
+    queryKey: ["completedTasks", user?.id],
+    queryFn: async () => {
+      if (user) {
+        return await fetchCompletedTasks(user.id);
+      }
+      return {
+        completedTaskIds: [],
+        totalPoints: 0,
+      };
+    },
+  });
 
   const {
     data: userProfileData,
@@ -190,7 +216,22 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
       }}
     >
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>{avatar}</DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: [0, "100px", "86px"] }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className='flex cursor-pointer md:bottom-1 relative gap-1 border-blue-700 border-[1px] rounded-full shadow-inner p-1 justify-end'
+          >
+            {!questStatus?.totalPoints && isQuestSTatusLoading ? null : (
+              <QuestPoints
+                className='flex text-xs'
+                totalPoints={questStatus?.totalPoints ?? 0}
+              />
+            )}
+            {avatar}
+          </motion.div>
+        </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem className='text-gray-500 text-sm font-medium font-body leading-[21px]'>
             <Link

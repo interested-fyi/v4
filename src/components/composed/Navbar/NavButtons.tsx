@@ -8,7 +8,7 @@ export function NavButtons() {
   const router = useRouter();
 
   return (
-    <div className='flex md:flex-row flex-row gap-4 '>
+    <div className='md:flex hidden md:flex-row flex-row gap-4 '>
       <div className='flex gap-4'>
         {" "}
         <Link
