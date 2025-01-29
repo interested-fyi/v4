@@ -395,6 +395,7 @@ export default function Quest() {
         <CardContent className='space-y-4 p-6'>
           {steps.map((step, index) => (
             <QuestRow
+              key={step.id + index}
               step={step}
               index={index}
               handleStartQuest={handleStartQuest}
