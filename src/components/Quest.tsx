@@ -11,6 +11,7 @@ import {
   MessageCircle,
   XIcon as BrandX,
   ArrowRight,
+  Loader,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -57,9 +58,8 @@ export default function Quest() {
   const [questPoints] = useState(10);
   const [totalPoints, setTotalPoints] = useState(0);
 
-  const router = useRouter();
   const { getAccessToken } = usePrivy();
-  const { data, refetch } = useQuery<{
+  const { data, isLoading, refetch } = useQuery<{
     completedTaskIds: string[];
     totalPoints: number;
   }>({
@@ -293,6 +293,39 @@ export default function Quest() {
   return (
     <div className='min-h-screen bg-blue-700 flex items-center justify-center p-4'>
       <Card className='w-full max-w-2xl bg-white/90 backdrop-blur shadow-xl'>
+        {!!data &&
+        !data?.completedTaskIds.includes("daily_login") &&
+        !isLoading ? (
+          <motion.div
+            initial={{
+              width: 0,
+              opacity: 0,
+            }}
+            animate={{
+              width: "100%",
+              opacity: 1,
+            }}
+            transition={{
+              duration: 0.5,
+              delay: 0.5,
+            }}
+            className='p-4'
+          >
+            <QuestRow
+              step={{
+                id: "daily_login",
+                title: "Daily Login",
+                icon: <ArrowRight className='h-5 w-5' />,
+                points: 5,
+                completed:
+                  data?.completedTaskIds?.includes("daily_login") ?? false,
+                linkMethod: "daily_login",
+              }}
+              index={0}
+              handleStartQuest={handleStartQuest}
+            />
+          </motion.div>
+        ) : null}
         <CardHeader className='text-center'>
           <motion.div
             initial={{ scale: 0.5, opacity: 0 }}
@@ -353,92 +386,174 @@ export default function Quest() {
         </CardHeader>
         <CardContent className='space-y-4 p-6'>
           {steps.map((step, index) => (
-            <motion.div
-              key={step.id}
-              initial={{ x: -50, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
-            >
-              <div className='flex items-center justify-between rounded-lg border border-purple-100 bg-white p-4 transition-all hover:shadow-md hover:border-purple-300'>
-                <div className='flex items-center gap-4'>
-                  <div className='rounded-full bg-gradient-to-br from-blue-700 to-yellow-200 p-2 text-white'>
-                    {step.icon}
-                  </div>
-                  <div>
-                    <h3 className='font-medium'>{step.title}</h3>
-                    <AnimatePresence mode='wait'>
-                      {step.completed ? (
-                        <motion.div
-                          key='completed'
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <Badge
-                            variant='secondary'
-                            className='bg-green-100 text-green-800'
-                          >
-                            <Check className='mr-1 h-3 w-3' />
-                            Completed
-                          </Badge>
-                        </motion.div>
-                      ) : (
-                        <motion.span
-                          key='points'
-                          className='text-sm text-blue-700 font-semibold flex gap-1'
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          +{step.points}{" "}
-                          <Image
-                            src='/svg/small-binocular.svg'
-                            width={16}
-                            height={16}
-                            alt='binoculars'
-                          />
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </div>
-                <Button
-                  variant={step.completed ? "secondary" : "default"}
-                  disabled={step.completed}
-                  onClick={() => {
-                    if (step.linkMethod === "quiz") {
-                      router.push("/salary-quiz");
-                    } else {
-                      try {
-                        handleStartQuest(step.linkMethod);
-                      } catch (error) {
-                        alert("Error starting quest");
-                        console.error("Error starting quest:", error);
-                      }
-                    }
-                  }}
-                  className={`${
-                    step.completed
-                      ? "bg-green-100 text-green-800"
-                      : "bg-blue-700 text-white hover:opacity-90"
-                  } transition-all duration-300`}
-                >
-                  {step.completed ? (
-                    "Completed"
-                  ) : (
-                    <>
-                      Start Quest
-                      <ArrowRight className=' h-4 w-4' />
-                    </>
-                  )}
-                </Button>
-              </div>
-            </motion.div>
+            <QuestRow
+              step={step}
+              index={index}
+              handleStartQuest={handleStartQuest}
+            />
           ))}
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function QuestRow({
+  step,
+  index,
+  handleStartQuest,
+}: {
+  step: QuestStep;
+  index: number;
+  handleStartQuest: (linkMethod: string) => void;
+}) {
+  const [isLoading, setIsLoading] = useState(false);
+  const { user } = usePrivy();
+  const router = useRouter();
+  const { refetch } = useQuery<{
+    completedTaskIds: string[];
+    totalPoints: number;
+  }>({
+    enabled: !!user,
+    queryKey: ["completedTasks", user?.id],
+    queryFn: async () => {
+      if (user) {
+        return await fetchCompletedTasks(user.id);
+      }
+      return {
+        completedTaskIds: [],
+        totalPoints: 0,
+      };
+    },
+  });
+
+  const completeQuest = async () => {
+    setIsLoading(true);
+
+    if (step.linkMethod === "quiz") {
+      router.push("/salary-quiz");
+    } else if (step.linkMethod === "daily_login") {
+      if (!user) return;
+
+      await completeTask(user?.id, "daily_login");
+      await refetch();
+    } else {
+      try {
+        handleStartQuest(step.linkMethod);
+      } catch (error) {
+        alert("Error starting quest");
+        console.error("Error starting quest:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  return (
+    <motion.div
+      key={step.id}
+      initial={{
+        x: -50,
+        opacity: 0,
+      }}
+      animate={{
+        x: 0,
+        opacity: 1,
+      }}
+      transition={{
+        duration: 0.3,
+        delay: index * 0.1,
+      }}
+    >
+      <div className='flex items-center justify-between rounded-lg border border-purple-100 bg-white p-4 transition-all hover:shadow-md hover:border-purple-300'>
+        <div className='flex items-center gap-4'>
+          <div className='rounded-full bg-gradient-to-br from-blue-700 to-yellow-200 p-2 text-white'>
+            {step.icon}
+          </div>
+          <div>
+            <h3 className='font-medium'>{step.title}</h3>
+            <AnimatePresence mode='wait'>
+              {step.completed ? (
+                <motion.div
+                  key='completed'
+                  initial={{
+                    opacity: 0,
+                    y: -10,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    y: 10,
+                  }}
+                  transition={{
+                    duration: 0.2,
+                  }}
+                >
+                  <Badge
+                    variant='secondary'
+                    className='bg-green-100 text-green-800'
+                  >
+                    <Check className='mr-1 h-3 w-3' />
+                    Completed
+                  </Badge>
+                </motion.div>
+              ) : (
+                <motion.span
+                  key='points'
+                  className='text-sm text-blue-700 font-semibold flex gap-1'
+                  initial={{
+                    opacity: 0,
+                    y: 10,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    y: -10,
+                  }}
+                  transition={{
+                    duration: 0.2,
+                  }}
+                >
+                  +{step.points}{" "}
+                  <Image
+                    src='/svg/small-binocular.svg'
+                    width={16}
+                    height={16}
+                    alt='binoculars'
+                  />
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+        <Button
+          variant={step.completed ? "secondary" : "default"}
+          disabled={step.completed || !user || isLoading}
+          onClick={completeQuest}
+          className={`${
+            step.completed
+              ? "bg-green-100 text-green-800"
+              : "bg-blue-700 text-white hover:opacity-90"
+          } transition-all duration-300 min-w-40`}
+        >
+          {step.completed ? (
+            "Completed"
+          ) : isLoading ? (
+            <Loader className='h-4 w-4 animate-spin' />
+          ) : (
+            <>
+              Start Quest
+              <ArrowRight className=' h-4 w-4' />
+            </>
+          )}
+        </Button>
+      </div>
+    </motion.div>
   );
 }

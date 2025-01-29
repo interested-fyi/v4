@@ -13,29 +13,42 @@ export async function GET(request: Request) {
         { status: 400 }
       );
     }
+    let filteredTasks;
 
-    // Fetch completed tasks for the given privy_did
+    const todayUTC = new Date().toISOString().split("T")[0];
+
     const { data: completedTasks, error } = await supabase
       .from("user_tasks")
       .select("task_id")
       .eq("privy_did", privyDid);
+
+    const { data: dailyLoginCompleted, error: dailyLoginError } = await supabase
+      .from("user_tasks")
+      .select("task_id")
+      .eq("privy_did", privyDid)
+      .eq("task_id", "daily_login")
+      .eq("completed_at", todayUTC)
+      .single();
+    if (completedTasks) {
+      filteredTasks = completedTasks.filter(
+        (task) => task.task_id !== "daily_login"
+      );
+      if (dailyLoginCompleted) {
+        filteredTasks.push(dailyLoginCompleted);
+      }
+    }
 
     const { data: totalPoints, error: totalPointsError } = await supabase
       .from("user_profiles")
       .select("total_points")
       .eq("privy_did", privyDid)
       .single();
-
-    console.log("🚀 ~ GET ~ totalPoints:", totalPoints);
-
     if (error) {
       throw error;
     }
 
     // Extract the task IDs from the completed tasks
-    const completedTaskIds = completedTasks.map((task) => task.task_id);
-    console.log("🚀 ~ GET ~ completedTaskIds:", completedTaskIds);
-
+    const completedTaskIds = filteredTasks?.map((task) => task.task_id);
     return NextResponse.json(
       { completedTaskIds, totalPoints: totalPoints?.total_points || 0 },
       { status: 200 }
