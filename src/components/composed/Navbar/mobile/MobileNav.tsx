@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users, Banknote, Compass, User } from "lucide-react";
+import { Users, Banknote, Compass, User, Sword } from "lucide-react";
 import { usePrivy } from "@privy-io/react-auth";
 
 const navItems = [
   { name: "Talent", href: "/explore-talent", icon: Users },
   { name: "Salary Quiz", href: "/salary-quiz", icon: Banknote },
   { name: "Explore", href: "/explore", icon: Compass },
+  { name: "Quest", href: "/quest", icon: Sword },
   { name: "Profile", href: "/profile", icon: User },
 ];
 
@@ -23,11 +24,11 @@ export default function MobileNavbar() {
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
-              <li key={item.name}>
+              <li key={item.name} className='max-w-12 text-nowrap'>
                 <Link
                   href={
                     item.href === "/profile" && user?.id
-                      ? user.id.replace("did:privy:", "")
+                      ? `/profile/${user.id.replace("did:privy:", "")}`
                       : item.href
                   }
                   className={`flex flex-col items-center p-2 transition-colors ${

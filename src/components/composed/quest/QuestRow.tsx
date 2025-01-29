@@ -42,23 +42,22 @@ export default function QuestRow({
 
   const completeQuest = async () => {
     setIsLoading(true);
+    try {
+      if (step.linkMethod === "quiz") {
+        router.push("/salary-quiz");
+      } else if (step.linkMethod === "daily_login") {
+        if (!user) return;
 
-    if (step.linkMethod === "quiz") {
-      router.push("/salary-quiz");
-    } else if (step.linkMethod === "daily_login") {
-      if (!user) return;
-
-      await completeTask(user?.id, "daily_login");
-      await refetch();
-    } else {
-      try {
+        await completeTask(user?.id, "daily_login");
+        await refetch();
+      } else {
         handleStartQuest(step.linkMethod);
-      } catch (error) {
-        alert("Error starting quest");
-        console.error("Error starting quest:", error);
-      } finally {
-        setIsLoading(false);
       }
+    } catch (error) {
+      alert("Error starting quest");
+      console.error("Error starting quest:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 

@@ -12,6 +12,16 @@ export function NavButtons() {
       <div className='flex gap-4'>
         {" "}
         <Link
+          href={"/quest"}
+          onClick={() => {
+            router.push("/quest");
+          }}
+        >
+          <Button className='w-16 h-8 px-4 text-xs text-black bg-[#919cf4] bg-opacity-30 hover:bg-opacity-90 hover:bg-[#919cf4] md:text-sm '>
+            Quest
+          </Button>
+        </Link>
+        <Link
           href={"/explore-talent"}
           onClick={() => {
             router.push("/explore-talent");
