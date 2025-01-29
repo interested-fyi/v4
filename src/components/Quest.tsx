@@ -309,12 +309,20 @@ export default function Quest() {
               duration: 0.5,
               delay: 0.5,
             }}
-            className='p-4'
+            className='p-4 pb-0'
           >
+            <div className='flex flex-col items-center justify-center'>
+              <h3 className='text-xl font-bold text-center bg-clip-text max-w-[305px] text-transparent bg-gradient-to-r from-purple-700 via-blue-700 to-blue-600'>
+                Looks like you haven&apos;t completed the daily checkin yet!
+              </h3>
+              <p className='text-sm text-center text-gray-500'>
+                Complete the daily checkin quest to unlock more rewards
+              </p>
+            </div>
             <QuestRow
               step={{
                 id: "daily_login",
-                title: "Daily Login",
+                title: "Daily Checkin",
                 icon: <ArrowRight className='h-5 w-5' />,
                 points: 5,
                 completed:
