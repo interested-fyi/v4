@@ -3,12 +3,12 @@ const nextConfig = {
   headers: async () => {
     const ContentSecurityPolicy = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://telegram.org https://auth.privy.io",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://telegram.org https://auth.privy.io https://us-assets.i.posthog.com/* https://vercel.live/_next-live/feedback/feedback.js",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https: https://i.imgur.com",
       "media-src 'self'",
-      "connect-src 'self' https://auth.privy.io wss://relay.walletconnect.com wss://relay.walletconnect.org wss://www.walletlink.org https://*.rpc.privy.systems https://api.mainnet-beta.solana.com https://api.devnet.solana.com https://api.testnet.solana.com https://api.relay.link https://api.testnets.relay.link https://sepolia.optimism.io https://explorer-api.walletconnect.com https://pulse.walletconnect.org https://us.i.posthog.com",
-      "frame-src 'self' https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org https://challenges.cloudflare.com https://oauth.telegram.org",
+      "connect-src 'self' https://auth.privy.io wss://relay.walletconnect.com wss://relay.walletconnect.org wss://www.walletlink.org https://*.rpc.privy.systems https://api.mainnet-beta.solana.com https://api.devnet.solana.com https://api.testnet.solana.com https://api.relay.link https://api.testnets.relay.link https://sepolia.optimism.io https://explorer-api.walletconnect.com https://pulse.walletconnect.org https://us.i.posthog.com https://mainnet.optimism.io/",
+      "frame-src 'self' https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org https://challenges.cloudflare.com https://oauth.telegram.org https://vercel.live/",
       "child-src 'self' https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org",
       "worker-src 'self' blob:",
       "frame-ancestors 'none'",
