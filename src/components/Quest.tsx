@@ -134,7 +134,6 @@ export default function Quest() {
   useEffect(() => {
     console.count();
     if (data) {
-      console.log("🚀 ~ useEffect ~ data:", data);
       const updatedSteps = steps.map((step) => ({
         ...step,
         completed: data.completedTaskIds?.includes(step.id),
@@ -158,11 +157,13 @@ export default function Quest() {
       console.error("Error linking account:", error);
       if (
         user?.linkedAccounts.find(
-          (account) => account.type === details.linkMethod
+          (account) => account.type.replace("_oauth", "") === details.linkMethod
         )
       ) {
         alert("Account already linked");
-        await completeTask(user.id, details.linkMethod);
+        const account =
+          details.linkMethod === "twitter" ? "x" : details.linkMethod;
+        await completeTask(user.id, account);
         refetch();
       }
     },
@@ -267,15 +268,11 @@ export default function Quest() {
   };
 
   // Handle quest start
-  const handleStartQuest = (linkMethod: string) => {
+  const handleStartQuest = async (linkMethod: string) => {
     const linkFunction =
       linkMethodMap[linkMethod as keyof typeof linkMethodMap];
     if (linkFunction) {
-      try {
-        linkFunction();
-      } catch (error) {
-        alert("Failed to start quest");
-      }
+      await linkFunction();
     }
   };
 
