@@ -167,10 +167,11 @@ export default function Quest() {
         user?.linkedAccounts.find(
           (linkedAccount) =>
             linkedAccount.type.replace("_oauth", "") === account
-        )
+        ) &&
+        (!error.includes("failed_to_link_account") ||
+          !error.includes("exited_link_flow"))
       ) {
         alert("Account already linked");
-
         await completeTask(user.id, task);
         refetch();
       }
