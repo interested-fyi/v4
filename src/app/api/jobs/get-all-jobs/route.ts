@@ -28,7 +28,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
         `
       )
       .eq("approved", true)
-      .eq("job_postings.active", true);
+      .eq("job_postings.active", true)
+      .order("created_at", { ascending: false });
 
     // Apply filters
     if (department)

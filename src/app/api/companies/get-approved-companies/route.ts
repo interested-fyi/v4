@@ -40,7 +40,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
       )
       .eq("approved", true)
       .eq("job_postings.active", true)
-      .range(offset, offset + limit - 1); // Apply pagination using range
+      .range(offset, offset + limit - 1) // Apply pagination using range
+      .order("created_at", { ascending: false }); // order by newest companies first
 
     if (companyError) {
       throw new Error(`Error fetching company data: ${companyError}`);

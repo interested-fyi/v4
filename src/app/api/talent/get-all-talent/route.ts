@@ -30,7 +30,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       .from("user_profile_combined")
       .select("*")
       .eq("available", true)
-      .order("privy_did", { ascending: true }) // Ensure consistent ordering
+      .order("created_at", { ascending: true }) // Ensure consistent ordering
       .range(startIndex, endIndex);
 
     if (filter) {
