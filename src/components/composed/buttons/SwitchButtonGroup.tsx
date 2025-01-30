@@ -37,9 +37,10 @@ const SwitchButtonGroup: React.FC<SwitchButtonGroupProps> = ({
       <Button
         size='icon'
         onClick={svgOnClick}
-        className='bg-transparent hover:bg-transparent active:scale-95 transition-all duration-100 absolute right-[45%]'
+        className='bg-transparent hover:bg-transparent active:scale-95 transition-all duration-100 absolute right-[45%] w-10 h-10'
       >
         <svg
+          className='min-w-10 min-h-10'
           xmlns='http://www.w3.org/2000/svg'
           width='36'
           height='37'
