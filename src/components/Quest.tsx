@@ -28,6 +28,7 @@ import { completeTask } from "@/lib/completeTask";
 import { QuestPoints } from "./composed/quest/QuestPoints";
 import QuestRow from "./composed/quest/QuestRow";
 import posthog from "posthog-js";
+import { useRouter } from "next/navigation";
 
 export interface QuestStep {
   id: string;
@@ -52,10 +53,10 @@ export const fetchCompletedTasks = async (privyDid: string) => {
 };
 
 export default function Quest() {
-  const { user } = usePrivy();
+  const { user, ready, authenticated } = usePrivy();
   const [questPoints] = useState(10);
   const [totalPoints, setTotalPoints] = useState(0);
-
+  const router = useRouter();
   const { getAccessToken } = usePrivy();
   const { data, isLoading, refetch } = useQuery<{
     completedTaskIds: string[];
@@ -145,6 +146,15 @@ export default function Quest() {
       setSteps(updatedSteps);
     }
   }, [data]);
+
+  useEffect(() => {
+    if (!ready) return;
+    if (!authenticated) {
+      router.push("/?message=login");
+    } else {
+      posthog.identify(user?.id);
+    }
+  }, [authenticated, ready]);
 
   const {
     linkGithub,
