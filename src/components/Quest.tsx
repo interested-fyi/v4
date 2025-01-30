@@ -155,6 +155,8 @@ export default function Quest() {
   } = useLinkAccount({
     onError: async (error, details) => {
       const account =
+        details.linkMethod === "siwe" ? "wallet" : details.linkMethod;
+      const task =
         details.linkMethod === "twitter"
           ? "x"
           : details.linkMethod === "siwe"
@@ -169,7 +171,7 @@ export default function Quest() {
       ) {
         alert("Account already linked");
 
-        await completeTask(user.id, account);
+        await completeTask(user.id, task);
         refetch();
       }
     },
