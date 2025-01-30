@@ -106,12 +106,14 @@ function Selector({ activeButton, handleButtonClick }: SelectorProps) {
             ? handleButtonClick("companies")
             : handleButtonClick("jobs")
         }
-        className='bg-transparent hover:bg-transparent active:scale-95 transition-all duration-100 absolute right-[45%] md:right-[46%]'
+        className='w-9 h-9 bg-transparent hover:bg-transparent active:scale-95 transition-all duration-100 absolute right-[45%] md:right-[46%]'
       >
         <svg
           xmlns='http://www.w3.org/2000/svg'
-          width='36'
-          height='37'
+          className='w-9 h-9'
+          id='switch'
+          width={36}
+          height={37}
           viewBox='0 0 36 37'
           fill='none'
         >

@@ -83,6 +83,11 @@
   background-position: left 0.5rem center;
 }
 
+#switch {
+  width: 2rem;
+  height: 2rem;
+}
+
 .bg-blue-overlay {
   background-image: linear-gradient(to right, #2640eb, #2640eb),
     url("/repeated-square.png");
