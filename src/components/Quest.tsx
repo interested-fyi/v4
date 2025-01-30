@@ -154,15 +154,21 @@ export default function Quest() {
     linkWallet,
   } = useLinkAccount({
     onError: async (error, details) => {
+      const account =
+        details.linkMethod === "twitter"
+          ? "x"
+          : details.linkMethod === "siwe"
+          ? "wallet"
+          : details.linkMethod;
       console.error("Error linking account:", error);
       if (
         user?.linkedAccounts.find(
-          (account) => account.type.replace("_oauth", "") === details.linkMethod
+          (linkedAccount) =>
+            linkedAccount.type.replace("_oauth", "") === account
         )
       ) {
         alert("Account already linked");
-        const account =
-          details.linkMethod === "twitter" ? "x" : details.linkMethod;
+
         await completeTask(user.id, account);
         refetch();
       }
