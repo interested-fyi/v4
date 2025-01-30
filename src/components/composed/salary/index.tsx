@@ -129,6 +129,10 @@ export function SalaryRangeComposed() {
         throw new Error("Network response was not ok");
       }
       await completeTask(user.id, "salary_quiz");
+      posthog.capture("quest_completed", {
+        user_id: user.id,
+        task_id: "salary_quiz",
+      });
     } catch (error) {
       console.error("Error submitting feedback:", error);
       setIsComplete(false);

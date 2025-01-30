@@ -27,7 +27,7 @@ export async function GET(request: Request) {
       .select("task_id")
       .eq("privy_did", privyDid)
       .eq("task_id", "daily_login")
-      .eq("completed_at", todayUTC)
+      .gte("completed_at", todayUTC)
       .single();
     if (completedTasks) {
       filteredTasks = completedTasks.filter(

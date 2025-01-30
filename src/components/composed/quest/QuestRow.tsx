@@ -10,6 +10,7 @@ import { useState } from "react";
 import { ArrowRight, Check, Loader } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import posthog from "posthog-js";
 
 export default function QuestRow({
   step,
@@ -49,6 +50,10 @@ export default function QuestRow({
         if (!user) return;
 
         await completeTask(user?.id, "daily_login");
+        posthog.capture("quest_completed", {
+          user_id: user.id,
+          task_id: "daily_login",
+        });
         await refetch();
       } else {
         handleStartQuest(step.linkMethod);

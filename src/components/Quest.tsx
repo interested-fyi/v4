@@ -27,6 +27,7 @@ import {
 import { completeTask } from "@/lib/completeTask";
 import { QuestPoints } from "./composed/quest/QuestPoints";
 import QuestRow from "./composed/quest/QuestRow";
+import posthog from "posthog-js";
 
 export interface QuestStep {
   id: string;
@@ -173,6 +174,11 @@ export default function Quest() {
       ) {
         alert("Account already linked");
         await completeTask(user.id, task);
+        posthog.capture("quest_completed", {
+          user_id: user.id,
+          task_id: task,
+          account: account,
+        });
         refetch();
       }
     },
@@ -194,6 +200,10 @@ export default function Quest() {
       if (completedStep) {
         // Call the API to mark the task as complete
         await completeTask(user.id, completedStep.id);
+        posthog.capture("quest_completed", {
+          user_id: user.id,
+          task_id: completedStep.id,
+        });
       }
 
       const accessToken = await getAccessToken();

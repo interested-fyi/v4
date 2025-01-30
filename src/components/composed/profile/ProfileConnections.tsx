@@ -16,6 +16,7 @@ import {
   updateWalletUser,
 } from "@/lib/updateSocialConnections";
 import { completeTask } from "@/lib/completeTask";
+import posthog from "posthog-js";
 
 enum PROFILE_TYPE {
   GITHUB = "github",
@@ -82,6 +83,11 @@ export const ProfileConnections = ({
       const stepId = TaskMap[linkMethod as keyof typeof TaskMap];
 
       await completeTask(user.id, stepId);
+      posthog.capture("quest_completed", {
+        user_id: user.id,
+        task_id: stepId,
+        account: linkMethod,
+      });
       const accessToken = await getAccessToken();
       if (!accessToken) return;
       switch (linkMethod) {
