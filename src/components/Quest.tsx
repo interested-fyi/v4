@@ -55,7 +55,12 @@ export const fetchCompletedTasks = async (privyDid: string) => {
 
 export const fetchTopUsers = async () => {
   try {
-    const response = await fetch(`/api/quests/leaderboard`);
+    const response = await fetch(`/api/quests/leaderboard`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (!response.ok) {
       throw new Error("Failed to fetch top users");
     }
