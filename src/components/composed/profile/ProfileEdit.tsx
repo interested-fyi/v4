@@ -75,7 +75,6 @@ export const ProfileEditForm = ({ isEditMode, onSubmit, onClose }: Props) => {
       queryFn: async () => {
         const res = await fetch(`/api/salary-range/details`, {
           method: "GET",
-          cache: "no-store",
           headers: {
             "Content-type": "application/json",
           },

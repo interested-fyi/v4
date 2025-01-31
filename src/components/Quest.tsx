@@ -57,7 +57,6 @@ export const fetchTopUsers = async () => {
   try {
     const response = await fetch(`/api/quests/leaderboard`, {
       method: "GET",
-      cache: "no-store",
       headers: {
         "Content-Type": "application/json",
       },

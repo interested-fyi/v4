@@ -43,7 +43,6 @@ export default function EndorementsTab({
         }`,
         {
           method: "GET",
-          cache: "no-store",
           headers: {
             "Content-type": "application/json",
           },

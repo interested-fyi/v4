@@ -113,7 +113,6 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
         `/api/users/${user?.id?.replace("did:privy:", "")}`,
         {
           method: "GET",
-          cache: "no-store",
           headers: {
             "Content-type": "application/json",
             Authorization: `Bearer ${accessToken}`,
