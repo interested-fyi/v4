@@ -1,25 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import supabase from "@/lib/supabase";
 import { toCamelCase } from "@/lib/utils";
-import { PrivyClient } from "@privy-io/server-auth";
 
-const privyClient = new PrivyClient(
-  process.env.NEXT_PUBLIC_PRIVY_APP_ID!,
-  process.env.PRIVY_SECRET!
-);
-
-export async function GET(request: NextRequest, privyDid: string) {
+export async function GET() {
   try {
-    const accessToken = request.headers
-      .get("Authorization")
-      ?.replace("Bearer ", "");
-    // Verify and authenticate the user
-    const verified = await privyClient.verifyAuthToken(accessToken!);
-    const privy_did = verified.userId;
-    if (privy_did !== privyDid) {
-      throw new Error("Privy DIDs do not match");
-    }
-
     const { data, error } = await supabase
       .from("user_profiles")
       .select("privy_did, name, photo_source, total_points")
