@@ -338,7 +338,11 @@ export default function Quest() {
 
   return (
     <div className='bg-blue-700 w-full min-h-screen flex flex-col items-center justify-center pt-4'>
-      {topUsers && <Leaderboard entries={topUsers.users} />}
+      {topUsers && (
+        <div className='w-full max-w-2xl mx-auto p-2 md:p-0'>
+          <Leaderboard entries={topUsers.users} />
+        </div>
+      )}
 
       <div className='w-full min-h-screen bg-blue-700 flex items-center justify-center p-2 md:p-4'>
         <Card className='w-full max-w-2xl bg-white/90 backdrop-blur shadow-xl'>
