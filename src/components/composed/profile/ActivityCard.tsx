@@ -28,10 +28,7 @@ export default function ActivityCard({
           <div className='flex gap-2 items-center'>
             <Avatar>
               <AvatarImage
-                src={
-                  userProfileData?.profile?.farcaster_photo ??
-                  "/placeholder.svg?height=40&width=40"
-                }
+                src={userProfileData?.profile?.farcaster_photo ?? ""}
                 alt={userProfileData?.profile?.name ?? "User"}
               />
               <AvatarFallback>
