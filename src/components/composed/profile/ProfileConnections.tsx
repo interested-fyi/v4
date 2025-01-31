@@ -81,15 +81,14 @@ export const ProfileConnections = ({
   } = useLinkAccount({
     onSuccess: async (user, linkMethod, linkedAccount) => {
       const stepId = TaskMap[linkMethod as keyof typeof TaskMap];
-
-      await completeTask(user.id, stepId);
+      const accessToken = await getAccessToken();
+      if (!accessToken) return;
+      await completeTask(user.id, stepId, accessToken);
       posthog.capture("quest_completed", {
         user_id: user.id,
         task_id: stepId,
         account: linkMethod,
       });
-      const accessToken = await getAccessToken();
-      if (!accessToken) return;
       switch (linkMethod) {
         case "github":
           updateGithubUser(

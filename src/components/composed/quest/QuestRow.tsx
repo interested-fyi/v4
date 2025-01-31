@@ -22,7 +22,7 @@ export default function QuestRow({
   handleStartQuest: (linkMethod: string) => void;
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { user } = usePrivy();
+  const { user, getAccessToken } = usePrivy();
   const router = useRouter();
   const { refetch } = useQuery<{
     completedTaskIds: string[];
@@ -48,8 +48,9 @@ export default function QuestRow({
         router.push("/salary-quiz");
       } else if (step.linkMethod === "daily_login") {
         if (!user) return;
-
-        await completeTask(user?.id, "daily_login");
+        const accessToken = await getAccessToken();
+        if (!accessToken) return;
+        await completeTask(user?.id, "daily_login", accessToken);
         posthog.capture("quest_completed", {
           user_id: user.id,
           task_id: "daily_login",

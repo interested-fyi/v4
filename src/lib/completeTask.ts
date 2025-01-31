@@ -1,9 +1,14 @@
-export const completeTask = async (privyDid: string, taskId: string) => {
+export const completeTask = async (
+  privyDid: string,
+  taskId: string,
+  accessToken: string
+) => {
   try {
     const response = await fetch("/api/quests/complete", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({ privyDid, taskId }),
     });

@@ -29,6 +29,7 @@ import { QuestPoints } from "./composed/quest/QuestPoints";
 import QuestRow from "./composed/quest/QuestRow";
 import posthog from "posthog-js";
 import { useRouter } from "next/navigation";
+import Leaderboard from "./composed/quest/QuestLeaderboard";
 
 export interface QuestStep {
   id: string;
@@ -52,12 +53,25 @@ export const fetchCompletedTasks = async (privyDid: string) => {
   }
 };
 
+export const fetchTopUsers = async () => {
+  try {
+    const response = await fetch(`/api/quests/leaderboard`);
+    if (!response.ok) {
+      throw new Error("Failed to fetch top users");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching top users:", error);
+    return [];
+  }
+};
+
 export default function Quest() {
-  const { user, ready, authenticated } = usePrivy();
+  const { user, ready, authenticated, getAccessToken } = usePrivy();
   const [questPoints] = useState(10);
   const [totalPoints, setTotalPoints] = useState(0);
   const router = useRouter();
-  const { getAccessToken } = usePrivy();
   const { data, isLoading, refetch } = useQuery<{
     completedTaskIds: string[];
     totalPoints: number;
@@ -74,6 +88,11 @@ export default function Quest() {
       };
     },
   });
+  const { data: topUsers } = useQuery({
+    queryKey: ["topUsers"],
+    queryFn: fetchTopUsers,
+  });
+
   const [steps, setSteps] = useState<QuestStep[]>([
     {
       id: "x",
@@ -183,7 +202,9 @@ export default function Quest() {
           !error.includes("exited_link_flow"))
       ) {
         alert("Account already linked");
-        await completeTask(user.id, task);
+        const accessToken = await getAccessToken();
+        if (!accessToken) return;
+        await completeTask(user.id, task, accessToken);
         posthog.capture("quest_completed", {
           user_id: user.id,
           task_id: task,
@@ -208,8 +229,10 @@ export default function Quest() {
         (step) => step.linkMethod === linkMethod
       );
       if (completedStep) {
+        const accessToken = await getAccessToken();
+        if (!accessToken) return;
         // Call the API to mark the task as complete
-        await completeTask(user.id, completedStep.id);
+        await completeTask(user.id, completedStep.id, accessToken);
         posthog.capture("quest_completed", {
           user_id: user.id,
           task_id: completedStep.id,
@@ -314,94 +337,99 @@ export default function Quest() {
   const progress = (completedSteps() / steps.length) * 100;
 
   return (
-    <div className='min-h-screen bg-blue-700 flex items-center justify-center p-2 md:p-4'>
-      <Card className='w-full max-w-2xl bg-white/90 backdrop-blur shadow-xl'>
-        {!!data &&
-        !data?.completedTaskIds.includes("daily_login") &&
-        !isLoading ? (
-          <motion.div
-            initial={{
-              width: 0,
-              opacity: 0,
-            }}
-            animate={{
-              width: "100%",
-              opacity: 1,
-            }}
-            transition={{
-              duration: 0.5,
-              delay: 0.5,
-            }}
-            className='p-4 pb-0'
-          >
-            <div className='flex flex-col items-center justify-center'>
-              <h3 className='text-xl font-bold text-center bg-clip-text max-w-[305px] text-transparent bg-gradient-to-r from-purple-700 via-blue-700 to-blue-600'>
-                Looks like you haven&apos;t completed the daily checkin yet!
-              </h3>
-              <p className='text-sm text-center text-gray-500'>
-                Complete the daily checkin quest to unlock more rewards
-              </p>
-            </div>
-            <QuestRow
-              step={{
-                id: "daily_login",
-                title: "Daily Checkin",
-                icon: <ArrowRight className='h-5 w-5' />,
-                points: 5,
-                completed:
-                  data?.completedTaskIds?.includes("daily_login") ?? false,
-                linkMethod: "daily_login",
-              }}
-              index={0}
-              handleStartQuest={handleStartQuest}
-            />
-          </motion.div>
-        ) : null}
-        <CardHeader className='text-center'>
-          <motion.div
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <CardTitle className='text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-700 via-blue-500 to-yellow-200'>
-              Quest
-            </CardTitle>
-          </motion.div>
-          <p className='mt-2 text-muted-foreground max-w-96 mx-auto pb-4'>
-            Connect your accounts to unlock rewards.
-          </p>
+    <div className='bg-blue-700 w-full min-h-screen flex flex-col items-center justify-center pt-4'>
+      {topUsers && <Leaderboard entries={topUsers.users} />}
 
-          <div className='mt-6 space-y-2'>
-            <Progress value={progress} className='h-3 bg-gray-200'>
-              <motion.div
-                className='h-full bg-gradient-to-r from-blue-700 to-yellow-200 rounded-full'
-                style={{ width: `${progress}%` }}
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
-              />
-            </Progress>
-            <div className='flex justify-between items-center text-sm'>
-              <span className='text-muted-foreground'>
-                {completedSteps()} of {steps.length} quests completed
-              </span>
-              <QuestPoints totalPoints={totalPoints} />
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className='space-y-4 p-2 md:p-6'>
-          {steps.map((step, index) => (
-            <div key={step.id + index} className='flex flex-col gap-2'>
+      <div className='w-full min-h-screen bg-blue-700 flex items-center justify-center p-2 md:p-4'>
+        <Card className='w-full max-w-2xl bg-white/90 backdrop-blur shadow-xl'>
+          {!!data &&
+          !data?.completedTaskIds.includes("daily_login") &&
+          !isLoading ? (
+            <motion.div
+              initial={{
+                width: 0,
+                opacity: 0,
+              }}
+              animate={{
+                width: "100%",
+                opacity: 1,
+              }}
+              transition={{
+                duration: 0.5,
+                delay: 0.5,
+              }}
+              className='p-4 pb-0'
+            >
+              <div className='flex flex-col items-center justify-center'>
+                <h3 className='text-xl font-bold text-center bg-clip-text max-w-[305px] text-transparent bg-gradient-to-r from-purple-700 via-blue-700 to-blue-600'>
+                  Looks like you haven&apos;t completed the daily checkin yet!
+                </h3>
+                <p className='text-sm text-center text-gray-500'>
+                  Complete the daily checkin quest to unlock more rewards
+                </p>
+              </div>
               <QuestRow
-                key={step.id + index}
-                step={step}
-                index={index}
+                step={{
+                  id: "daily_login",
+                  title: "Daily Checkin",
+                  icon: <ArrowRight className='h-5 w-5' />,
+                  points: 5,
+                  completed:
+                    data?.completedTaskIds?.includes("daily_login") ?? false,
+                  linkMethod: "daily_login",
+                }}
+                index={0}
                 handleStartQuest={handleStartQuest}
               />
+            </motion.div>
+          ) : null}
+          <CardHeader className='text-center'>
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <CardTitle className='text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-700 via-blue-500 to-yellow-200'>
+                Quest
+              </CardTitle>
+            </motion.div>
+            <p className='mt-2 text-muted-foreground max-w-96 mx-auto pb-4'>
+              Connect your accounts to unlock rewards.
+            </p>
+
+            <div className='mt-6 space-y-2'>
+              <Progress value={progress} className='h-3 bg-gray-200'>
+                <motion.div
+                  className='h-full bg-gradient-to-r from-blue-700 to-yellow-200 rounded-full'
+                  style={{ width: `${progress}%` }}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progress}%` }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                />
+              </Progress>
+              <div className='flex justify-between items-center text-sm'>
+                <span className='text-muted-foreground'>
+                  {completedSteps()} of {steps.length} quests completed
+                </span>
+                <QuestPoints totalPoints={totalPoints} />
+              </div>
             </div>
-          ))}
-        </CardContent>
-      </Card>
+          </CardHeader>
+          <CardContent className='space-y-4 p-2 md:p-6'>
+            {steps.map((step, index) => (
+              <div key={step.id + index} className='flex flex-col gap-2'>
+                <QuestRow
+                  key={step.id + index}
+                  step={step}
+                  index={index}
+                  handleStartQuest={handleStartQuest}
+                />
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+      <div className='w-full max-w-2xl pt-4 pb-8'></div>
     </div>
   );
 }

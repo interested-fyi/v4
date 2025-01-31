@@ -128,7 +128,8 @@ export function SalaryRangeComposed() {
         setIsComplete(false);
         throw new Error("Network response was not ok");
       }
-      await completeTask(user.id, "salary_quiz");
+      if (!accessToken) return;
+      await completeTask(user.id, "salary_quiz", accessToken);
       posthog.capture("quest_completed", {
         user_id: user.id,
         task_id: "salary_quiz",
@@ -284,7 +285,6 @@ import {
   MousePointerClickIcon,
 } from "lucide-react";
 import { USAGroupMap } from "../inputs/SelectComposed";
-
 import { usePrivy } from "@privy-io/react-auth";
 import {
   Dialog,
@@ -293,7 +293,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import posthog from "posthog-js";
-import { json } from "stream/consumers";
 import { completeTask } from "@/lib/completeTask";
 
 interface SalaryCarouselProps {
