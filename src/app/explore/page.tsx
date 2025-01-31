@@ -24,7 +24,6 @@ export default function ExplorePage() {
         `/api/companies/get-approved-companies?page=${page}&limit=${limit}`,
         {
           method: "GET",
-          cache: "no-store",
           headers: {
             "Content-type": "application/json",
             authorization: `Bearer ${accessToken}`,
