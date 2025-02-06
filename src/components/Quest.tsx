@@ -95,7 +95,7 @@ export default function Quest() {
     },
   });
   const { data: topUsers } = useQuery({
-    queryKey: ["topUsers"],
+    queryKey: ["topUsers", data?.totalPoints],
     queryFn: fetchTopUsers,
   });
 
