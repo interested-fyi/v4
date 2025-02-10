@@ -22,8 +22,10 @@ export async function POST(req: NextRequest) {
     unlock_calendar_fee,
     booking_description,
     smart_wallet_address,
+    degen_score_wallet,
   } = await req.json();
   const accessToken = req.headers.get("Authorization")?.replace("Bearer ", "");
+  console.log("🚀 ~ POST ~ accessToken:", accessToken);
 
   // verify authenticate user sent request
   let privyDid;
@@ -34,7 +36,8 @@ export async function POST(req: NextRequest) {
       throw new Error("Privy DIDs do not match");
     }
   } catch (e) {
-    throw new Error("Invalid access token");
+    console.error(`Unauthorized: ${e}`);
+    throw new Error("Invalid access token ");
   }
 
   let preferredProfile;
@@ -59,6 +62,7 @@ export async function POST(req: NextRequest) {
     unlock_calendar_fee: unlock_calendar_fee,
     booking_description: booking_description,
     smart_wallet_address: smart_wallet_address,
+    degen_score_wallet,
   };
   const filteredProfileData = Object.fromEntries(
     Object.entries(profileData).filter(([_, value]) => value !== undefined)

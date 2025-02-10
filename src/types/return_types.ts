@@ -27,6 +27,7 @@ export interface UserCombinedProfile {
   x_username?: string | null;
   x_photo?: string | null;
   wallet_addresses?: string[] | null;
+  degen_score_wallet?: string | null;
 }
 
 interface Embed {

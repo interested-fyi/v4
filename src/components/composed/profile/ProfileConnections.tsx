@@ -36,13 +36,16 @@ const profiles = [
   PROFILE_TYPE.WALLET,
 ];
 
-const TaskMap = {
+export const TaskMap = {
   [PROFILE_TYPE.GITHUB]: "github",
   [PROFILE_TYPE.LINKEDIN]: "linkedin",
   [PROFILE_TYPE.FARCASTER]: "farcaster",
   [PROFILE_TYPE.TELEGRAM]: "telegram",
   [PROFILE_TYPE.TWITTER]: "x",
   [PROFILE_TYPE.WALLET]: "wallet",
+  endorseFriend: "endorse_a_friend",
+  receiveEndorsement: "receive_endorsement",
+  degenScore: "degen_score",
 };
 
 export const ProfileConnections = ({
