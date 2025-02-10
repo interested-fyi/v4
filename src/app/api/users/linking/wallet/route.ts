@@ -39,5 +39,5 @@ export async function POST(req: NextRequest) {
 
   if (error) throw error;
 
-  return NextResponse.json({ x_user: data }, { status: 200 });
+  return NextResponse.json({ wallet_user: data }, { status: 200 });
 }

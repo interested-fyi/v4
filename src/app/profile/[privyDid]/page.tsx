@@ -618,25 +618,28 @@ function DegenScoreUnavailable() {
       const accessToken = await getAccessToken();
       if (!accessToken) return;
 
-      await completeTask(user.id, stepId, accessToken);
-      posthog.capture("quest_completed", {
-        user_id: user.id,
-        task_id: stepId,
-        account: linkMethod,
-      });
-
-      if (linkMethod === "siwe" && linkedAccount?.type === "wallet") {
+      if (linkedAccount?.type === "wallet") {
         await updateWalletUser(user.id, linkedAccount.address, accessToken);
+        const hasScore = await handleDegenScore(
+          user?.id,
+          getAccessToken,
+          setCheckingDegenScore
+        );
+        if (!hasScore) {
+          alert("no score found");
+          return;
+        }
+        await completeTask(user.id, stepId, accessToken);
+        posthog.capture("quest_completed", {
+          user_id: user.id,
+          task_id: stepId,
+          account: linkMethod,
+        });
       }
     },
   });
 
   const isOwner = user?.id?.replace("did:privy:", "") === privyDid;
-  const { data: userProfileData } = useQuery({
-    enabled: !!privyDid,
-    queryKey: ["user", privyDid?.replace("did:privy:", "")],
-    queryFn: async () => fetchUserProfile({ userId: privyDid }),
-  });
 
   if (!isOwner) return null;
 
@@ -646,9 +649,16 @@ function DegenScoreUnavailable() {
       <DegenScoreMintingCard />
       <DegenScoreCheckSection
         checkingDegenScore={checkingDegenScore}
-        handleDegenScore={() =>
-          handleDegenScore(user?.id, getAccessToken, setCheckingDegenScore)
-        }
+        handleDegenScore={async () => {
+          const hasScore = await handleDegenScore(
+            user?.id,
+            getAccessToken,
+            setCheckingDegenScore
+          );
+          if (!hasScore) {
+            linkWallet();
+          }
+        }}
       />
     </div>
   );

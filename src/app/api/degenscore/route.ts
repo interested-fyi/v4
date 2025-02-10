@@ -7,10 +7,7 @@ const privyClient = new PrivyClient(
   process.env.NEXT_PUBLIC_PRIVY_APP_ID!,
   process.env.PRIVY_SECRET!
 );
-const testData = [
-  "0x049569adb8a1e8A9349E9F1111C7b7993A4612eB",
-  "0x14A3b36a41852b61EEaD7bA3a383044D6365394E",
-];
+
 export async function GET(req: NextRequest) {
   const authToken = req.headers.get("Authorization")?.replace("Bearer ", "");
   console.log("🚀 ~ GET ~ authToken:", authToken);
@@ -32,6 +29,7 @@ export async function GET(req: NextRequest) {
         `Error fetching user for the supplied auth token: ${userError?.message}`
       );
     }
+    console.log("🚀 ~ GET ~ userData:", userData);
 
     if (!userData.wallet_addresses || userData.wallet_addresses.length === 0) {
       return NextResponse.json(
@@ -42,6 +40,7 @@ export async function GET(req: NextRequest) {
 
     // Iterate through wallet addresses one by one
     for (const address of userData.wallet_addresses) {
+      console.log("🚀 ~ GET ~ address:", address);
       try {
         const response = await fetch(
           `https://beacon.degenscore.com/v2/beacon/${address}`
@@ -55,20 +54,21 @@ export async function GET(req: NextRequest) {
         const degenScoreData: DegenScoreResponse = await response.json();
 
         if (degenScoreData?.properties?.DegenScore) {
-          // Save the DegenScore and wallet to Supabase
-          const { error: updateError } = await supabase
-            .from("user_profiles")
-            .update({
-              degen_score: degenScoreData.properties.DegenScore,
-              degen_score_wallet: address,
-            })
-            .eq("privy_did", privyDid);
-
-          if (updateError) {
-            console.error(
-              `Error updating DegenScore for user: ${updateError.message}`
-            );
-          }
+          // Call the new API route to save the score
+          await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/save-degenscore`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                privyDid,
+                degenScore: degenScoreData.properties.DegenScore,
+                degenScoreWallet: address,
+              }),
+            }
+          );
 
           return NextResponse.json(
             {
