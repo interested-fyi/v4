@@ -128,7 +128,7 @@ interface TalentSortFilterProps {
   onSortChange: (field: SortOption["field"]) => void;
 }
 
-export function TalentSortFilter({
+function TalentSortFilter({
   filter,
   sort,
   onFilterChange,
