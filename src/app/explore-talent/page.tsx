@@ -7,7 +7,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 
 // Define sort options
 export type SortOption = {
-  field: "created_at" | "attestation_count" | "position";
+  field: "created_at" | "position";
   direction: "asc" | "desc";
 };
 
@@ -17,7 +17,8 @@ export default function ExploreTalentPage() {
     field: "created_at",
     direction: "desc",
   });
-  const limit = 20;
+  const [limit, setLimit] = useState(20);
+
   const observerElem = useRef<HTMLDivElement | null>(null);
 
   const {
@@ -161,8 +162,7 @@ function TalentSortFilter({
     switch (field) {
       case "created_at":
         return "Date";
-      case "attestation_count":
-        return "Attestations";
+
       case "position":
         return "Role";
       default:
@@ -196,28 +196,26 @@ function TalentSortFilter({
         </Button>
         {isOpen && (
           <div className='absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-md shadow-lg divide-y divide-gray-100'>
-            {(["created_at", "attestation_count", "position"] as const).map(
-              (field) => (
-                <button
-                  key={field}
-                  className={`w-full px-4 py-2.5 text-sm text-left hover:bg-gray-50 flex items-center justify-between
+            {(["created_at", "position"] as const).map((field) => (
+              <button
+                key={field}
+                className={`w-full px-4 py-2.5 text-sm text-left hover:bg-gray-50 flex items-center justify-between
                   ${
                     sort.field === field
                       ? "text-blue-600 bg-blue-50 hover:bg-blue-50"
                       : "text-gray-700"
                   }`}
-                  onClick={() => handleSort(field)}
-                >
-                  <span>{getSortLabel(field)}</span>
-                  {sort.field === field &&
-                    (sort.direction === "desc" ? (
-                      <ArrowDownIcon className='h-4 w-4 ml-2' />
-                    ) : (
-                      <ArrowUpIcon className='h-4 w-4 ml-2' />
-                    ))}
-                </button>
-              )
-            )}
+                onClick={() => handleSort(field)}
+              >
+                <span>{getSortLabel(field)}</span>
+                {sort.field === field &&
+                  (sort.direction === "desc" ? (
+                    <ArrowDownIcon className='h-4 w-4 ml-2' />
+                  ) : (
+                    <ArrowUpIcon className='h-4 w-4 ml-2' />
+                  ))}
+              </button>
+            ))}
           </div>
         )}
       </div>
