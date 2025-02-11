@@ -328,7 +328,7 @@ export default function ProfilePage() {
               className='pb-4 h-full min-h-96 place-self-start w-full'
               value='onchain'
             >
-              <div className='flex flex-col gap-4 justify-center items-center min-h-screen bg-white p-4'>
+              <div className='flex flex-col gap-4 justify-start items-center min-h-screen bg-white p-4'>
                 <DegenScoreBeacon
                   address={
                     userProfileData?.profile?.wallet_addresses?.[0] ?? ""
