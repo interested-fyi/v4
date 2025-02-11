@@ -1,6 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Trophy } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 interface LeaderboardEntry {
