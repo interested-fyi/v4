@@ -126,9 +126,13 @@ export default function EndorseDialog({
         });
         const resData = (await res.json()).success;
         setIsLoading(false);
-        if (user?.privy_did) {
-          await completeTask(user?.privy_did, "give_endorsement", accessToken);
-        }
+
+        await completeTask(
+          privyUser?.id ?? "",
+          "give_endorsement",
+          accessToken
+        );
+
         onClose();
         return {
           success: resData.success,
