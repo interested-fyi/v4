@@ -56,7 +56,6 @@ export default function Home() {
           <div className='absolute right-0 md:right-10 top-0 h-full w-[50vw] z-[0] hidden lg:flex place-items-center'>
             <div className='relative h-full w-full'>
               <Image
-                className='dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert'
                 src='/svg/illustration.svg'
                 alt='Interested illustration'
                 sizes='50vw'
