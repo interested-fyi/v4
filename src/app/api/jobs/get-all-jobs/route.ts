@@ -22,10 +22,24 @@ export async function GET(req: NextRequest, res: NextResponse) {
       .from("companies")
       .select(
         `
+        id,
+        company_name,
+        job_postings (
           id,
-          company_name,
-          job_postings ( id, company_id, role_title, location, posting_url, department, created_at, active, job_attestations ( attestation_uid, attestation_tx_hash, created_at) )
-        `
+          company_id,
+          role_title,
+          location,
+          posting_url,
+          department,
+          created_at,
+          active,
+          job_attestations (
+            attestation_uid,
+            attestation_tx_hash,
+            created_at
+          )
+        )
+      `
       )
       .eq("approved", true)
       .eq("job_postings.active", true)
@@ -43,6 +57,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
     // Execute the query
     const { data: companyData, error: companyError } = await query;
+    console.log("🚀 ~ GET ~ companyData:", companyData);
 
     if (companyError) {
       throw new Error(`Error fetching company data: ${companyError.message}`);
