@@ -15,7 +15,7 @@ const navItems = [
 
 export default function MobileNavbar() {
   const pathname = usePathname();
-  const { user } = usePrivy();
+  const { user, authenticated } = usePrivy();
 
   return (
     <nav className='md:hidden fixed z-50 bottom-4 left-4 right-4'>
@@ -23,6 +23,9 @@ export default function MobileNavbar() {
         <ul className='flex justify-around items-center h-16'>
           {navItems.map((item) => {
             const isActive = pathname === item.href;
+            if (item.href === "/profile" && !authenticated) {
+              return null;
+            }
             return (
               <li key={item.name} className='max-w-12 text-nowrap'>
                 <Link
