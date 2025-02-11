@@ -17,7 +17,7 @@ export default function ExploreTalentPage() {
     field: "created_at",
     direction: "desc",
   });
-  const limit = 10;
+  const limit = 20;
   const observerElem = useRef<HTMLDivElement | null>(null);
 
   const {
