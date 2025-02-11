@@ -1,4 +1,3 @@
-// app/talent/ExploreTalentPage.tsx
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import TalentFilter from "@/components/composed/talent/TalentFilter";
