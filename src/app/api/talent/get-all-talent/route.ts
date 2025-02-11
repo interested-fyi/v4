@@ -22,6 +22,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     const page = parseInt(url.searchParams.get("page") || "1", 10);
     const limit = parseInt(url.searchParams.get("limit") || "10", 10);
     const filter = url.searchParams.get("filter") || "";
+    const sortField = url.searchParams.get("sortField") || "created_at";
+    const sortDirection = url.searchParams.get("sortDirection") || "desc";
 
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit - 1;
@@ -29,13 +31,21 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     let query = supabase
       .from("user_profile_combined")
       .select("*")
-      .eq("available", true)
-      .order("created_at", { ascending: false }) // Ensure consistent ordering
-      .range(startIndex, endIndex);
+      .eq("available", true);
 
     if (filter) {
       query = query.contains("position", [filter]);
     }
+
+    // Handle different sort fields
+    if (sortField === "attestation_count") {
+      // For attestation count sorting, we need to handle it after fetching the data
+      query = query.order("created_at", { ascending: false });
+    } else {
+      query = query.order(sortField, { ascending: sortDirection === "asc" });
+    }
+
+    query = query.range(startIndex, endIndex);
 
     const { data: userData, error: userError } = await query;
 
@@ -43,7 +53,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       throw new Error(`Error fetching user data: ${userError?.message}`);
     }
 
-    // Batch query for attestation counts
+    // Fetch attestation counts
     const { data: attestations, error: attestationsError } = await supabase
       .from("attestations")
       .select("recipient")
@@ -58,7 +68,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // Create a count map for attestations
+    // Create attestation count map
     const attestationCountMap = new Map<string, number>();
     attestations?.forEach((attestation) => {
       const recipient = attestation.recipient;
@@ -68,11 +78,20 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       );
     });
 
-    // Map attestation counts back to user data
-    const usersWithAttestations = userData.map((user) => ({
+    // Combine user data with attestation counts
+    let usersWithAttestations = userData.map((user) => ({
       ...user,
       attestation_count: attestationCountMap.get(user.privy_did) || 0,
     }));
+
+    // Sort by attestation count if needed
+    if (sortField === "attestation_count") {
+      usersWithAttestations.sort((a, b) => {
+        return sortDirection === "asc"
+          ? a.attestation_count - b.attestation_count
+          : b.attestation_count - a.attestation_count;
+      });
+    }
 
     const { count: totalUsers, error: countError } = await supabase
       .from("user_profile_combined")

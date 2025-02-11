@@ -1,3 +1,4 @@
+import { SortOption } from "@/app/explore-talent/page";
 import {
   UserCombinedProfile,
   WarpcastResponseObject,
@@ -8,10 +9,12 @@ export async function fetchTalent({
   filter,
   limit,
   page,
+  sort,
 }: {
   filter?: string;
   limit?: number;
   page?: number;
+  sort?: SortOption;
 }) {
   let query = "";
   if (filter) {
@@ -22,6 +25,9 @@ export async function fetchTalent({
   }
   if (limit) {
     query = `${query}&limit=${limit}`;
+  }
+  if (sort) {
+    query = `${query}&sortField=${sort.field}&sortDirection=${sort.direction}`;
   }
 
   const response = await fetch(`/api/talent/get-all-talent?${query}`, {
