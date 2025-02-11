@@ -27,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { completeTask } from "@/lib/completeTask";
 
 export default function EndorseDialog({
   isOpen,
@@ -125,6 +126,9 @@ export default function EndorseDialog({
         });
         const resData = (await res.json()).success;
         setIsLoading(false);
+        if (user?.privy_did) {
+          await completeTask(user?.privy_did, "give_endorsement", accessToken);
+        }
         onClose();
         return {
           success: resData.success,

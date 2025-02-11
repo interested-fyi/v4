@@ -13,8 +13,9 @@ export async function POST(req: NextRequest) {
     }
 
     const { error } = await supabase
-      .from("user_profiles")
-      .update({
+      .from("degen_scores")
+      .upsert({
+        privy_did: privyDid,
         degen_score: degenScore,
         degen_score_wallet: degenScoreWallet,
       })

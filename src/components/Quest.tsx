@@ -157,6 +157,14 @@ export default function Quest() {
       linkMethod: "quiz",
     },
     {
+      id: "give_endorsement",
+      title: "Endorse a Peer",
+      icon: <Check className='h-5 w-5' />,
+      points: 10,
+      completed: false,
+      linkMethod: "give_endorsement",
+    },
+    {
       id: "degen_score",
       title: "Complete Degen Score",
       icon: <Check className='h-5 w-5' />,
@@ -335,10 +343,20 @@ export default function Quest() {
 
   // Handle quest start
   const handleStartQuest = async (linkMethod: string) => {
+    console.log("🚀 ~ handleStartQuest ~ linkMethod:", linkMethod);
     const linkFunction =
       linkMethodMap[linkMethod as keyof typeof linkMethodMap];
     if (linkFunction) {
       await linkFunction();
+    }
+    if (linkMethod === "degen_score") {
+      router.push(`/profile/${user?.id.replace("did:privy:", "")}?tab=onchain`);
+    }
+    if (linkMethod === "quiz") {
+      router.push("/salary-quiz");
+    }
+    if (linkMethod === "give_endorsement") {
+      router.push("/explore-talent");
     }
   };
 

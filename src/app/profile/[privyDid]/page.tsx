@@ -45,6 +45,7 @@ export default function ProfilePage() {
     SOCIALFEED.FARCASTER
   );
   const [addressData, setAddressData] = useState<EthAddress[] | null>(null);
+  const [openTab, setOpenTab] = useState("activity");
   const { user } = usePrivy();
   const params = useParams();
   const { toast } = useToast();
@@ -56,7 +57,7 @@ export default function ProfilePage() {
     queryFn: async () => fetchUserProfile({ userId: privyDid }),
   });
 
-  const { data: ethAddresses, isLoading: ethAddressesLoading } = useQuery({
+  const { data: ethAddresses } = useQuery({
     enabled: !!userProfileData?.profile?.farcaster_fid,
     queryKey: ["ethAddresses", privyDid.replace("did:privy:", "")],
     queryFn: async () => {
@@ -97,6 +98,14 @@ export default function ProfilePage() {
           console.error("Error in fetching ENS names:", error);
         }
       };
+
+      const setTabFromQuery = () => {
+        const tab = new URLSearchParams(window.location.search).get("tab");
+        if (tab) {
+          setOpenTab(tab);
+        }
+      };
+      setTabFromQuery();
       fetchEnsNames();
     }
   }, [userProfileData, ethAddresses]);
@@ -160,6 +169,10 @@ export default function ProfilePage() {
     },
   ];
 
+  const handleTabChange = (tab: string) => {
+    setOpenTab(tab);
+    window.history.pushState({}, "", `${window.location.pathname}?tab=${tab}`);
+  };
   const connectedSocials = socialLinks.filter((social) => social.url);
 
   return (
@@ -238,15 +251,27 @@ export default function ProfilePage() {
           <SocialLinks connectedSocials={connectedSocials} />
         </div>
         <div className='w-full flex flex-col md:items-center md:justify-start md:gap-4 md:mt-4 px-2'>
-          <Tabs defaultValue='activity' className='w-full '>
+          <Tabs defaultValue='activity' className='w-full ' value={openTab}>
             <TabsList className='h-14 sm:h-10 my-2 md:my-0'>
-              <TabsTrigger className='h-12 sm:h-8' value='activity'>
+              <TabsTrigger
+                className='h-12 sm:h-8'
+                value='activity'
+                onClick={() => handleTabChange("activity")}
+              >
                 activity
               </TabsTrigger>
-              <TabsTrigger className='h-12 sm:h-8' value='onchain'>
+              <TabsTrigger
+                className='h-12 sm:h-8'
+                value='onchain'
+                onClick={() => handleTabChange("onchain")}
+              >
                 onchain
               </TabsTrigger>
-              <TabsTrigger className='h-12 sm:h-8' value='endorsements'>
+              <TabsTrigger
+                className='h-12 sm:h-8'
+                value='endorsements'
+                onClick={() => handleTabChange("endorsements")}
+              >
                 endorsements
               </TabsTrigger>
             </TabsList>
@@ -612,6 +637,11 @@ function DegenScoreUnavailable() {
   const { user, getAccessToken } = usePrivy();
   const { privyDid }: { privyDid: string } = useParams();
   const [checkingDegenScore, setCheckingDegenScore] = useState(false);
+  const { refetch } = useQuery({
+    enabled: !!user,
+    queryKey: ["user", user?.id?.replace("did:privy:", "")],
+    queryFn: async () => fetchUserProfile({ userId: user?.id ?? "" }),
+  });
   const { linkWallet } = useLinkAccount({
     onSuccess: async (user, linkMethod, linkedAccount) => {
       const stepId = TaskMap["degenScore"];
@@ -625,6 +655,7 @@ function DegenScoreUnavailable() {
           getAccessToken,
           setCheckingDegenScore
         );
+        await refetch();
         if (!hasScore) {
           alert("no score found");
           return;

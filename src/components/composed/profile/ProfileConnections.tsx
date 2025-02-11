@@ -43,7 +43,7 @@ export const TaskMap = {
   [PROFILE_TYPE.TELEGRAM]: "telegram",
   [PROFILE_TYPE.TWITTER]: "x",
   [PROFILE_TYPE.WALLET]: "wallet",
-  endorseFriend: "endorse_a_friend",
+  giveEndorsement: "give_endorsement",
   receiveEndorsement: "receive_endorsement",
   degenScore: "degen_score",
 };

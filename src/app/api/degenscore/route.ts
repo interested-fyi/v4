@@ -10,11 +10,8 @@ const privyClient = new PrivyClient(
 
 export async function GET(req: NextRequest) {
   const authToken = req.headers.get("Authorization")?.replace("Bearer ", "");
-  console.log("🚀 ~ GET ~ authToken:", authToken);
-
   try {
     const verificationClaim = await privyClient.verifyAuthToken(authToken!);
-    console.log("🚀 ~ GET ~ verificationClaim:", verificationClaim);
     const privyDid = verificationClaim.userId;
 
     // Fetch user's wallet addresses
@@ -29,8 +26,6 @@ export async function GET(req: NextRequest) {
         `Error fetching user for the supplied auth token: ${userError?.message}`
       );
     }
-    console.log("🚀 ~ GET ~ userData:", userData);
-
     if (!userData.wallet_addresses || userData.wallet_addresses.length === 0) {
       return NextResponse.json(
         { message: "No wallet addresses found." },
@@ -40,7 +35,6 @@ export async function GET(req: NextRequest) {
 
     // Iterate through wallet addresses one by one
     for (const address of userData.wallet_addresses) {
-      console.log("🚀 ~ GET ~ address:", address);
       try {
         const response = await fetch(
           `https://beacon.degenscore.com/v2/beacon/${address}`
@@ -56,7 +50,7 @@ export async function GET(req: NextRequest) {
         if (degenScoreData?.properties?.DegenScore) {
           // Call the new API route to save the score
           await fetch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/api/save-degenscore`,
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/degenscore/save-degenscore`,
             {
               method: "POST",
               headers: {
