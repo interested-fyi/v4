@@ -30,6 +30,8 @@ import QuestRow from "./composed/quest/QuestRow";
 import posthog from "posthog-js";
 import { useRouter } from "next/navigation";
 import Leaderboard from "./composed/quest/QuestLeaderboard";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Button } from "./ui/button";
 
 export interface QuestStep {
   id: string;
@@ -49,6 +51,26 @@ export const fetchCompletedTasks = async (privyDid: string) => {
     return data;
   } catch (error) {
     console.error("Error fetching completed tasks:", error);
+    return [];
+  }
+};
+
+export const fetchTopDegens = async () => {
+  try {
+    const response = await fetch(`/api/quests/leaderboard/degen`, {
+      method: "GET",
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch top degens");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching top degens:", error);
     return [];
   }
 };
@@ -100,6 +122,10 @@ export default function Quest() {
     queryFn: fetchTopUsers,
   });
 
+  const { data: topDegens } = useQuery({
+    queryKey: ["topDegens", data?.totalPoints],
+    queryFn: fetchTopDegens,
+  });
   const [steps, setSteps] = useState<QuestStep[]>([
     {
       id: "x",
@@ -412,7 +438,34 @@ export default function Quest() {
     <div className='bg-blue-700 w-full min-h-screen flex flex-col items-center justify-center pt-4'>
       {topUsers && (
         <div className='w-full max-w-2xl mx-auto p-2 md:p-0'>
-          <Leaderboard entries={topUsers.users} />
+          <Tabs>
+            <TabsList>
+              <TabsTrigger value='Top 10 Leaderboard'>
+                <span>Top 10 Questors</span>
+              </TabsTrigger>
+              <TabsTrigger value='Top Degens'>
+                <span>Top Degens</span>
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent
+              value='Top 10 Leaderboard'
+              children={
+                <Leaderboard
+                  entries={topUsers?.users}
+                  title='Top 10 Questors'
+                />
+              }
+            />
+            <TabsContent
+              value='Top Degens'
+              children={
+                <Leaderboard
+                  entries={topDegens?.users}
+                  title='Degen Leaderboard'
+                />
+              }
+            />
+          </Tabs>
         </div>
       )}
 

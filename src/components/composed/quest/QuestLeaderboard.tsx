@@ -11,15 +11,16 @@ interface LeaderboardEntry {
 
 interface LeaderboardProps {
   entries: LeaderboardEntry[];
+  title?: string;
 }
 
-export default function Leaderboard({ entries }: LeaderboardProps) {
+export default function Leaderboard({ entries, title }: LeaderboardProps) {
   return (
     <div className='w-full max-w-2xl bg-white rounded-xl shadow-sm overflow-hidden'>
       <div className='bg-[#4052F6] text-white p-4'>
         <h2 className='text-xl font-bold flex items-center gap-2'>
           <Trophy className='h-6 w-6' />
-          Top 10 Leaderboard
+          {title ?? "Top 10 Leaderboard"}
         </h2>
       </div>
       <div className='divide-y divide-gray-100'>
