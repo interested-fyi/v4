@@ -453,10 +453,7 @@ export default function Quest() {
             </TabsContent>
             <TabsContent value='Top Degens'>
               <Leaderboard
-                entries={topDegens?.users.sort(
-                  (a: LeaderboardEntry, b: LeaderboardEntry) =>
-                    b.totalPoints - a.totalPoints
-                )}
+                entries={topDegens?.users}
                 title='Degen Leaderboard'
               />
             </TabsContent>
