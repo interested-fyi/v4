@@ -447,24 +447,16 @@ export default function Quest() {
                 <span>Top Degens</span>
               </TabsTrigger>
             </TabsList>
-            <TabsContent
-              value='Top 10 Leaderboard'
-              children={
-                <Leaderboard
-                  entries={topUsers?.users}
-                  title='Top 10 Questors'
-                />
-              }
-            />
-            <TabsContent
-              value='Top Degens'
-              children={
-                <Leaderboard
-                  entries={topDegens?.users}
-                  title='Degen Leaderboard'
-                />
-              }
-            />
+            <TabsContent value='Top 10 Leaderboard'>
+              <Leaderboard entries={topUsers?.users} title='Top 10 Questors' />
+            </TabsContent>
+            <TabsContent value='Top Degens'>
+              {" "}
+              <Leaderboard
+                entries={topDegens?.users}
+                title='Degen Leaderboard'
+              />
+            </TabsContent>
           </Tabs>
         </div>
       )}
