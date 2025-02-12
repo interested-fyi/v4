@@ -57,7 +57,7 @@ export default function QuestRow({
         });
         await refetch();
       } else {
-        handleStartQuest(step.linkMethod);
+        await handleStartQuest(step.linkMethod);
       }
     } catch (error) {
       alert("Error starting quest");
@@ -65,6 +65,7 @@ export default function QuestRow({
     } finally {
       setIsLoading(false);
     }
+    setIsLoading(false);
   };
 
   return (

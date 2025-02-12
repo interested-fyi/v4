@@ -495,22 +495,6 @@ export const LinkAccountSelect: React.FC<LinkAccountSelectProps> = ({
         </motion.div>
       ))}
     </div>
-    // <div className='flex flex-wrap gap-3 mt-1 items-start rounded-lg text-black'>
-    //   {profiles.map((profile) => (
-    //     <div className='w-full flex rounded-lg shadow-sm border items-center bg-gradient-to-r to-slate-200 via-yellow-100 from-blue-700 text-white p-3'>
-    //       <p className='flex-grow font-bold font-heading'>
-    //         {profile[0].toLocaleUpperCase() + profile.slice(1)}
-    //       </p>
-    //       <Button
-    //         key={profile}
-    //         className='bg-[#2640eb] text-yellow-200 w-40'
-    //         onClick={() => handleLink(profile?.toLocaleLowerCase() ?? "")}
-    //       >
-    //         Connect
-    //       </Button>
-    //     </div>
-    //   ))}
-    // </div>
   );
 };
 

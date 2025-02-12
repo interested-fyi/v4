@@ -78,6 +78,7 @@ export default function Quest() {
   const [questPoints] = useState(10);
   const [totalPoints, setTotalPoints] = useState(0);
   const router = useRouter();
+
   const { data, isLoading, refetch } = useQuery<{
     completedTaskIds: string[];
     totalPoints: number;
@@ -160,9 +161,17 @@ export default function Quest() {
       id: "give_endorsement",
       title: "Endorse a Peer",
       icon: <Check className='h-5 w-5' />,
-      points: 10,
+      points: 20,
       completed: false,
       linkMethod: "give_endorsement",
+    },
+    {
+      id: "receive_endorsement",
+      title: "Receive an Endorsement",
+      icon: <Check className='h-5 w-5' />,
+      points: 20,
+      completed: false,
+      linkMethod: "receive_endorsement",
     },
     {
       id: "degen_score",
@@ -343,11 +352,11 @@ export default function Quest() {
 
   // Handle quest start
   const handleStartQuest = async (linkMethod: string) => {
-    console.log("🚀 ~ handleStartQuest ~ linkMethod:", linkMethod);
     const linkFunction =
       linkMethodMap[linkMethod as keyof typeof linkMethodMap];
     if (linkFunction) {
       await linkFunction();
+      return;
     }
     if (linkMethod === "degen_score") {
       router.push(`/profile/${user?.id.replace("did:privy:", "")}?tab=onchain`);
@@ -358,6 +367,37 @@ export default function Quest() {
     if (linkMethod === "give_endorsement") {
       router.push("/explore-talent");
     }
+    if (linkMethod === "receive_endorsement") {
+      try {
+        const res = await fetch(
+          `/api/quests/status/receive-endorsement?privy_did=${user?.id}`
+        );
+        const data = await res.json();
+
+        if (data.success) {
+          const accessToken = await getAccessToken();
+          completeTask(user?.id!, "receive_endorsement", accessToken!);
+          alert(
+            "You have received an endorsement! We're updating your points now..."
+          );
+          posthog.capture("quest_completed", {
+            user_id: user?.id,
+            task_id: "receive_endorsement",
+          });
+          await refetch();
+          return;
+        } else {
+          alert("You have not received an endorsement yet");
+          return;
+        }
+      } catch (e) {
+        alert("You have not received an endorsement yet");
+        console.error(e);
+      } finally {
+        return;
+      }
+    }
+    return;
   };
 
   const completedSteps = useCallback(
