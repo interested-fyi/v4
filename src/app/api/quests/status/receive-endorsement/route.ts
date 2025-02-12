@@ -14,16 +14,19 @@ export async function GET(request: Request) {
       );
     }
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("attestations")
       .select("*")
-      .eq("recipient", privyDid)
-      .single();
+      .eq("recipient", privyDid);
 
     if (error) {
       throw error;
     }
-    return NextResponse.json({ success: true }, { status: 200 });
+    if (data.length > 0) {
+      return NextResponse.json({ success: true }, { status: 200 });
+    } else {
+      return NextResponse.json({ success: false }, { status: 200 });
+    }
   } catch (error) {
     console.error("Error fetching completed tasks:", error);
     return NextResponse.json(
