@@ -37,7 +37,7 @@ export async function GET() {
     return NextResponse.json(
       {
         users: transformedData.sort((a, b) => {
-          return b.total_points - a.total_points;
+          return b.totalPoints - a.totalPoints;
         }),
       },
       { status: 200 }
