@@ -688,6 +688,9 @@ function DegenScoreUnavailable() {
           );
           if (!hasScore) {
             linkWallet();
+          } else {
+            const accessToken = await getAccessToken();
+            await completeTask(user.id, TaskMap["degenScore"], accessToken!);
           }
         }}
       />
