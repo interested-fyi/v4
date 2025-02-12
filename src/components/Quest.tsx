@@ -451,7 +451,6 @@ export default function Quest() {
               <Leaderboard entries={topUsers?.users} title='Top 10 Questors' />
             </TabsContent>
             <TabsContent value='Top Degens'>
-              {" "}
               <Leaderboard
                 entries={topDegens?.users}
                 title='Degen Leaderboard'

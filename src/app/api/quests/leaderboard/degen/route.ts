@@ -34,7 +34,14 @@ export async function GET() {
     });
 
     const transformedData = userData.map(toCamelCase);
-    return NextResponse.json({ users: transformedData }, { status: 200 });
+    return NextResponse.json(
+      {
+        users: transformedData.sort((a, b) => {
+          return b.total_points - a.total_points;
+        }),
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error fetching top users:", error);
     return NextResponse.json(
