@@ -29,9 +29,10 @@ import { QuestPoints } from "./composed/quest/QuestPoints";
 import QuestRow from "./composed/quest/QuestRow";
 import posthog from "posthog-js";
 import { useRouter } from "next/navigation";
-import Leaderboard from "./composed/quest/QuestLeaderboard";
+import Leaderboard, {
+  LeaderboardEntry,
+} from "./composed/quest/QuestLeaderboard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Button } from "./ui/button";
 
 export interface QuestStep {
   id: string;
@@ -452,7 +453,10 @@ export default function Quest() {
             </TabsContent>
             <TabsContent value='Top Degens'>
               <Leaderboard
-                entries={topDegens?.users}
+                entries={topDegens?.users.sort(
+                  (a: LeaderboardEntry, b: LeaderboardEntry) =>
+                    b.totalPoints - a.totalPoints
+                )}
                 title='Degen Leaderboard'
               />
             </TabsContent>

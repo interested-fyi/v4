@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Trophy } from "lucide-react";
 import Link from "next/link";
 
-interface LeaderboardEntry {
+export interface LeaderboardEntry {
   name: string;
   photoSource: string;
   totalPoints: number;
