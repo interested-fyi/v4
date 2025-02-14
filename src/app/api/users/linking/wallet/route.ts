@@ -22,21 +22,23 @@ export async function POST(req: NextRequest) {
   } catch (e) {
     throw new Error("Invalid access token");
   }
-
   const { data, error } = await supabase
     .from("wallet_users")
-    .upsert(
-      [
-        {
-          privy_did: privyDid,
-          addresses: wallet_address,
-        },
-      ],
-      { onConflict: "privy_did" }
-    )
+    .insert({
+      privy_did: privyDid,
+      address: wallet_address,
+    })
     .select()
     .single();
 
+  // If there's a unique constraint violation, return a specific error
+  if (error?.code === "23505") {
+    // PostgreSQL unique constraint violation code
+    return NextResponse.json(
+      { error: "This wallet address is already registered for this user" },
+      { status: 400 }
+    );
+  }
   if (error) throw error;
 
   return NextResponse.json({ wallet_user: data }, { status: 200 });

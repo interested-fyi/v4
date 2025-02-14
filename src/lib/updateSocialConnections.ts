@@ -145,7 +145,7 @@ export async function updateWalletUser(
     },
     body: JSON.stringify({
       privy_did: privy_did,
-      wallet_address: [wallet_address],
+      wallet_address: wallet_address,
     }),
   });
 }
