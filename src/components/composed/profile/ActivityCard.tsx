@@ -39,7 +39,8 @@ export default function ActivityCard({
             <div className='flex flex-col gap-0 justify-center items-start'>
               <div className='flex gap-2 items-center'>
                 <h3 className='font-semibold text-[#2640eb]'>
-                  {userProfileData?.profile?.name}
+                  {userProfileData?.profile?.farcaster_username ||
+                    userProfileData?.profile?.name}
                 </h3>
                 <Image
                   src={"/svg/warpcast.svg"}

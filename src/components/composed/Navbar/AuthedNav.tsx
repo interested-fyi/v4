@@ -131,9 +131,6 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
     email: string;
     bio: string;
     bestProfile: string;
-    calendar: string;
-    fee: string;
-    bookingDescription: string;
     geography: string;
     isAvailable: boolean;
     position: string[];
@@ -172,9 +169,6 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
         photo_source: image ?? userProfileData?.profile?.photo_source,
         preferred_profile: formToSubmit.bestProfile,
         bio: formToSubmit.bio,
-        calendly_link: formToSubmit.calendar,
-        unlock_calendar_fee: formToSubmit.fee,
-        booking_description: formToSubmit.bookingDescription,
         geography: formToSubmit.geography,
         available: formToSubmit.isAvailable,
         position: formToSubmit.position,
@@ -285,9 +279,6 @@ export const AvatarMenu = ({ avatar, logout }: AvatarMenuProps) => {
               email: string;
               bio: string;
               bestProfile: string;
-              calendar: string;
-              fee: string;
-              bookingDescription: string;
               isAvailable: boolean;
               geography: string;
               position: string[];

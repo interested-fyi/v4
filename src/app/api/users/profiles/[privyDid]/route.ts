@@ -28,7 +28,9 @@ export async function GET(
   console.log(privyDid);
   const { data, error } = await supabase
     .from("user_profiles")
-    .select("*")
+    .select(
+      "available, bio, created_at, degen_score, email, employment_type, farcaster_username, geography, github_username, linkedin_name, name, photo_source, position, preferred_photo, preferred_profile, privy_did, telegram_photo, telegram_user_id, telegram_username, wallet_addresses, x_photo, x_username"
+    )
     .eq("privy_did", privyDid)
     .maybeSingle();
 

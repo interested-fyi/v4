@@ -43,12 +43,9 @@ export default function AuthDialog({
     email: string;
     bio: string;
     bestProfile: string;
-    calendar: string;
-    fee: string;
     geography: string;
     position: string[];
     employmentType: string[];
-    bookingDescription: string;
     isAvailable: boolean;
   }) => {
     const accessToken = await getAccessToken();
@@ -120,10 +117,7 @@ export default function AuthDialog({
               bestProfile: string;
               tempPhotoUrl: string | null;
               isAvailable: boolean;
-              calendar: string;
-              fee: string;
               geography: string;
-              bookingDescription: string;
               position: string[];
               employmentType: string[];
             }) => {

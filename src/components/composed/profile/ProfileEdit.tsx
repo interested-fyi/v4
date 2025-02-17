@@ -23,9 +23,6 @@ interface Props {
     email: string;
     bio: string;
     bestProfile: string;
-    calendar: string;
-    fee: string;
-    bookingDescription: string;
     isAvailable: boolean;
     geography: string;
     position: string[];
@@ -43,9 +40,6 @@ export const ProfileEditForm = ({ isEditMode, onSubmit, onClose }: Props) => {
     email: "",
     bio: "",
     bestProfile: "",
-    calendar: "",
-    fee: "",
-    bookingDescription: "",
     geography: "",
     isAvailable: true,
     position: [""],
@@ -61,7 +55,7 @@ export const ProfileEditForm = ({ isEditMode, onSubmit, onClose }: Props) => {
   const pathname = usePathname();
 
   const { data: userProfileData } = useQuery({
-    enabled: !!user,
+    enabled: !!user?.id,
     queryKey: ["user", user?.id?.replace("did:privy:", "")],
     queryFn: async () => {
       const accessToken = await getAccessToken();
@@ -103,7 +97,8 @@ export const ProfileEditForm = ({ isEditMode, onSubmit, onClose }: Props) => {
           val !== "editMode" &&
           val !== "page" &&
           val !== "view" &&
-          val !== "limit"
+          val !== "limit" &&
+          val !== "tab"
       ).length
     ) {
       setForm({
@@ -111,9 +106,6 @@ export const ProfileEditForm = ({ isEditMode, onSubmit, onClose }: Props) => {
         email: urlParams.email ?? "",
         bio: urlParams.bio ?? "",
         bestProfile: urlParams.bestProfile ?? "",
-        calendar: urlParams.calendar ?? "",
-        fee: urlParams.fee ?? "",
-        bookingDescription: urlParams.bookingDescription ?? "",
         isAvailable: urlParams.isAvailable === "true",
         position: urlParams.position ? urlParams.position.split(",") : [""],
         employmentType: urlParams.employmentType
@@ -127,16 +119,14 @@ export const ProfileEditForm = ({ isEditMode, onSubmit, onClose }: Props) => {
         email: user?.google?.email ?? "",
         bio: userProfileData.profile?.bio ?? "",
         bestProfile: userProfileData.profile?.preferred_profile ?? "",
-        calendar: userProfileData.profile?.calendly_link ?? "",
-        fee: userProfileData.profile?.unlock_calendar_fee ?? "",
-        bookingDescription: userProfileData.profile?.booking_description ?? "",
+
         isAvailable: userProfileData.profile?.available ?? true,
         position: userProfileData.profile?.position ?? [""],
         employmentType: userProfileData.profile?.employment_type ?? [""],
         geography: userProfileData.profile?.geography ?? "",
       });
     }
-  }, [userProfileData]);
+  }, [userProfileData, user]);
 
   useEffect(() => {
     const isFormComplete = form.name && form.bio && form.email;
@@ -492,79 +482,6 @@ export const ProfileEditForm = ({ isEditMode, onSubmit, onClose }: Props) => {
               options={jobSalaryOptions?.salaryDetails.locations}
             />
           </div>
-          {/* {jobSalary?.success ? (
-            // display the salary range and ask if it looks right, too high, or too low
-            <>
-              <div className='space-y-4 border p-4 rounded-md shadow-sm bg-white'>
-                <div className='space-y-2'>
-                  <Label
-                    className='text-sm font-medium text-gray-700'
-                    htmlFor='bestProfile'
-                  >
-                    Salary Range
-                  </Label>
-                  <div className='grid grid-cols-2 gap-y-1'>
-                    <p className='text-sm font-medium text-gray-600'>Min:</p>
-                    <p className='text-sm font-medium'>
-                      {`${new Intl.NumberFormat(
-                        jobSalary.salaryRange?.currency,
-                        {
-                          style: "currency",
-                          currency: jobSalary.salaryRange?.currency,
-                        }
-                      )}`}
-                    </p>
-                    <p className='text-sm font-medium text-gray-600'>Max:</p>
-                    <p className='text-sm font-medium'>
-                      {jobSalary.salaryRange?.new_max}
-                    </p>
-                    <p className='text-sm font-medium text-gray-600'>Median:</p>
-                    <p className='text-sm font-medium'>
-                      {jobSalary.salaryRange?.new_mid}
-                    </p>
-                  </div>
-                </div>
-                <hr className='border-gray-200' />
-                <div className='space-y-2'>
-                  <Label
-                    className='text-sm font-medium text-gray-700'
-                    htmlFor='bestProfile'
-                  >
-                    Does this look right?
-                  </Label>
-                  <div className='flex gap-4'>
-                    <Button
-                      variant='link'
-                      className='text-sm text-red-700 hover:underline'
-                      onClick={() => {
-                        // set the salary range to the form
-                      }}
-                    >
-                      Too low
-                    </Button>
-                    <Button
-                      variant='link'
-                      className='text-sm text-green-700 hover:underline'
-                      onClick={() => {
-                        // set the salary range to the form
-                      }}
-                    >
-                      Just right
-                    </Button>
-                    <Button
-                      variant='link'
-                      className='text-sm text-red-700 hover:underline'
-                      onClick={() => {
-                        // set the salary range to the form
-                      }}
-                    >
-                      Too high
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </>
-          ) : null} */}
         </div>
         <Button
           className='w-full text-sm font-body font-medium leading-[21px] mt-4 bg-[#2640eb]'
