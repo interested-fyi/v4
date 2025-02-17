@@ -39,7 +39,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     const { data: jobPostings, error: jobPostingsError } = await supabase
       .from("job_details_last_scraping")
       .select("id, company_id")
-      .not("id", "in", existingJobAttestationsIds)
+      .not("id", "in", `(${existingJobAttestationsIds}.join(",")})`)
       .limit(5);
 
     if (jobPostingsError) {
