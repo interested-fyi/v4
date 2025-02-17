@@ -20,95 +20,103 @@ export async function GET(req: NextRequest, res: NextResponse) {
   }
 
   try {
-    const { data, error } = await supabase
+    // Fetch existing job attestations (IDs that have already been posted on-chain)
+    const { data: existingAttestations, error: attestationsError } =
+      await supabase.from("job_attestations").select("job_posting_id");
+
+    if (attestationsError) {
+      console.error("Error fetching job attestations:", attestationsError);
+      return NextResponse.json("Error fetching job attestations", {
+        status: 500,
+      });
+    }
+
+    const existingJobAttestationsIds = existingAttestations.map(
+      (a) => a.job_posting_id
+    );
+
+    // Fetch job postings that are NOT in the job_attestations table
+    const { data: jobPostings, error: jobPostingsError } = await supabase
       .from("job_details_last_scraping")
       .select("id, company_id")
-      .not(
-        "id",
-        "in",
-        supabase.from("job_attestations").select("job_posting_id")
-      );
+      .not("id", "in", existingJobAttestationsIds)
+      .limit(5);
 
-    if (error) {
-      console.error("Error fetching job postings:", error);
-      return NextResponse.json("Error", { status: 500 });
+    if (jobPostingsError) {
+      console.error("Error fetching job postings:", jobPostingsError);
+      return NextResponse.json("Error fetching job postings", { status: 500 });
     }
-    if (data && data?.length > 0) {
-      const ids = data.map((row) => row.id);
-      const { data: jobPostingsDetails, error: detailsError } = await supabase
-        .from("job_postings_details")
-        .select(
-          `
-          *,
-          job_attestations (
-          job_posting_id),
-          job_details_last_scraping (
-            last_scraped
-            ),
-            job_postings (
-                id,
-                company_id,
-                department,
-                sub_department,
-                type,
-                role_title,
-                location,
-                posting_url,
-                active,
-                data,
-                created_at,
-                companies (
-                    company_name
-                    )
-                    )
-                    `
-        )
-        .in("job_posting_id", ids)
-        .not(
-          "job_attestations.job_posting_id",
-          "in",
-          supabase.from("job_attestations").select("job_posting_id")
-        )
-        .limit(5);
 
-      if (detailsError) {
-        console.error("Error fetching job postings details:", detailsError);
-      } else {
-        console.log(
-          "Fetched job postings details with company names:",
-          ...jobPostingsDetails
-        );
-      }
-      if (!jobPostingsDetails) {
-        console.log("No job postings details found.");
-        return NextResponse.json("No job postings details found.");
-      }
-      // format each line to match the schema
-      const formattedData = jobPostingsDetails.map((row) => ({
-        id: row.job_posting_id,
-        company_id: row.job_postings.company_id,
-        company_name: row.job_postings.companies.company_name,
-        department: row.job_postings.department,
-        sub_department: row.job_postings.sub_department,
-        type: row.job_postings.type,
-        role_title: row.job_postings.role_title,
-        location: row.job_postings.location,
-        posting_url: row.job_postings.posting_url,
-        active: row.job_postings.active,
-        data: row.job_postings.data,
-        description: row.description,
-        summary: row.summary,
-        compensation: row.compensation,
-      }));
-      await saveDetailsOnchain(formattedData);
-      return NextResponse.json("Success", { status: 200 });
-    } else {
-      console.log("No IDs found to query job_postings_details.");
-      return NextResponse.json("No IDs found to query job_postings_details.");
+    if (!jobPostings || jobPostings.length === 0) {
+      console.log("No new job postings found.");
+      return NextResponse.json("No new job postings found.");
     }
-  } catch (e) {
-    console.log(e);
-    return NextResponse.json("Error", { status: 500 });
+
+    // Extract job posting IDs for further querying
+    const jobPostingIds = jobPostings.map((row) => row.id);
+
+    // Fetch job details for the filtered job postings
+    const { data: jobPostingsDetails, error: detailsError } = await supabase
+      .from("job_postings_details")
+      .select(
+        `
+        *,
+        job_postings (
+          id,
+          company_id,
+          department,
+          sub_department,
+          type,
+          role_title,
+          location,
+          posting_url,
+          active,
+          data,
+          created_at,
+          companies (company_name)
+        )
+        `
+      )
+      .in("job_posting_id", jobPostingIds);
+
+    if (detailsError) {
+      console.error("Error fetching job postings details:", detailsError);
+      return NextResponse.json("Error fetching job postings details", {
+        status: 500,
+      });
+    }
+
+    if (!jobPostingsDetails || jobPostingsDetails.length === 0) {
+      console.log("No job postings details found.");
+      return NextResponse.json("No job postings details found.");
+    }
+
+    // Format the data to match the schema
+    const formattedData = jobPostingsDetails.map((row) => ({
+      id: row.job_posting_id,
+      company_id: row.job_postings.company_id,
+      company_name: row.job_postings.companies.company_name,
+      department: row.job_postings.department,
+      sub_department: row.job_postings.sub_department,
+      type: row.job_postings.type,
+      role_title: row.job_postings.role_title,
+      location: row.job_postings.location,
+      posting_url: row.job_postings.posting_url,
+      active: row.job_postings.active,
+      data: row.job_postings.data,
+      description: row.description,
+      summary: row.summary,
+      compensation: row.compensation,
+    }));
+
+    // Save filtered job postings to on-chain storage
+    await saveDetailsOnchain(formattedData);
+
+    console.log("Successfully saved details on-chain.");
+    return NextResponse.json("Success", { status: 200 });
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    return NextResponse.json("Internal Server Error", { status: 500 });
   }
 }
 
