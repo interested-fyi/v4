@@ -30,7 +30,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     const { data, error } = await supabase
       .from("job_details_last_scraping")
       .select("id, company_id")
-      .filter("id", "not.in", attestedJobIds) // Use the array of IDs
+      .filter("id", "not.in", `(${attestedJobIds.join(",")})`) // Use the array of IDs
       .not("last_scraped", "is", null) // Ensure timestamp exists
       .eq("active", true); // Ensure job is active
 
