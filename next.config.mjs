@@ -3,7 +3,7 @@ const nextConfig = {
   headers: async () => {
     const ContentSecurityPolicy = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://telegram.org https://auth.privy.io https://us-assets.i.posthog.com/* https://vercel.live/_next-live/feedback/feedback.js",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://telegram.org https://auth.privy.io https://us-assets.i.posthog.com https://vercel.live/_next-live/feedback/feedback.js",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https: https://i.imgur.com",
       "media-src 'self'",
