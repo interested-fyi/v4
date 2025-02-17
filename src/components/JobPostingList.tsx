@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { OnchainBadge } from "./OnchainBadge";
 import JobPosting from "@/types/job-posting";
 import Link from "next/link";
+import posthog from "posthog-js";
 
 interface JobPostingListProps {
   jobs: JobPosting[];
@@ -32,6 +33,12 @@ export function JobPostingList({ jobs }: JobPostingListProps) {
                     </div>
                   </Link>
                   <Link
+                    onClick={() => {
+                      posthog.capture("clicked job link", {
+                        job_id: job.id,
+                        company_id: job.company_id,
+                      });
+                    }}
                     href={jobUrlBuilder(job.posting_url)}
                     target='_blank'
                     prefetch={false}
