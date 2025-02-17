@@ -20,19 +20,14 @@ export async function GET(req: NextRequest, res: NextResponse) {
   }
 
   try {
-    const { data: jobAttestations, error: attestationsError } = await supabase
-      .from("job_attestations")
-      .select("job_posting_id");
-    // Extract job IDs
-    const attestedJobIds =
-      jobAttestations?.map((row) => row.job_posting_id) || [];
-
     const { data, error } = await supabase
       .from("job_details_last_scraping")
       .select("id, company_id")
-      .filter("id", "not.in", `(${attestedJobIds.join(",")})`) // Use the array of IDs
-      .not("last_scraped", "is", null) // Ensure timestamp exists
-      .eq("active", true); // Ensure job is active
+      .not(
+        "id",
+        "in",
+        supabase.from("job_attestations").select("job_posting_id")
+      );
 
     if (error) {
       console.error("Error fetching job postings:", error);
@@ -72,7 +67,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         .not(
           "job_attestations.job_posting_id",
           "in",
-          `(${attestedJobIds.join(",")})`
+          supabase.from("job_attestations").select("job_posting_id")
         )
         .limit(5);
 
