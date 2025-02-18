@@ -479,7 +479,7 @@ export const ProfileEditForm = ({ isEditMode, onSubmit, onClose }: Props) => {
               onValueChange={(val) => {
                 setForm({ ...form, geography: val });
               }}
-              options={jobSalaryOptions?.salaryDetails.locations}
+              options={jobSalaryOptions?.salaryDetails?.locations}
             />
           </div>
         </div>

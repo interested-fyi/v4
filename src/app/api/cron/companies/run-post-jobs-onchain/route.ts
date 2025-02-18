@@ -20,34 +20,19 @@ export async function GET(req: NextRequest, res: NextResponse) {
   }
 
   try {
-    // Fetch existing job attestations (IDs that have already been posted on-chain)
-    const { data: existingAttestations, error: attestationsError } =
-      await supabase.from("job_attestations").select("job_posting_id");
-
-    if (attestationsError) {
-      console.error("Error fetching job attestations:", attestationsError);
-      return NextResponse.json("Error fetching job attestations", {
-        status: 500,
-      });
-    }
-
-    const existingJobAttestationsIds = existingAttestations.map(
-      (a) => a.job_posting_id
-    );
-
     // Fetch job postings that are NOT in the job_attestations table
     const { data: jobPostings, error: jobPostingsError } = await supabase
       .from("job_details_last_scraping")
-      .select("id, company_id")
-      .not(
-        "id",
-        "in",
-        `(${
-          existingJobAttestationsIds.length > 0
-            ? existingJobAttestationsIds.join(",")
-            : "0"
-        })`
+      .select(
+        `
+    id,
+    company_id,
+    job_attestations!left (
+      attestation_uid
+    )
+  `
       )
+      .is("job_attestations", null) // This filters for rows where job_attestations is null
       .limit(5);
 
     if (jobPostingsError) {
