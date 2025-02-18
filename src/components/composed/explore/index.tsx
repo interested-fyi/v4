@@ -1,11 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CompanyCard } from "@/components/composed/companies/CompanyCard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { usePrivy } from "@privy-io/react-auth";
-import JobPosting from "@/types/job-posting";
 import { JobPostingList } from "@/components/JobPostingList";
 import { CompanyResponse } from "@/app/api/companies/get-approved-companies/route";
 import { LoaderCircle } from "lucide-react";
@@ -61,21 +60,7 @@ export default function Explore() {
         </div>
       </div>
 
-      {activeButton === "companies" ? (
-        <Companies
-          page={page}
-          limit={limit}
-          onPageChange={setPage}
-          onLimitChange={setLimit}
-        />
-      ) : (
-        <Jobs
-          page={page}
-          limit={limit}
-          onPageChange={setPage}
-          onLimitChange={setLimit}
-        />
-      )}
+      {activeButton === "companies" ? <Companies /> : <Jobs />}
     </>
   );
 }
@@ -158,20 +143,22 @@ interface CompaniesProps {
   onLimitChange: (limit: number) => void;
 }
 
-export function Companies({
-  page,
-  limit,
-  onPageChange,
-  onLimitChange,
-}: CompaniesProps) {
+export function Companies() {
   const { getAccessToken } = usePrivy();
+  const observerRef = useRef(null);
 
-  const { data: companiesData, isLoading: isLoadingCompanies } = useQuery({
-    queryKey: ["companies", page, limit],
-    queryFn: async () => {
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: isLoadingCompanies,
+  } = useInfiniteQuery({
+    queryKey: ["companies"],
+    queryFn: async ({ pageParam = 1 }) => {
       const accessToken = await getAccessToken();
       const res = await fetch(
-        `/api/companies/get-approved-companies?page=${page}&limit=${limit}`,
+        `/api/companies/get-approved-companies?page=${pageParam}&limit=20`,
         {
           method: "GET",
           headers: {
@@ -180,39 +167,44 @@ export function Companies({
           },
         }
       );
-      return (await res.json()) as {
-        success: boolean;
-        companies: CompanyResponse[];
-        totalCompanies: number;
-        totalPages: number;
-      };
+      return res.json();
     },
+    getNextPageParam: (lastPage) => {
+      return lastPage.currentPage < lastPage.totalPages
+        ? lastPage.currentPage + 1
+        : undefined;
+    },
+
+    initialPageParam: 1,
   });
 
-  return (
-    <>
-      <div className='flex justify-end items-center gap-4 px-8'>
-        <span>Companies per page:</span>
-        <select
-          value={limit}
-          onChange={(e) => onLimitChange(Number(e.target.value))}
-          className='border p-1 rounded'
-        >
-          {[10, 20, 50].map((limitOption) => (
-            <option key={limitOption} value={limitOption}>
-              {limitOption}
-            </option>
-          ))}
-        </select>
-      </div>
+  // Intersection Observer to detect scrolling to bottom
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 1.0 }
+    );
 
-      {isLoadingCompanies ? (
-        <div className='text-center flex items-center w-full min-h-60'>
-          <LoaderCircle className='w-12 h-12 text-blue-500 animate-spin mx-auto' />
-        </div>
-      ) : (
-        <section className='grid grid-cols-1 gap-6 p-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:p-6 min-h-48'>
-          {companiesData?.companies?.map((company: CompanyResponse) => (
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observer.unobserve(observerRef.current);
+      }
+    };
+  }, [hasNextPage, fetchNextPage]);
+
+  return (
+    <div className='flex flex-col gap-8'>
+      <section className='grid grid-cols-1 gap-6 p-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:p-6'>
+        {data?.pages.map((page) =>
+          page.companies.map((company: CompanyResponse) => (
             <Link
               className='w-full'
               href={`/company-details/${company.id}`}
@@ -220,16 +212,17 @@ export function Companies({
             >
               <CompanyCard company={company} />
             </Link>
-          ))}
-        </section>
-      )}
+          ))
+        )}
 
-      <Pagination
-        page={page}
-        totalPages={companiesData?.totalPages ?? 1}
-        onPageChange={onPageChange}
-      />
-    </>
+        <div ref={observerRef} className='h-10' />
+      </section>
+      {(isFetchingNextPage || isLoadingCompanies) && (
+        <div className='text-center w-full mx-auto'>
+          <LoaderCircle className='w-12 h-12 text-blue-500 animate-spin mx-auto' />
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -240,7 +233,7 @@ interface JobsProps {
   onLimitChange: (limit: number) => void;
 }
 
-export function Jobs({ page, limit, onPageChange, onLimitChange }: JobsProps) {
+export function Jobs() {
   const [filters, setFilters] = useState({
     department: "",
     location: "",
@@ -248,15 +241,21 @@ export function Jobs({ page, limit, onPageChange, onLimitChange }: JobsProps) {
   });
 
   const { getAccessToken } = usePrivy();
+  const observerRef = useRef(null);
 
-  const { data: jobsData, isLoading: isLoadingJobs } = useQuery({
-    queryKey: ["jobs", page, limit, filters],
-    queryFn: async () => {
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: isLoadingJobs,
+  } = useInfiniteQuery({
+    queryKey: ["jobs", filters],
+    queryFn: async ({ pageParam = 1 }) => {
       const accessToken = await getAccessToken();
-      // build query string
       const query = new URLSearchParams();
-      query.append("page", String(page));
-      query.append("limit", String(limit));
+      query.append("page", String(pageParam));
+      query.append("limit", "20"); // Changed to match Companies component
       for (const key in filters) {
         if (filters[key as keyof typeof filters]) {
           query.append(key, filters[key as keyof typeof filters]);
@@ -270,13 +269,14 @@ export function Jobs({ page, limit, onPageChange, onLimitChange }: JobsProps) {
           authorization: `Bearer ${accessToken}`,
         },
       });
-      return (await res.json()) as {
-        success: boolean;
-        jobs: JobPosting[];
-        totalJobs: number;
-        totalPages: number;
-      };
+      return res.json();
     },
+    getNextPageParam: (lastPage) => {
+      return lastPage.currentPage < lastPage.totalPages
+        ? lastPage.currentPage + 1
+        : undefined;
+    },
+    initialPageParam: 1,
   });
 
   const { data: jobFilters, isLoading: isLoadingJobFilters } = useQuery({
@@ -298,96 +298,94 @@ export function Jobs({ page, limit, onPageChange, onLimitChange }: JobsProps) {
       };
     },
   });
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observer.unobserve(observerRef.current);
+      }
+    };
+  }, [hasNextPage, fetchNextPage]);
+
   return (
-    <>
-      <div className='flex justify-end items-center gap-4 px-8'>
-        <span>Jobs per page:</span>
-        <select
-          value={limit}
-          onChange={(e) => onLimitChange(Number(e.target.value))}
-          className='border p-1 rounded'
-        >
-          {[10, 20, 50].map((limitOption) => (
-            <option key={limitOption} value={limitOption}>
-              {limitOption}
-            </option>
-          ))}
-        </select>
+    <div className='flex flex-col gap-8'>
+      <div className='flex lg:flex-row flex-col gap-4 justify-between items-start lg:items-center px-8 max-w-3xl'>
+        <div className='flex items-center gap-2'>
+          <label className='min-w-24 lg:min-w-12'>Department:</label>
+          <select
+            value={filters.department}
+            onChange={(e) =>
+              setFilters({ ...filters, department: e.target.value })
+            }
+            className='border p-1 rounded w-40'
+          >
+            <option value=''>All Departments</option>
+            {jobFilters?.departments?.map((department) => (
+              <option key={department} value={department}>
+                {department}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className='flex items-center gap-2'>
+          <label className='min-w-24 lg:min-w-12'>Location:</label>
+          <select
+            value={filters.location}
+            onChange={(e) =>
+              setFilters({ ...filters, location: e.target.value })
+            }
+            className='border p-1 rounded w-40'
+          >
+            <option value=''>All Locations</option>
+            {jobFilters?.locations?.map((location) => (
+              <option key={location} value={location}>
+                {location}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className='flex items-center gap-2'>
+          <label className='min-w-24 lg:min-w-12'>Title:</label>
+          <select
+            value={filters.title}
+            onChange={(e) => setFilters({ ...filters, title: e.target.value })}
+            className='border p-1 rounded w-40'
+          >
+            <option value=''>All Titles</option>
+            {jobFilters?.roleTitles?.map((title) => (
+              <option key={title} value={title}>
+                {title}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      {isLoadingJobs ? (
-        <div className='text-center flex items-center w-full min-h-60'>
+      <section className='flex flex-col gap-6 p-4'>
+        <JobPostingList jobs={data?.pages.flatMap((page) => page.jobs) ?? []} />
+        <div ref={observerRef} className='h-10' />
+      </section>
+      {(isFetchingNextPage || isLoadingJobs) && (
+        <div className='text-center w-full mx-auto'>
           <LoaderCircle className='w-12 h-12 text-blue-500 animate-spin mx-auto' />
         </div>
-      ) : (
-        <div>
-          <div className='flex lg:flex-row flex-col gap-4 justify-between items-start lg:items-center px-8 max-w-3xl'>
-            <div className='flex  items-center gap-2'>
-              <label className='min-w-24 lg:min-w-12'>Department:</label>
-              <select
-                value={filters.department}
-                onChange={(e) =>
-                  setFilters({ ...filters, department: e.target.value })
-                }
-                className='border p-1 rounded w-40'
-              >
-                <option value=''>All Departments</option>
-                {jobFilters?.departments?.map((department) => (
-                  <option key={department} value={department}>
-                    {department}
-                  </option>
-                ))}
-                {/* Add more options */}
-              </select>
-            </div>
-
-            <div className='flex items-center gap-2'>
-              <label className='min-w-24 lg:min-w-12'>Location:</label>
-              <select
-                value={filters.location}
-                onChange={(e) =>
-                  setFilters({ ...filters, location: e.target.value })
-                }
-                className='border p-1 rounded w-40'
-              >
-                <option value=''>All Locations</option>
-                {jobFilters?.locations?.map((location) => (
-                  <option key={location} value={location}>
-                    {location}
-                  </option>
-                ))}
-                {/* Add more options */}
-              </select>
-            </div>
-
-            <div className='flex items-center gap-2'>
-              <label className='min-w-24 lg:min-w-12'>Title:</label>
-              <select
-                value={filters.title}
-                onChange={(e) =>
-                  setFilters({ ...filters, title: e.target.value })
-                }
-                className='border p-1 rounded w-40'
-              >
-                <option value=''>All Titles</option>
-                {jobFilters?.roleTitles?.map((title) => (
-                  <option key={title} value={title}>
-                    {title}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <JobPostingList jobs={jobsData?.jobs ?? []} />
-        </div>
       )}
-
-      <Pagination
-        page={page}
-        totalPages={jobsData?.totalPages ?? 1}
-        onPageChange={onPageChange}
-      />
-    </>
+    </div>
   );
 }
 

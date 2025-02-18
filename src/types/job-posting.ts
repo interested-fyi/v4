@@ -1,8 +1,8 @@
 export default interface JobPosting {
   id?: number;
-  created_at?: Date;
+  created_at?: string; // Changed from Date to string
   company_id?: number;
-  company_name?: string;
+  companies?: { company_name: string }; // Matches the nested structure
   department: string;
   sub_department?: string;
   type?: string;

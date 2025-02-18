@@ -24,12 +24,12 @@ export function JobPostingList({ jobs }: JobPostingListProps) {
             key={job.id}
             className='relative flex flex-col justify-between overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2'
           >
-            <CardContent className='p-6 space-y-4 flex flex-col justify-between'>
+            <CardContent className='p-6 pb-0 space-y-4 flex flex-col justify-between h-full'>
               <div className='flex items-center justify-between'>
                 <div className='flex flex-row gap-3 justify-between items-center w-full'>
                   <Link href={`/company-details/${job.company_id}`}>
                     <div className='text-[#1a56db] text-md font-semibold font-body leading-[21px]'>
-                      {job.company_name}
+                      {job.companies?.company_name}
                     </div>
                   </Link>
                   <Link
@@ -70,8 +70,8 @@ export function JobPostingList({ jobs }: JobPostingListProps) {
                 </div>
               </div>
             </CardContent>
-            {job.job_attestations && job.job_attestations?.length > 0 && (
-              <CardFooter className='flex flex-col gap-3 w-full'>
+            <CardFooter className='flex flex-col gap-3 w-full h-fit'>
+              {job.job_attestations && job.job_attestations?.length > 0 && (
                 <div className='flex flex-row gap-3 px-0 w-full items-center justify-between'>
                   <OnchainBadge
                     attestationUrl={`https://optimism.easscan.org/attestation/view/${job.job_attestations[0]?.attestation_uid}`}
@@ -80,8 +80,18 @@ export function JobPostingList({ jobs }: JobPostingListProps) {
                     {` Verified on ${verifiedDate || ""}`}
                   </div>
                 </div>
-              </CardFooter>
-            )}
+              )}
+              <div className='text-xs font-medium text-muted-foreground self-end pt-2'>
+                {`Posted on: ${new Date(
+                  job.created_at ?? ""
+                ).toLocaleDateString()}`}
+                {new Date().getTime() -
+                  new Date(job.created_at ?? "").getTime() >
+                  60 * 24 * 60 * 60 * 1000 && (
+                  <span className='text-red-500'> (stale)</span>
+                )}
+              </div>
+            </CardFooter>
           </Card>
         );
       })}

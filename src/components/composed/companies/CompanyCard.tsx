@@ -10,7 +10,7 @@ interface CompanyCardProps {
 
 export function CompanyCard({ company }: CompanyCardProps) {
   return (
-    <Card className='relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2'>
+    <Card className='relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2 min-h-full'>
       <Link
         href={`/company-details/${company.id}`}
         className='absolute inset-0 z-10'

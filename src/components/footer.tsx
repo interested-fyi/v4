@@ -46,7 +46,15 @@ export function Footer() {
             </Button>
           </Link>
         </div>
+        <Image
+          src={"/svg/ethereum-badge.svg"}
+          alt={"Ethereum Badge"}
+          width={100}
+          height={100}
+          className='mx-auto mt-4'
+        />
       </div>
+      <div className='md:hidden block min-h-24' />
     </footer>
   );
 }
