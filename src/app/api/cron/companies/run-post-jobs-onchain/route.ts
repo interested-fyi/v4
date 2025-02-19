@@ -33,6 +33,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
   `
       )
       .is("job_attestations", null) // This filters for rows where job_attestations is null
+      .eq("active", true)
       .limit(5);
 
     if (jobPostingsError) {
