@@ -54,6 +54,10 @@ export default function EndorseDialog({
     endorsement: string | null;
   }) => {
     setIsLoading(true);
+    if (privyUser?.id === user.privy_did) {
+      alert("You cannot endorse yourself");
+      return;
+    }
     const accessToken = await getAccessToken();
     if (client && accessToken && form.relationship && form.endorsement) {
       try {
