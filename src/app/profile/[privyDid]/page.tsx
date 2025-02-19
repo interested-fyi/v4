@@ -175,6 +175,8 @@ export default function ProfilePage() {
   };
   const connectedSocials = socialLinks.filter((social) => social.url);
 
+  const isOwnProfile = user?.id === userProfileData?.profile?.privy_did;
+
   return (
     <div className='flex flex-col items-center min-h-screen bg-[#2640eb] text-white p-4 pt-0 px-0 md:p-8'>
       <div className='relative flex md:flex-row flex-col w-full max-w-5xl bg-white overflow-hidden'>
@@ -238,7 +240,9 @@ export default function ProfilePage() {
             </div>
           </div>
           <div className='flex justify-center gap-2 mt-8 max-w-[343px] mx-auto'>
-            <EndorseButton setEndorseDialogOpen={setEndorseDialogOpen} />
+            {!isOwnProfile && (
+              <EndorseButton setEndorseDialogOpen={setEndorseDialogOpen} />
+            )}
             {endorseDialogOpen && userProfileData?.profile && (
               <EndorseDialog
                 isOpen={endorseDialogOpen}
