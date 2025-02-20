@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import StatsBanner, { StatItem } from "@/components/composed/StatsBanner";
 
 export default function Home() {
   const { user, login } = usePrivy();
@@ -66,7 +67,82 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <StatsBanner
+        recentCompanies={[
+          {
+            name: "Coinbase",
+            logo: "/svg/coinbase_brand_logo.svg",
+            url: "https://www.coinbase.com/",
+          },
+          {
+            name: "Optimism",
+            logo: "/svg/op_brand_logo.svg",
+            url: "https://www.optimism.io/",
+          },
+
+          {
+            name: "Consensys",
+            logo: "/svg/consensys_brand_logo.svg",
+            url: "https://consensys.io/",
+          },
+          {
+            name: "Dune Analytics",
+            logo: "/svg/dune_icon.svg",
+            url: "https://dune.com/",
+          },
+          {
+            name: "Aztec",
+            logo: "/svg/aztec_brand_logo.svg",
+            url: "https://aztec.network/",
+          },
+          {
+            name: "Celestia",
+            logo: "/svg/celestia_logo.svg",
+            url: "https://celestia.org/",
+          },
+          {
+            name: "OpenSea",
+            logo: "/svg/opensea_brand_logo.svg",
+            url: "https://opensea.io/",
+          },
+          {
+            name: "Ethereum Foundation",
+            logo: "/svg/ef_brand_logo.svg",
+            url: "https://ethereum.foundation/",
+          },
+          {
+            name: "Privy",
+            logo: "/svg/privy_brand_logo.svg",
+            url: "https://privy.io/",
+          },
+        ]}
+      />
+
       <section className='w-full bg-[#e1effe]'>
+        <div className='flex space-x-4 justify-center'>
+          {/* {[
+            {
+              label: "Jobs Posted Onchain",
+              value: 1202,
+              icon: "Sparkles",
+            },
+            {
+              label: "Users Brought Onchain",
+              value: 302,
+              icon: "Sparkles",
+            },
+          ].map((stat, index) => (
+            <StatItem
+              key={index}
+              label={stat.label}
+              value={stat.value}
+              icon={
+                stat.icon as "Sparkles" | "Users" | "Briefcase" | "Building"
+              }
+            />
+          ))} */}
+        </div>
         <Explore />
         {
           <AuthDialog
