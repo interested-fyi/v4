@@ -17,11 +17,19 @@ export async function GET(req: NextRequest, res: NextResponse) {
     // Get job postings for the specified company ID
     const { data: jobData, error: jobError } = await supabase
       .from("job_postings")
-      .select("*")
+      .select(
+        `
+      *,
+      job_attestations (
+        attestation_uid,
+        attestation_tx_hash,
+        created_at
+      )
+    `
+      )
       .eq("company_id", companyId)
       .eq("active", isActive)
-      .returns<JobPosting[]>();
-
+      .returns<JobPosting>();
     if (jobError) {
       throw new Error(
         `Error fetching job postings for the company: ${jobError}`
