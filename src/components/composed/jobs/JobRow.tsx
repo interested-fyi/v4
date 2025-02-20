@@ -35,9 +35,11 @@ export function JobRow({ index, job }: JobRowProps) {
               <p>{job.sub_department}</p>
             ) : null}
 
-            <OnchainBadge
-              attestationUrl={`https://optimism.easscan.org/attestation/view/${job.job_attestations?.[0].attestation_uid}`}
-            />
+            {job.job_attestations?.[0].attestation_uid && (
+              <OnchainBadge
+                attestationUrl={`https://optimism.easscan.org/attestation/view/${job.job_attestations?.[0].attestation_uid}`}
+              />
+            )}
           </div>
         </Link>
       </TableCell>
