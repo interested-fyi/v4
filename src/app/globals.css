@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .pause {
+    animation-play-state: paused;
+  }
+  .marquee-container:hover .animate-marquee {
+    animation-play-state: paused;
+  }
+}
 @layer base {
   :root {
     --background: 0 0% 100%;

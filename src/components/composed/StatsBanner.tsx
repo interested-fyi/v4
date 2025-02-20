@@ -49,8 +49,12 @@ export const StatItem: React.FC<Stat> = ({ label, value, icon }) => {
 };
 
 const CompanyItem: React.FC<Company> = ({ name, logo, url }) => (
-  <Link href={url} target={"_blank"} className='flex flex-col'>
-    <div className='relative w-full'>
+  <Link
+    href={url}
+    target='_blank'
+    className='flex flex-col items-center group hover:scale-105 transition-transform'
+  >
+    <div className='relative'>
       <div className='absolute -right-1'>
         <Sparkles className='w-4 h-4 text-yellow-300' />
       </div>
@@ -66,23 +70,27 @@ const CompanyItem: React.FC<Company> = ({ name, logo, url }) => (
 );
 
 const StatsBanner: React.FC<StatsBannerProps> = ({ recentCompanies }) => {
-  const totalItems = recentCompanies.length;
-
   return (
-    <div className='w-full relative overflow-hidden shadow-lg bg-blue-700 py-2'>
-      <div
-        className={`flex items-center gap-8 space-x-4 animate-rtl`}
-        style={{
-          animationDuration: `${totalItems * 2}s`,
-        }}
-      >
-        {recentCompanies.map((company, index) => (
-          <CompanyItem key={`company-1-${index}`} {...company} />
-        ))}
+    <div className='relative w-full overflow-hidden bg-blue-700 py-2'>
+      {/* Added marquee-container class for hover control */}
+      <div className='inline-flex w-full marquee-container'>
+        <div className='flex animate-marquee gap-12 whitespace-nowrap'>
+          {recentCompanies.map((company, index) => (
+            <CompanyItem key={`company-1-${index}`} {...company} />
+          ))}
+          {recentCompanies.map((company, index) => (
+            <CompanyItem key={`company-2-${index}`} {...company} />
+          ))}
+        </div>
 
-        {recentCompanies.map((company, index) => (
-          <CompanyItem key={`company-2-${index}`} {...company} />
-        ))}
+        <div className='flex animate-marquee whitespace-nowrap'>
+          {recentCompanies.map((company, index) => (
+            <CompanyItem key={`company-3-${index}`} {...company} />
+          ))}
+          {recentCompanies.map((company, index) => (
+            <CompanyItem key={`company-4-${index}`} {...company} />
+          ))}
+        </div>
       </div>
     </div>
   );
