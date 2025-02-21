@@ -87,6 +87,11 @@ export default function Home() {
             url: "/company-details/98",
           },
           {
+            name: "Unichain",
+            logo: "/svg/unichain_brand_logo.svg",
+            url: "/company-details/61",
+          },
+          {
             name: "Dune Analytics",
             logo: "/svg/dune_icon.svg",
             url: "/company-details/68",
@@ -110,6 +115,11 @@ export default function Home() {
             name: "Ethereum Foundation",
             logo: "/svg/ef_brand_logo.svg",
             url: "/company-details/11",
+          },
+          {
+            name: "Base",
+            logo: "/svg/base_brand_logo.svg",
+            url: "/company-details/85",
           },
           {
             name: "Privy",
