@@ -73,48 +73,48 @@ export default function Home() {
           {
             name: "Coinbase",
             logo: "/svg/coinbase_brand_logo.svg",
-            url: "https://www.coinbase.com/",
+            url: "/company-details/86",
           },
           {
             name: "Optimism",
             logo: "/svg/op_brand_logo.svg",
-            url: "https://www.optimism.io/",
+            url: "/company-details/59",
           },
 
           {
             name: "Consensys",
             logo: "/svg/consensys_brand_logo.svg",
-            url: "https://consensys.io/",
+            url: "/company-details/98",
           },
           {
             name: "Dune Analytics",
             logo: "/svg/dune_icon.svg",
-            url: "https://dune.com/",
+            url: "/company-details/68",
           },
           {
             name: "Aztec",
             logo: "/svg/aztec_brand_logo.svg",
-            url: "https://aztec.network/",
+            url: "/company-details/54",
           },
           {
             name: "Celestia",
             logo: "/svg/celestia_logo.svg",
-            url: "https://celestia.org/",
+            url: "/company-details/9",
           },
           {
             name: "OpenSea",
             logo: "/svg/opensea_brand_logo.svg",
-            url: "https://opensea.io/",
+            url: "/company-details/62",
           },
           {
             name: "Ethereum Foundation",
             logo: "/svg/ef_brand_logo.svg",
-            url: "https://ethereum.foundation/",
+            url: "/company-details/11",
           },
           {
             name: "Privy",
             logo: "/svg/privy_brand_logo.svg",
-            url: "https://privy.io/",
+            url: "/company-details/65",
           },
         ]}
       />
