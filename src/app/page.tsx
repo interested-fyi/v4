@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import StatsBanner, { StatItem } from "@/components/composed/StatsBanner";
+import StatsBanner from "@/components/composed/StatsBanner";
 
 export default function Home() {
   const { user, login } = usePrivy();
@@ -130,29 +130,6 @@ export default function Home() {
       />
 
       <section className='w-full bg-[#e1effe]'>
-        <div className='flex space-x-4 justify-center'>
-          {/* {[
-            {
-              label: "Jobs Posted Onchain",
-              value: 1202,
-              icon: "Sparkles",
-            },
-            {
-              label: "Users Brought Onchain",
-              value: 302,
-              icon: "Sparkles",
-            },
-          ].map((stat, index) => (
-            <StatItem
-              key={index}
-              label={stat.label}
-              value={stat.value}
-              icon={
-                stat.icon as "Sparkles" | "Users" | "Briefcase" | "Building"
-              }
-            />
-          ))} */}
-        </div>
         <Explore />
         {
           <AuthDialog

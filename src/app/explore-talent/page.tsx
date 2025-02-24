@@ -73,7 +73,8 @@ export default function ExploreTalentPage() {
   return (
     <div className='flex flex-col gap-0'>
       <PageHeader />
-      <div className='flex flex-col lg:px-16 sm:px-32 md:px-20 xl:px-32 bg-[#e1effe]'>
+      <div className='flex pt-8 flex-col lg:px-16 sm:px-32 md:px-20 xl:px-32 bg-[#e1effe]'>
+        <StatItem type={StatType.Users} />
         <div className='flex justify-between items-center mb-4'>
           <TalentSortFilter
             onFilterChange={setFilter}
@@ -121,6 +122,7 @@ function PageHeader() {
 import { Button } from "@/components/ui/button";
 import { ArrowDownIcon, ArrowUpIcon, SlidersHorizontal } from "lucide-react";
 import { JobSelect } from "@/components/composed/inputs/JobSelect";
+import { StatItem, StatType } from "@/components/composed/StatsBanner";
 
 interface TalentSortFilterProps {
   filter: string;

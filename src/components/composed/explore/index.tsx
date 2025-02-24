@@ -9,6 +9,7 @@ import { JobPostingList } from "@/components/JobPostingList";
 import { CompanyResponse } from "@/app/api/companies/get-approved-companies/route";
 import { LoaderCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { StatItem, StatType } from "../StatsBanner";
 
 export default function Explore() {
   const searchParams = useSearchParams();
@@ -29,7 +30,7 @@ export default function Explore() {
     params.set("view", activeButton);
 
     // Replace current URL with new params
-    router.replace(`/?${params.toString()}`);
+    window.history.pushState({}, "", `${window.location.pathname}?${params}`);
   }, [page, limit, activeButton, router]);
 
   const handleButtonClick = (button: string) => {
@@ -59,7 +60,11 @@ export default function Explore() {
           />
         </div>
       </div>
-
+      {activeButton === "companies" ? (
+        <StatItem type={StatType.Companies} />
+      ) : (
+        <StatItem type={StatType.Jobs} />
+      )}
       {activeButton === "companies" ? <Companies /> : <Jobs />}
     </>
   );
@@ -218,7 +223,7 @@ export function Companies() {
         <div ref={observerRef} className='h-10' />
       </section>
       {(isFetchingNextPage || isLoadingCompanies) && (
-        <div className='text-center w-full mx-auto'>
+        <div className='text-center w-full mx-auto min-h-96'>
           <LoaderCircle className='w-12 h-12 text-blue-500 animate-spin mx-auto' />
         </div>
       )}
@@ -381,7 +386,7 @@ export function Jobs() {
         <div ref={observerRef} className='h-10' />
       </section>
       {(isFetchingNextPage || isLoadingJobs) && (
-        <div className='text-center w-full mx-auto'>
+        <div className='text-center w-full mx-auto min-h-96'>
           <LoaderCircle className='w-12 h-12 text-blue-500 animate-spin mx-auto' />
         </div>
       )}

@@ -1,16 +1,18 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
 import { Users, Briefcase, Building, Sparkles } from "lucide-react";
 import Image from "next/image";
 
 import Link from "next/link";
-
+import { useQuery } from "@tanstack/react-query";
+export enum StatType {
+  Companies = "companies",
+  Jobs = "jobs",
+  Users = "users",
+}
 interface Stat {
-  label: string;
-  value: string | number;
-  icon: keyof typeof iconComponents;
+  type: StatType;
 }
 
 interface Company {
@@ -24,14 +26,44 @@ interface StatsBannerProps {
 }
 
 export const iconComponents = {
-  Users,
-  Briefcase,
-  Building,
-  Sparkles,
+  [StatType.Users]: Users,
+  [StatType.Jobs]: Briefcase,
+  [StatType.Companies]: Building,
 };
 
-export const StatItem: React.FC<Stat> = ({ label, value, icon }) => {
-  const IconComponent = iconComponents[icon];
+export const StatItem: React.FC<Stat> = ({ type }) => {
+  const IconComponent = iconComponents[type];
+  const { data, error } = useQuery({
+    queryKey: ["stats", "companies", type],
+    queryFn: async () => {
+      const res = await fetch(`/api/data/stats?type=${type}`, {
+        method: "GET",
+        cache: "no-store",
+      });
+      return await res.json();
+    },
+  });
+
+  if (error) {
+    return (
+      <div className='flex flex-col items-center px-8 py-4 stat-item relative'>
+        <div className='relative mb-2'>
+          <div className='absolute inset-0 bg-white/10 rounded-full' />
+          <IconComponent className='w-8 h-8 text-blue-700 relative z-10' />
+        </div>
+        <span className='text-4xl font-mono font-bold mb-1 text-blue-700'>
+          Error
+        </span>
+        <span className='text-sm uppercase tracking-wider text-center text-blue-700/80 font-mono'>
+          {error.message}
+        </span>
+      </div>
+    );
+  }
+  if (!data) {
+    return null;
+  }
+
   return (
     <div className='flex flex-col items-center px-8 py-4 stat-item relative'>
       <div className='relative mb-2'>
@@ -39,10 +71,10 @@ export const StatItem: React.FC<Stat> = ({ label, value, icon }) => {
         <IconComponent className='w-8 h-8 text-blue-700 relative z-10' />
       </div>
       <span className='text-4xl font-mono font-bold mb-1 text-blue-700'>
-        {value}
+        {data.value}
       </span>
       <span className='text-sm uppercase tracking-wider text-center text-blue-700/80 font-mono'>
-        {label}
+        {data.label}
       </span>
     </div>
   );
