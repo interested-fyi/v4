@@ -56,7 +56,8 @@ export async function GET(req: NextRequest) {
       case "users":
         const { data: users, error: usersError } = await supabase
           .from("users")
-          .select("id", { count: "exact" });
+          .select("id", { count: "exact" })
+          .eq("fid", null);
 
         if (usersError) {
           console.error("Users query error:", usersError);
