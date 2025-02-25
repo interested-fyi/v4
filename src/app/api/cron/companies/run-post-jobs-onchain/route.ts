@@ -25,16 +25,17 @@ export async function GET(req: NextRequest, res: NextResponse) {
       .from("job_details_last_scraping")
       .select(
         `
-    id,
-    company_id,
-    job_attestations!left (
-      attestation_uid
-    )
-  `
+        id,
+        company_id,
+        job_attestations!left (
+          attestation_uid
+          )
+          `
       )
       .is("job_attestations", null) // This filters for rows where job_attestations is null
       .eq("active", true)
-      .limit(5);
+      .limit(10);
+    console.log("🚀 ~ GET ~ jobPostings:", jobPostings);
 
     if (jobPostingsError) {
       console.error("Error fetching job postings:", jobPostingsError);
@@ -48,6 +49,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
     // Extract job posting IDs for further querying
     const jobPostingIds = jobPostings.map((row) => row.id);
+    console.log("🚀 ~ GET ~ jobPostingIds:", jobPostingIds);
 
     // Fetch job details for the filtered job postings
     const { data: jobPostingsDetails, error: detailsError } = await supabase
@@ -72,6 +74,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         `
       )
       .in("job_posting_id", jobPostingIds);
+    console.log("🚀 ~ GET ~ jobPostingsDetails:", jobPostingsDetails);
 
     if (detailsError) {
       console.error("Error fetching job postings details:", detailsError);
