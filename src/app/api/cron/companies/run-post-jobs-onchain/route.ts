@@ -33,8 +33,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
           `
       )
       .is("job_attestations", null) // This filters for rows where job_attestations is null
-      .eq("active", true)
-      .limit(10);
+      .eq("active", true);
+
     console.log("🚀 ~ GET ~ jobPostings:", jobPostings);
 
     if (jobPostingsError) {
@@ -73,7 +73,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
         )
         `
       )
-      .in("job_posting_id", jobPostingIds);
+      .in("job_posting_id", jobPostingIds)
+      .limit(5);
     console.log("🚀 ~ GET ~ jobPostingsDetails:", jobPostingsDetails);
 
     if (detailsError) {
