@@ -63,7 +63,7 @@
     "jsonwebtoken": "^9.0.2",
     "ldrs": "^1.0.2",
     "lucide-react": "^0.400.0",
-    "next": "14.2.4",
+    "next": "14.2.35",
     "openai": "^4.77.0",
     "posthog-js": "^1.203.1",
     "puppeteer": "^22.15.0",
