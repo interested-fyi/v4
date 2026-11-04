@@ -33,36 +33,28 @@ export const iconComponents = {
 
 export const StatItem: React.FC<Stat> = ({ type }) => {
   const IconComponent = iconComponents[type];
-  const { data, error } = useQuery({
+  const { data } = useQuery({
     queryKey: ["stats", "companies", type],
     queryFn: async () => {
-      const res = await fetch(`/api/data/stats?type=${type}`, {
-        method: "GET",
-        cache: "no-store",
-      });
-      return await res.json();
+      const fallback = { value: 0, label: {
+        [StatType.Companies]: "Companies",
+        [StatType.Jobs]: "Job Attestations",
+        [StatType.Users]: "Users Brought Onchain",
+      }[type] };
+      try {
+        const res = await fetch(`/api/data/stats?type=${type}`, {
+          method: "GET",
+          cache: "no-store",
+        });
+        if (!res.ok) throw new Error(`Stats request failed: ${res.status}`);
+        const result = await res.json();
+        return { value: result.value ?? 0, label: result.label ?? fallback.label };
+      } catch (error) {
+        console.error("Failed to load stats:", error);
+        return fallback;
+      }
     },
   });
-
-  if (error) {
-    return (
-      <div className='flex flex-col items-center px-8 py-4 stat-item relative'>
-        <div className='relative mb-2'>
-          <div className='absolute inset-0 bg-white/10 rounded-full' />
-          <IconComponent className='w-8 h-8 text-blue-700 relative z-10' />
-        </div>
-        <span className='text-4xl font-mono font-bold mb-1 text-blue-700'>
-          Error
-        </span>
-        <span className='text-sm uppercase tracking-wider text-center text-blue-700/80 font-mono'>
-          {error.message}
-        </span>
-      </div>
-    );
-  }
-  if (!data) {
-    return null;
-  }
 
   return (
     <div className='flex flex-col items-center px-8 py-4 stat-item relative'>
@@ -71,10 +63,10 @@ export const StatItem: React.FC<Stat> = ({ type }) => {
         <IconComponent className='w-8 h-8 text-blue-700 relative z-10' />
       </div>
       <span className='text-4xl font-mono font-bold mb-1 text-blue-700'>
-        {data.value}
+        {data?.value ?? 0}
       </span>
       <span className='text-sm uppercase tracking-wider text-center text-blue-700/80 font-mono'>
-        {data.label}
+        {data?.label ?? type}
       </span>
     </div>
   );
@@ -107,19 +99,19 @@ const StatsBanner: React.FC<StatsBannerProps> = ({ recentCompanies }) => {
       {/* Added marquee-container class for hover control */}
       <div className='inline-flex w-full marquee-container'>
         <div className='flex animate-marquee gap-12 whitespace-nowrap'>
-          {recentCompanies.map((company, index) => (
+          {(recentCompanies ?? []).map((company, index) => (
             <CompanyItem key={`company-1-${index}`} {...company} />
           ))}
-          {recentCompanies.map((company, index) => (
+          {(recentCompanies ?? []).map((company, index) => (
             <CompanyItem key={`company-2-${index}`} {...company} />
           ))}
         </div>
 
         <div className='flex animate-marquee whitespace-nowrap'>
-          {recentCompanies.map((company, index) => (
+          {(recentCompanies ?? []).map((company, index) => (
             <CompanyItem key={`company-3-${index}`} {...company} />
           ))}
-          {recentCompanies.map((company, index) => (
+          {(recentCompanies ?? []).map((company, index) => (
             <CompanyItem key={`company-4-${index}`} {...company} />
           ))}
         </div>

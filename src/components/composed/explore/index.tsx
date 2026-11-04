@@ -161,18 +161,24 @@ export function Companies() {
   } = useInfiniteQuery({
     queryKey: ["companies"],
     queryFn: async ({ pageParam = 1 }) => {
-      const accessToken = await getAccessToken();
-      const res = await fetch(
-        `/api/companies/get-approved-companies?page=${pageParam}&limit=20`,
-        {
-          method: "GET",
-          headers: {
-            "Content-type": "application/json",
-            authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-      return res.json();
+      try {
+        const accessToken = await getAccessToken();
+        const res = await fetch(
+          `/api/companies/get-approved-companies?page=${pageParam}&limit=20`,
+          {
+            method: "GET",
+            headers: {
+              "Content-type": "application/json",
+              authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+        return await res.json();
+      } catch (error) {
+        console.error("Failed to load homepage data:", error);
+        return { companies: [], currentPage: pageParam, totalPages: 0 };
+      }
     },
     getNextPageParam: (lastPage) => {
       return lastPage.currentPage < lastPage.totalPages
@@ -208,8 +214,8 @@ export function Companies() {
   return (
     <div className='flex flex-col gap-8'>
       <section className='grid grid-cols-1 gap-6 p-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:p-6'>
-        {data?.pages.map((page) =>
-          page.companies.map((company: CompanyResponse) => (
+        {(data?.pages ?? []).map((page) =>
+          (page.companies ?? []).map((company: CompanyResponse) => (
             <Link
               className='w-full'
               href={`/company-details/${company.id}`}
@@ -257,24 +263,30 @@ export function Jobs() {
   } = useInfiniteQuery({
     queryKey: ["jobs", filters],
     queryFn: async ({ pageParam = 1 }) => {
-      const accessToken = await getAccessToken();
-      const query = new URLSearchParams();
-      query.append("page", String(pageParam));
-      query.append("limit", "20"); // Changed to match Companies component
-      for (const key in filters) {
-        if (filters[key as keyof typeof filters]) {
-          query.append(key, filters[key as keyof typeof filters]);
+      try {
+        const accessToken = await getAccessToken();
+        const query = new URLSearchParams();
+        query.append("page", String(pageParam));
+        query.append("limit", "20"); // Changed to match Companies component
+        for (const key in filters) {
+          if (filters[key as keyof typeof filters]) {
+            query.append(key, filters[key as keyof typeof filters]);
+          }
         }
-      }
 
-      const res = await fetch(`/api/jobs/get-all-jobs?${query.toString()}`, {
-        method: "GET",
-        headers: {
-          "Content-type": "application/json",
-          authorization: `Bearer ${accessToken}`,
-        },
-      });
-      return res.json();
+        const res = await fetch(`/api/jobs/get-all-jobs?${query.toString()}`, {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json",
+            authorization: `Bearer ${accessToken}`,
+          },
+        });
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+        return await res.json();
+      } catch (error) {
+        console.error("Failed to load homepage data:", error);
+        return { jobs: [], currentPage: pageParam, totalPages: 0 };
+      }
     },
     getNextPageParam: (lastPage) => {
       return lastPage.currentPage < lastPage.totalPages
@@ -287,20 +299,26 @@ export function Jobs() {
   const { data: jobFilters, isLoading: isLoadingJobFilters } = useQuery({
     queryKey: ["job-filters"],
     queryFn: async () => {
-      const accessToken = await getAccessToken();
-      const res = await fetch(`/api/jobs/get-job-filters`, {
-        method: "GET",
-        headers: {
-          "Content-type": "application/json",
-          authorization: `Bearer ${accessToken}`,
-        },
-      });
-      return (await res.json()) as {
-        success: boolean;
-        departments: string[];
-        locations: string[];
-        roleTitles: string[];
-      };
+      try {
+        const accessToken = await getAccessToken();
+        const res = await fetch(`/api/jobs/get-job-filters`, {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json",
+            authorization: `Bearer ${accessToken}`,
+          },
+        });
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+        return (await res.json()) as {
+          success: boolean;
+          departments: string[];
+          locations: string[];
+          roleTitles: string[];
+        };
+      } catch (error) {
+        console.error("Failed to load homepage data:", error);
+        return { success: false, departments: [], locations: [], roleTitles: [] };
+      }
     },
   });
 
@@ -338,7 +356,7 @@ export function Jobs() {
             className='border p-1 rounded w-40'
           >
             <option value=''>All Departments</option>
-            {jobFilters?.departments?.map((department) => (
+            {(jobFilters?.departments ?? []).map((department) => (
               <option key={department} value={department}>
                 {department}
               </option>
@@ -356,7 +374,7 @@ export function Jobs() {
             className='border p-1 rounded w-40'
           >
             <option value=''>All Locations</option>
-            {jobFilters?.locations?.map((location) => (
+            {(jobFilters?.locations ?? []).map((location) => (
               <option key={location} value={location}>
                 {location}
               </option>
@@ -372,7 +390,7 @@ export function Jobs() {
             className='border p-1 rounded w-40'
           >
             <option value=''>All Titles</option>
-            {jobFilters?.roleTitles?.map((title) => (
+            {(jobFilters?.roleTitles ?? []).map((title) => (
               <option key={title} value={title}>
                 {title}
               </option>
@@ -382,7 +400,7 @@ export function Jobs() {
       </div>
 
       <section className='flex flex-col gap-6 p-4'>
-        <JobPostingList jobs={data?.pages.flatMap((page) => page.jobs) ?? []} />
+        <JobPostingList jobs={(data?.pages ?? []).flatMap((page) => page.jobs ?? [])} />
         <div ref={observerRef} className='h-10' />
       </section>
       {(isFetchingNextPage || isLoadingJobs) && (
