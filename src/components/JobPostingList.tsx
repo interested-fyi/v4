@@ -13,7 +13,7 @@ interface JobPostingListProps {
 export function JobPostingList({ jobs }: JobPostingListProps) {
   return (
     <section className='grid grid-cols-1 gap-6 p-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:p-6'>
-      {jobs.map((job) => {
+      {(jobs ?? []).map((job) => {
         const verifiedDate = job.job_attestations
           ? new Date(
               job.job_attestations[0]?.created_at || ""
